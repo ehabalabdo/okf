@@ -179,7 +179,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
         </header>
 
         {/* Content Body */}
-        <div className={`flex-1 overflow-auto min-h-0 relative ${hideTitle ? 'p-2 md:p-3 pb-20 md:pb-3' : 'p-4 md:p-8 pb-24 md:pb-8'}`}>
+        <div className={`flex-1 min-h-0 relative ${hideTitle ? 'overflow-hidden p-0' : 'overflow-auto p-4 md:p-8 pb-24 md:pb-8'}`}>
            {!hideTitle && (
              <div className="max-w-7xl mx-auto mb-6 md:mb-8 animate-fade-in-down px-2">
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight">{title}</h2>

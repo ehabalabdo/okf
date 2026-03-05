@@ -572,7 +572,7 @@ const DoctorView: React.FC = () => {
           </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-80px)] gap-4 overflow-visible lg:overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-auto lg:h-full gap-4 overflow-visible lg:overflow-hidden">
         
         {/* --- SIDEBAR --- */}
         <div className={`w-full lg:w-64 xl:w-72 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
