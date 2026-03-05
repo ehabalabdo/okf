@@ -577,8 +577,8 @@ const DoctorView: React.FC = () => {
         {/* --- SIDEBAR --- */}
         <div className={`w-full lg:w-52 xl:w-60 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
             <div className="flex-1 min-h-[300px] lg:min-h-0 bg-white rounded-3xl shadow-soft border border-slate-100 flex flex-col overflow-hidden">
-                <div className="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                    <h2 className="font-bold text-slate-800 text-sm">{t('waiting_room')}</h2>
+                <div className="px-3 py-2 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                    <h2 className="font-bold text-slate-800 text-xs">{t('waiting_room')}</h2>
                     <div className="flex items-center gap-2">
                       {waitingList.filter(p => p.currentVisit.status === 'waiting').length > 0 && (
                         <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">
@@ -594,7 +594,7 @@ const DoctorView: React.FC = () => {
                       <span className="bg-slate-900 text-white text-xs px-2 py-1 rounded-lg font-bold">{waitingList.length}</span>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
                     {waitingList.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center opacity-30 py-10"><i className="fa-solid fa-mug-hot text-3xl mb-2"></i><p className="text-[10px] font-bold">{t('no_active_patients')}</p></div>
                     ) : (
@@ -604,7 +604,7 @@ const DoctorView: React.FC = () => {
                             const isSelected = selectedPatient?.id === p.id;
                             
                             // Dynamic Styling for Queue Items
-                            let cardClass = "w-full text-left p-4 rounded-2xl border transition-all relative group overflow-hidden shadow-sm ";
+                            let cardClass = "w-full text-left p-2.5 rounded-xl border transition-all relative group overflow-hidden shadow-sm ";
                             
                             if (isSelected) {
                                 cardClass += "bg-slate-800 text-white border-slate-900 shadow-xl scale-[1.02] z-10 ";
@@ -619,8 +619,8 @@ const DoctorView: React.FC = () => {
 
                             return (
                                 <button key={p.id} onClick={() => handleSelectPatient(p)} className={cardClass}>
-                                    {isUrgent && <div className="absolute top-2 right-2 text-xs font-bold bg-red-500 text-white px-2 py-0.5 rounded animate-pulse">URGENT</div>}
-                                    <div className={`font-bold text-sm mb-1 truncate pr-6 ${isSelected ? 'text-white' : 'text-slate-800'}`}>{p.name}</div>
+                                    {isUrgent && <div className="absolute top-1.5 right-1.5 text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded animate-pulse">URGENT</div>}
+                                    <div className={`font-bold text-xs mb-0.5 truncate pr-14 ${isSelected ? 'text-white' : 'text-slate-800'}`}>{p.name}</div>
                                     <div className="flex justify-between items-center text-[10px]">
                                         <span className={`font-medium italic ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>{p.currentVisit.reasonForVisit}</span>
                                         <div className={`px-2 py-0.5 rounded-full font-bold uppercase flex items-center gap-1 ${
