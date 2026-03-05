@@ -11,7 +11,7 @@ import DeviceResultsTimeline from '../components/DeviceResultsTimeline';
 import { fmtDate } from '../utils/formatters';
 
 // ===================== SOAP TAB TYPES =====================
-type SoapTab = 'chief' | 'history' | 'exam' | 'assessment' | 'plan' | 'billing' | 'devices';
+type SoapTab = 'chief' | 'history' | 'exam' | 'assessment' | 'plan' | 'billing' | 'devices' | 'ent-forms';
 
 const DoctorView: React.FC = () => {
   const { user } = useAuth();
@@ -88,6 +88,13 @@ const DoctorView: React.FC = () => {
   
   // Track previous count for doctor notifications
   const prevWaitingCountRef = useRef(0);
+
+  // ENT Forms State
+  const [entForms, setEntForms] = useState<any>(null);
+  const [entLoading, setEntLoading] = useState(false);
+  const [entExpanded, setEntExpanded] = useState<string | null>(null);
+  const [entDetail, setEntDetail] = useState<any>(null);
+  const [entDetailLoading, setEntDetailLoading] = useState(false);
   const selectedPatientRef = useRef<Patient | null>(null);
   const rxDropdownRef = useRef<HTMLDivElement>(null);
   
@@ -241,8 +248,23 @@ const DoctorView: React.FC = () => {
         
         setActiveTab('chief');
         if (window.innerWidth < 1024) setMobileTab('emr');
+        // Reset ENT forms when patient changes
+        setEntForms(null);
+        setEntExpanded(null);
+        setEntDetail(null);
     }
   }, [selectedPatient?.id]); // Only re-run when a different patient is selected
+
+  // Load ENT forms when ENT tab is active
+  useEffect(() => {
+    if (activeTab === 'ent-forms' && selectedPatient && !entForms && !entLoading) {
+      setEntLoading(true);
+      api.get(`/ent-forms/patient/${selectedPatient.id}/all`)
+        .then((data: any) => setEntForms(data))
+        .catch(() => setEntForms(null))
+        .finally(() => setEntLoading(false));
+    }
+  }, [activeTab, selectedPatient?.id]);
 
   const handleSaveVisit = async (status: VisitData['status']) => {
     if (!selectedPatient || !user) return;
@@ -519,6 +541,14 @@ const DoctorView: React.FC = () => {
   );
 
   // ===================== TAB CONFIG =====================
+  // ENT Detail Field helper
+  const EntField = ({ label, value, span2 }: { label: string, value: any, span2?: boolean }) => (
+    <div className={span2 ? 'md:col-span-2' : ''}>
+      <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">{label}</div>
+      <div className="text-sm text-slate-700 bg-slate-50 rounded-lg p-2 border border-slate-100">{value || '—'}</div>
+    </div>
+  );
+
   const tabs: { key: SoapTab; label: string; icon: string; color: string }[] = [
     { key: 'chief', label: 'Chief Complaint', icon: 'fa-comment-medical', color: 'bg-slate-800' },
     { key: 'history', label: 'History', icon: 'fa-clock-rotate-left', color: 'bg-indigo-600' },
@@ -527,6 +557,7 @@ const DoctorView: React.FC = () => {
     { key: 'plan', label: 'Plan & Orders', icon: 'fa-clipboard-list', color: 'bg-blue-600' },
     { key: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
     { key: 'devices', label: 'Devices', icon: 'fa-microchip', color: 'bg-violet-600' },
+    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-teal-600' },
   ];
 
   return (
@@ -1143,6 +1174,159 @@ const DoctorView: React.FC = () => {
                         <div className="bg-violet-50/30 rounded-xl border border-violet-100 p-4">
                             <DeviceResultsTimeline patientId={selectedPatient.id} />
                         </div>
+                      </div>
+                    )}
+
+                    {/* ============ TAB 8: ENT FORMS ============ */}
+                    {activeTab === 'ent-forms' && (
+                      <div className="space-y-5 animate-fadeIn" dir="rtl">
+                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                          <i className="fa-solid fa-stethoscope text-teal-500"></i> نماذج الأنف والأذن والحنجرة
+                        </h3>
+                        {entLoading ? (
+                          <div className="flex items-center justify-center py-16">
+                            <i className="fa-solid fa-spinner fa-spin text-3xl text-teal-500"></i>
+                          </div>
+                        ) : !entForms ? (
+                          <div className="text-center text-slate-400 py-16">
+                            <i className="fa-solid fa-folder-open text-4xl mb-3"></i>
+                            <p>لا توجد نماذج محفوظة لهذا المريض</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-5">
+                            {/* Category Cards */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                              {[
+                                { key: 'newPatientForms', label: 'استبيان جديد', icon: 'fa-file-medical', bg: 'bg-blue-50 border-blue-200 hover:bg-blue-100', txt: 'text-blue-600', activeBg: 'bg-blue-100 border-blue-400 ring-2 ring-blue-300' },
+                                { key: 'followUpForms', label: 'متابعة', icon: 'fa-file-lines', bg: 'bg-green-50 border-green-200 hover:bg-green-100', txt: 'text-green-600', activeBg: 'bg-green-100 border-green-400 ring-2 ring-green-300' },
+                                { key: 'audiograms', label: 'فحص سمع', icon: 'fa-ear-listen', bg: 'bg-purple-50 border-purple-200 hover:bg-purple-100', txt: 'text-purple-600', activeBg: 'bg-purple-100 border-purple-400 ring-2 ring-purple-300' },
+                                { key: 'balanceAssessments', label: 'فحص توازن', icon: 'fa-person-walking', bg: 'bg-amber-50 border-amber-200 hover:bg-amber-100', txt: 'text-amber-600', activeBg: 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' },
+                                { key: 'referrals', label: 'تحويل طبي', icon: 'fa-share-from-square', bg: 'bg-rose-50 border-rose-200 hover:bg-rose-100', txt: 'text-rose-600', activeBg: 'bg-rose-100 border-rose-400 ring-2 ring-rose-300' },
+                              ].map(cat => {
+                                const count = entForms[cat.key]?.length || 0;
+                                return (
+                                  <button key={cat.key} onClick={() => { setEntExpanded(entExpanded === cat.key ? null : cat.key); setEntDetail(null); }}
+                                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all text-center ${entExpanded === cat.key ? cat.activeBg : cat.bg}`}>
+                                    <i className={`fa-solid ${cat.icon} text-xl ${cat.txt}`}></i>
+                                    <span className="text-[10px] font-bold leading-tight">{cat.label}</span>
+                                    <span className={`text-lg font-black ${cat.txt}`}>{count}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {/* Records List */}
+                            {entExpanded && entForms[entExpanded] && entForms[entExpanded].length > 0 && (
+                              <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
+                                <h4 className="font-bold text-slate-700 mb-3 text-sm">السجلات ({entForms[entExpanded].length})</h4>
+                                <div className="space-y-2 max-h-48 overflow-y-auto">
+                                  {entForms[entExpanded].map((form: any, idx: number) => {
+                                    const formType = entExpanded === 'newPatientForms' ? 'new-patient'
+                                      : entExpanded === 'followUpForms' ? 'follow-up'
+                                      : entExpanded === 'audiograms' ? 'audiogram'
+                                      : entExpanded === 'balanceAssessments' ? 'balance-assessment' : 'referral';
+                                    const summary = form.chief_complaint || form.follow_up_reason || form.hearing_level || form.vestibular_function || form.referred_to_specialty || '—';
+                                    return (
+                                      <button key={form.id} onClick={async () => {
+                                        setEntDetailLoading(true);
+                                        try {
+                                          const data = await api.get(`/ent-forms/${formType}/${selectedPatient.id}`);
+                                          const found = (data as any[]).find((d: any) => d.id === form.id);
+                                          setEntDetail({ type: formType, data: found || form });
+                                        } catch { setEntDetail({ type: formType, data: form }); }
+                                        setEntDetailLoading(false);
+                                      }}
+                                        className={`w-full text-right p-3 rounded-xl border transition-all flex justify-between items-center gap-2 ${
+                                          entDetail?.data?.id === form.id ? 'bg-white border-teal-400 shadow-md' : 'bg-white border-slate-100 hover:border-teal-300'
+                                        }`}>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs font-bold text-slate-600">#{idx + 1}</span>
+                                          <span className="text-[10px] text-slate-400">{new Date(form.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                        </div>
+                                        <span className="text-[11px] text-slate-500 truncate max-w-[150px]">{summary}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {entExpanded && entForms[entExpanded]?.length === 0 && (
+                              <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 text-center text-slate-400 text-sm">
+                                <i className="fa-solid fa-inbox text-2xl mb-2"></i>
+                                <p>لا توجد سجلات</p>
+                              </div>
+                            )}
+
+                            {/* Detail View */}
+                            {entDetailLoading && (
+                              <div className="flex items-center justify-center py-8">
+                                <i className="fa-solid fa-spinner fa-spin text-xl text-teal-500"></i>
+                              </div>
+                            )}
+                            {entDetail && !entDetailLoading && (
+                              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="font-bold text-slate-800 flex items-center gap-2">
+                                    <i className="fa-solid fa-file-medical text-teal-500"></i> تفاصيل النموذج
+                                  </h4>
+                                  <span className="text-[10px] text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                  {entDetail.type === 'new-patient' && <>
+                                    <EntField label="الشكوى الرئيسية" value={entDetail.data.chief_complaint} />
+                                    <EntField label="مدة الأعراض" value={entDetail.data.symptom_duration} />
+                                    <EntField label="جهة الأعراض" value={{right:'يمين',left:'يسار',both:'كلاهما',none:'غير محدد'}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
+                                    <EntField label="علاج سابق" value={entDetail.data.previous_ent_treatment ? `نعم — ${entDetail.data.previous_ent_details}` : 'لا'} />
+                                    <EntField label="عمليات سابقة" value={entDetail.data.previous_ent_surgery ? `نعم — ${entDetail.data.previous_ent_surgery_details}` : 'لا'} />
+                                    {entDetail.data.symptoms && typeof entDetail.data.symptoms === 'object' && (
+                                      <div className="md:col-span-2">
+                                        <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">الأعراض</div>
+                                        <div className="flex flex-wrap gap-1">
+                                          {Object.entries(entDetail.data.symptoms).filter(([,v]) => v === true).map(([k]) => (
+                                            <span key={k} className="bg-red-50 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-red-200">
+                                              {{earPain:'ألم أذن',hearingLoss:'ضعف سمع',tinnitus:'طنين',earDischarge:'إفرازات أذن',vertigo:'دوخة',nasalObstruction:'انسداد أنف',nasalDischarge:'إفرازات أنف',sneezing:'عطاس',soreThroat:'ألم حلق',voiceChange:'تغير صوت',dysphagia:'صعوبة بلع',snoring:'شخير',sleepApnea:'انقطاع نفس',facialPain:'ألم وجه',headache:'صداع',nosebleeds:'رعاف',lossOfSmell:'فقدان شم',neckMass:'كتلة رقبة'}[k] || k}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                  </>}
+                                  {entDetail.type === 'follow-up' && <>
+                                    <EntField label="سبب المتابعة" value={entDetail.data.follow_up_reason} />
+                                    <EntField label="التشخيص السابق" value={entDetail.data.previous_diagnosis} />
+                                    <EntField label="الالتزام بالعلاج" value={{full:'كامل',partial:'جزئي',none:'لا'}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
+                                    <EntField label="تقييم الأعراض" value={{improved:'تحسن',same:'كما هي',worsened:'تفاقمت'}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
+                                    <EntField label="أعراض جديدة" value={entDetail.data.new_symptoms} />
+                                    <EntField label="فعالية الأدوية" value={entDetail.data.medication_effectiveness} />
+                                    <EntField label="الخطوات القادمة" value={entDetail.data.next_steps} />
+                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                  </>}
+                                  {entDetail.type === 'audiogram' && <>
+                                    <EntField label="مستوى السمع" value={entDetail.data.hearing_level} />
+                                    <EntField label="نوع ضعف السمع" value={entDetail.data.hearing_loss_type} />
+                                    <EntField label="توصية بسماعة" value={entDetail.data.recommend_hearing_aid ? 'نعم' : 'لا'} />
+                                    <EntField label="OAE" value={entDetail.data.oae} />
+                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                  </>}
+                                  {entDetail.type === 'balance-assessment' && <>
+                                    <EntField label="وظيفة الدهليز" value={entDetail.data.vestibular_function} />
+                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                  </>}
+                                  {entDetail.type === 'referral' && <>
+                                    <EntField label="الطبيب المحوّل" value={entDetail.data.referring_doctor} />
+                                    <EntField label="التخصص" value={entDetail.data.referred_to_specialty} />
+                                    <EntField label="الطبيب المحال إليه" value={entDetail.data.referred_to_doctor} />
+                                    <EntField label="المستشفى" value={entDetail.data.referred_to_hospital} />
+                                    <EntField label="الاستعجال" value={{routine:'عادي',urgent:'مستعجل',emergency:'طوارئ'}[entDetail.data.urgency as string] || entDetail.data.urgency} />
+                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                  </>}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
