@@ -170,26 +170,24 @@ const HrEmployeeGuard: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 // --- Helper to Determine Home Page ---
 const getHomeRoute = (user: User): string => {
-  const slug = localStorage.getItem('currentClientSlug');
-  const prefix = slug ? `/${slug}` : '';
+  const slug = localStorage.getItem('currentClientSlug') || 'tarek';
+  const prefix = `/${slug}`;
   if (user.role === UserRole.ADMIN) return `${prefix}/admin`;
   if (user.role === UserRole.SECRETARY) return `${prefix}/reception`;
   if (user.role === UserRole.DOCTOR) return `${prefix}/doctor`;
   if (user.role === UserRole.LAB_TECH) return `${prefix}/dental-lab`;
   if (user.role === UserRole.IMPLANT_MANAGER) return `${prefix}/implant-company`;
   if (user.role === UserRole.COURSE_MANAGER) return `${prefix}/academy`;
-  return slug ? `/${slug}/login` : '/login';
+  return `/${slug}/login`;
 };
 
 // --- Slug Redirect: redirects bare /path to /{slug}/path ---
 const SlugRedirect: React.FC<{ path: string }> = ({ path }) => {
-  const slug = localStorage.getItem('currentClientSlug');
-  if (slug) {
-    return <RedirectHandler to={`/${slug}${path}`} />;
+  const slug = localStorage.getItem('currentClientSlug') || 'tarek';
+  if (path === '/login') {
+    return <RedirectHandler to={`/${slug}/login`} />;
   }
-  // No slug saved — show login page directly (no redirect loop)
-  if (path === '/login') return <LoginView />;
-  return <RedirectHandler to="/login" />;
+  return <RedirectHandler to={`/${slug}${path}`} />;
 };
 
 // --- Slug Redirect with ID param (e.g. /patients/:id → /:slug/patients/:id) ---
@@ -242,10 +240,10 @@ const AppRoutes: React.FC = () => {
       <Route path="/device-management" element={<SlugRedirect path="/device-management" />} />
       <Route path="/queue-display" element={<SlugRedirect path="/queue-display" />} />
 
-      {/* Root - Landing Page */}
+      {/* Root - Redirect to /tarek/login for single-clinic deployment */}
       <Route 
         path="/" 
-        element={<LandingView />} 
+        element={<RedirectHandler to="/tarek/login" />} 
       />
 
       {/* Slug-based routes: /:slug/login, /:slug/admin, etc. */}
