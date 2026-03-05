@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Patient, VisitData, Clinic, Appointment } from '../types';
+import { Patient, VisitData, Appointment } from '../types';
 import { pgPatients, pgAppointments } from '../services/apiServices';
-import { ClinicService, AppointmentService } from '../services/services';
-import { getCurrentClientId } from '../context/ClientContext';
 import { fmtDate } from '../utils/formatters';
 
 const PatientDashboardView: React.FC = () => {
@@ -15,20 +13,10 @@ const PatientDashboardView: React.FC = () => {
 
   // Show cached data immediately - no waiting for DB
   const [patient, setPatient] = useState<Patient | null>(patientUser as Patient | null);
-  const [loading, setLoading] = useState(false); // Start false - show UI immediately
+  const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [clinics, setClinics] = useState<Clinic[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [refreshing, setRefreshing] = useState(false); // Background refresh indicator
-
-  // Booking modal state
-  const [showBooking, setShowBooking] = useState(false);
-  const [bookingClinic, setBookingClinic] = useState('');
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-  const [bookingReason, setBookingReason] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Load fresh data from database in background (non-blocking)
   useEffect(() => {
@@ -47,14 +35,6 @@ const PatientDashboardView: React.FC = () => {
       setRefreshing(true);
       
       try {
-        // Load clinics (small table, fast)
-        const allClinics = await ClinicService.getActive();
-        if (isMounted) setClinics(allClinics);
-      } catch (e) {
-        console.error('[PatientDashboard] Clinics error:', e);
-      }
-
-      try {
         // Load fresh patient data (use getAll with client_id scope, then find by id)
         const freshData = await pgPatients.getById(patientUser.id);
         if (isMounted && freshData) setPatient(freshData);
@@ -63,12 +43,11 @@ const PatientDashboardView: React.FC = () => {
       }
 
       try {
-        // Load appointments (with client_id filter)
-        const cid = getCurrentClientId();
+        // Load appointments
         const myApps = await pgAppointments.getByPatientId(patientUser.id);
         if (isMounted) {
           const upcomingApps = myApps.filter(a => 
-            (a.status === 'scheduled' || a.status === 'pending' || a.status === 'suggested') && (a.status === 'suggested' || a.date >= Date.now())
+            a.status === 'scheduled' && a.date >= Date.now()
           );
           setAppointments(upcomingApps.sort((a, b) => a.date - b.date));
         }
@@ -95,102 +74,6 @@ const PatientDashboardView: React.FC = () => {
     await logout();
     navigate('/patient/login');
   };
-
-  const handleBookAppointment = async () => {
-    if (!patient || !bookingClinic || !bookingDate || !bookingTime) {
-      alert('الرجاء تعبئة جميع الحقول المطلوبة');
-      return;
-    }
-    setBookingLoading(true);
-    try {
-      const timestamp = new Date(`${bookingDate}T${bookingTime}`).getTime();
-      if (isNaN(timestamp)) throw new Error('تاريخ غير صالح');
-
-      // Check for duplicate booking on the same day/clinic
-      const existingApps = await pgAppointments.getByPatientId(patient.id);
-      const sameDayBooking = existingApps.find(a => {
-        if (a.status === 'cancelled') return false;
-        const existingDay = new Date(a.date).toDateString();
-        const newDay = new Date(timestamp).toDateString();
-        return existingDay === newDay && a.clinicId === bookingClinic;
-      });
-      if (sameDayBooking) {
-        alert('لديك حجز موجود بالفعل في نفس اليوم لهذه العيادة');
-        setBookingLoading(false);
-        return;
-      }
-
-      console.log('[Booking] Creating appointment:', { patientId: patient.id, clinicId: bookingClinic, date: timestamp });
-
-      await pgAppointments.create({
-        id: '',
-        patientId: patient.id,
-        patientName: patient.name,
-        clinicId: bookingClinic,
-        doctorId: undefined,
-        date: timestamp,
-        reason: bookingReason || 'حجز من بوابة المريض',
-        status: 'pending'
-      });
-
-      console.log('[Booking] Appointment created successfully');
-      setBookingSuccess(true);
-      // Refresh appointments using optimized query
-      const myApps = await pgAppointments.getByPatientId(patient.id);
-      const upcomingApps = myApps.filter(a => 
-        (a.status === 'scheduled' || a.status === 'pending' || a.status === 'suggested') && (a.status === 'suggested' || a.date >= Date.now())
-      );
-      setAppointments(upcomingApps.sort((a, b) => a.date - b.date));
-
-      setTimeout(() => {
-        setShowBooking(false);
-        setBookingSuccess(false);
-        setBookingClinic('');
-        setBookingDate('');
-        setBookingTime('');
-        setBookingReason('');
-      }, 2000);
-    } catch (e: any) {
-      console.error('[Booking] Error:', e);
-      alert('خطأ في الحجز: ' + (e.message || 'حدث خطأ غير متوقع'));
-    } finally {
-      setBookingLoading(false);
-    }
-  };
-
-  // Handle accepting a suggested alternative appointment
-  const handleAcceptSuggestion = async (app: Appointment) => {
-    if (!app.suggestedDate) return;
-    try {
-      // Update appointment: move suggested date to main date, set status to scheduled
-      await pgAppointments.update(app.id, { 
-        date: app.suggestedDate, 
-        status: 'scheduled' 
-      });
-      // Refresh appointments
-      if (patient) {
-        const myApps = await pgAppointments.getByPatientId(patient.id);
-        const upcomingApps = myApps.filter(a => 
-          (a.status === 'scheduled' || a.status === 'pending' || a.status === 'suggested') && (a.status === 'suggested' || a.date >= Date.now())
-        );
-        setAppointments(upcomingApps.sort((a, b) => a.date - b.date));
-      }
-    } catch (e: any) {
-      alert('خطأ: ' + (e.message || 'حدث خطأ'));
-    }
-  };
-
-  // Handle rejecting a suggested alternative appointment
-  const handleRejectSuggestion = async (appId: string) => {
-    try {
-      await pgAppointments.update(appId, { status: 'cancelled' });
-      setAppointments(prev => prev.filter(a => a.id !== appId));
-    } catch (e: any) {
-      alert('خطأ: ' + (e.message || 'حدث خطأ'));
-    }
-  };
-
-  const getClinicName = (id: string) => clinics.find(c => c.id === id)?.name || id;
 
   if (!patient) {
     // Redirect if no patient (not logged in)
@@ -487,10 +370,6 @@ const PatientDashboardView: React.FC = () => {
               </h3>
             </div>
             <div className="space-y-3">
-              <button onClick={() => setShowBooking(true)} className="w-full bg-primary/10 hover:bg-primary/20 text-primary font-medium py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                <i className="fa-solid fa-calendar-plus"></i>
-                حجز موعد جديد
-              </button>
               <button className="w-full bg-green-50 hover:bg-green-100 text-green-700 font-medium py-3 rounded-lg transition-all flex items-center justify-center gap-2">
                 <i className="fa-solid fa-file-medical"></i>
                 عرض السجل الطبي الكامل
@@ -514,197 +393,33 @@ const PatientDashboardView: React.FC = () => {
             </div>
             <div className="space-y-3">
               {appointments.map(app => (
-                <div key={app.id} className={`rounded-xl p-4 border ${app.status === 'suggested' ? 'bg-blue-50/50 border-blue-200' : 'bg-primary/5 border-primary/10'}`}>
+                <div key={app.id} className="rounded-xl p-4 border bg-primary/5 border-primary/10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${app.status === 'suggested' ? 'bg-blue-100 text-blue-600' : 'bg-primary/10 text-primary'}`}>
-                        <i className={`text-xl ${app.status === 'suggested' ? 'fa-solid fa-calendar-plus' : 'fa-solid fa-calendar-day'}`}></i>
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+                        <i className="text-xl fa-solid fa-calendar-day"></i>
                       </div>
                       <div>
-                        {app.status === 'suggested' ? (
-                          <>
-                            <div className="text-xs text-red-500 line-through mb-1">
-                              الموعد الأصلي: {fmtDate(app.date)} - {new Date(app.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                            <div className="font-bold text-blue-800">
-                              <i className="fa-solid fa-arrow-left ml-1 text-xs"></i>
-                              الموعد المقترح: {app.suggestedDate ? fmtDate(app.suggestedDate) : ''}
-                            </div>
-                            <div className="text-sm text-blue-600 mt-0.5">
-                              <i className="fa-solid fa-clock ml-1"></i>
-                              {app.suggestedDate ? new Date(app.suggestedDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''}
-                              {' — '}
-                              <i className="fa-solid fa-hospital ml-1"></i>
-                              {getClinicName(app.clinicId)}
-                            </div>
-                            {app.suggestedNotes && <div className="text-xs text-blue-500 mt-1 bg-blue-50 p-2 rounded"><i className="fa-solid fa-message ml-1"></i> {app.suggestedNotes}</div>}
-                          </>
-                        ) : (
-                          <>
-                            <div className="font-bold text-slate-800">
-                              {fmtDate(app.date)}
-                            </div>
-                            <div className="text-sm text-slate-500 mt-0.5">
-                              <i className="fa-solid fa-clock ml-1"></i>
-                              {new Date(app.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                              {' — '}
-                              <i className="fa-solid fa-hospital ml-1"></i>
-                              {getClinicName(app.clinicId)}
-                            </div>
-                            {app.reason && <div className="text-xs text-slate-400 mt-1">{app.reason}</div>}
-                          </>
-                        )}
+                        <div className="font-bold text-slate-800">
+                          {fmtDate(app.date)}
+                        </div>
+                        <div className="text-sm text-slate-500 mt-0.5">
+                          <i className="fa-solid fa-clock ml-1"></i>
+                          {new Date(app.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        {app.reason && <div className="text-xs text-slate-400 mt-1">{app.reason}</div>}
                       </div>
                     </div>
-                    {app.status !== 'suggested' && (
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${app.status === 'pending' ? 'bg-amber-500 text-white' : 'bg-primary text-white'}`}>
-                        {app.status === 'pending' ? 'بانتظار التأكيد' : 'مؤكد'}
-                      </span>
-                    )}
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary text-white">
+                      مؤكد
+                    </span>
                   </div>
-                  {/* Accept/Reject buttons for suggested appointments */}
-                  {app.status === 'suggested' && (
-                    <div className="flex gap-2 mt-4 pt-3 border-t border-blue-200">
-                      <button 
-                        onClick={() => handleAcceptSuggestion(app)}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
-                      >
-                        <i className="fa-solid fa-check"></i>
-                        موافق على الموعد المقترح
-                      </button>
-                      <button 
-                        onClick={() => handleRejectSuggestion(app.id)}
-                        className="px-4 py-2.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
-                      >
-                        <i className="fa-solid fa-xmark"></i>
-                        رفض
-                      </button>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
       </main>
-
-      {/* Booking Modal */}
-      {showBooking && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !bookingLoading && setShowBooking(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-            {bookingSuccess ? (
-              <div className="p-10 text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className="fa-solid fa-check text-green-600 text-4xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-green-700 mb-2">تم الحجز بنجاح!</h3>
-                <p className="text-slate-500 text-sm">سيظهر موعدك في صفحة السكرتيرة</p>
-              </div>
-            ) : (
-              <>
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <i className="fa-solid fa-calendar-plus text-primary"></i>
-                    حجز موعد جديد
-                  </h3>
-                  <button onClick={() => setShowBooking(false)} className="text-slate-400 hover:text-slate-600 text-xl">
-                    <i className="fa-solid fa-xmark"></i>
-                  </button>
-                </div>
-                <div className="p-6 space-y-5">
-                  {/* Clinic */}
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      <i className="fa-solid fa-hospital ml-1"></i> العيادة *
-                    </label>
-                    {clinics.length === 0 ? (
-                      <div className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
-                        <i className="fa-solid fa-spinner fa-spin"></i>
-                        جاري تحميل العيادات...
-                      </div>
-                    ) : (
-                      <select
-                        value={bookingClinic}
-                        onChange={e => setBookingClinic(e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                      >
-                        <option value="">اختر العيادة...</option>
-                        {clinics.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-
-                  {/* Date */}
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      <i className="fa-solid fa-calendar ml-1"></i> التاريخ *
-                    </label>
-                    <input
-                      type="date"
-                      value={bookingDate}
-                      onChange={e => setBookingDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    />
-                  </div>
-
-                  {/* Time */}
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      <i className="fa-solid fa-clock ml-1"></i> الوقت *
-                    </label>
-                    <input
-                      type="time"
-                      value={bookingTime}
-                      onChange={e => setBookingTime(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    />
-                  </div>
-
-                  {/* Reason */}
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      <i className="fa-solid fa-notes-medical ml-1"></i> سبب الزيارة (اختياري)
-                    </label>
-                    <textarea
-                      value={bookingReason}
-                      onChange={e => setBookingReason(e.target.value)}
-                      placeholder="مثلاً: فحص دوري، ألم في الأسنان..."
-                      rows={3}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-6 border-t border-gray-100 flex gap-3">
-                  <button
-                    onClick={() => setShowBooking(false)}
-                    className="flex-1 py-3 rounded-xl border border-gray-200 text-slate-600 font-medium hover:bg-gray-50 transition-all"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    onClick={handleBookAppointment}
-                    disabled={bookingLoading || !bookingClinic || !bookingDate || !bookingTime}
-                    className="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {bookingLoading ? (
-                      <i className="fa-solid fa-spinner fa-spin"></i>
-                    ) : (
-                      <>
-                        <i className="fa-solid fa-check"></i>
-                        تأكيد الحجز
-                      </>
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-100 mt-16 py-6">

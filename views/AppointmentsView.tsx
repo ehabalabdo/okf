@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useClient } from '../context/ClientContext';
 import { Appointment, Clinic, Patient, UserRole, User, Gender, Priority } from '../types';
-import { fmtDate, fmtDateTime } from '../utils/formatters';
+import { fmtDate } from '../utils/formatters';
 
 const AppointmentsView: React.FC = () => {
   const { user } = useAuth();
@@ -25,7 +25,7 @@ const AppointmentsView: React.FC = () => {
   const [isPatientDropdownOpen, setIsPatientDropdownOpen] = useState(false);
   
   // View State
-  const [activeTab, setActiveTab] = useState<'pending' | 'scheduled' | 'history'>('pending');
+  const [activeTab, setActiveTab] = useState<'scheduled' | 'history'>('scheduled');
   
   // Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,12 +35,6 @@ const AppointmentsView: React.FC = () => {
   // Patient Mode: 'existing' or 'new'
   const [patientMode, setPatientMode] = useState<'existing' | 'new'>('existing');
 
-  // Suggest Alternative Modal State
-  const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
-  const [suggestingAppId, setSuggestingAppId] = useState<string | null>(null);
-  const [suggestDate, setSuggestDate] = useState('');
-  const [suggestTime, setSuggestTime] = useState('');
-  const [suggestNotes, setSuggestNotes] = useState('');
 
   const [formData, setFormData] = useState({
       // Appointment Info
@@ -95,9 +89,8 @@ const AppointmentsView: React.FC = () => {
 
   // -- FILTER LOGIC --
   const filteredAppointments = appointments.filter(app => {
-      if (activeTab === 'pending') return app.status === 'pending' || app.status === 'suggested';
-      if (activeTab === 'scheduled') return app.status === 'scheduled';
-      return app.status !== 'scheduled' && app.status !== 'pending' && app.status !== 'suggested';
+      if (activeTab === 'scheduled') return app.status === 'scheduled' || app.status === 'pending';
+      return app.status !== 'scheduled' && app.status !== 'pending';
   });
 
   // -- FORM HANDLERS --
@@ -273,57 +266,6 @@ const AppointmentsView: React.FC = () => {
       }
   };
 
-  const handleApprove = async (appId: string) => {
-      if (!user) return;
-      setAppointments(prev => prev.map(a => a.id === appId ? { ...a, status: 'scheduled' as any } : a));
-      try {
-          await AppointmentService.updateStatus(user, appId, 'scheduled');
-      } catch (e: any) {
-          alert("Error: " + e.message);
-          fetchData();
-      }
-  };
-
-  const handleReject = async (appId: string) => {
-      if (!user) return;
-      if (!window.confirm("رفض هذا الموعد؟")) return;
-      setAppointments(prev => prev.map(a => a.id === appId ? { ...a, status: 'cancelled' as any } : a));
-      try {
-          await AppointmentService.updateStatus(user, appId, 'cancelled');
-      } catch (e: any) {
-          alert("Error: " + e.message);
-          fetchData();
-      }
-  };
-
-  const openSuggestModal = (appId: string) => {
-      setSuggestingAppId(appId);
-      setSuggestDate('');
-      setSuggestTime('');
-      setSuggestNotes('');
-      setIsSuggestModalOpen(true);
-  };
-
-  const handleSuggestAlternative = async () => {
-      if (!user || !suggestingAppId || !suggestDate || !suggestTime) return;
-      const timestamp = new Date(`${suggestDate}T${suggestTime}`).getTime();
-      if (isNaN(timestamp)) { alert('تاريخ غير صالح'); return; }
-      
-      setAppointments(prev => prev.map(a => a.id === suggestingAppId ? { ...a, status: 'suggested' as any, suggestedDate: timestamp, suggestedNotes: suggestNotes } : a));
-      setIsSuggestModalOpen(false);
-      
-      try {
-          await AppointmentService.update(user, suggestingAppId, { 
-              status: 'suggested' as any, 
-              suggestedDate: timestamp, 
-              suggestedNotes: suggestNotes || 'موعد مقترح من العيادة'
-          } as any);
-      } catch (e: any) {
-          alert("Error: " + e.message);
-          fetchData();
-      }
-  };
-
   const handleDelete = async (appId: string) => {
       if (!user) return;
       if (!window.confirm(t('cancel_btn') + "?")) return; 
@@ -355,16 +297,10 @@ const AppointmentsView: React.FC = () => {
              
              <div className="flex gap-2 bg-gray-200 p-1 rounded-lg">
                 <button 
-                    onClick={() => setActiveTab('pending')}
-                    className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${activeTab === 'pending' ? 'bg-white shadow text-amber-700' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    <i className="fa-solid fa-clock mr-1"></i> بانتظار التأكيد ({appointments.filter(a => a.status === 'pending' || a.status === 'suggested').length})
-                </button>
-                <button 
                     onClick={() => setActiveTab('scheduled')}
                     className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${activeTab === 'scheduled' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                    {t('status_scheduled')} ({appointments.filter(a => a.status === 'scheduled').length})
+                    {t('status_scheduled')} ({appointments.filter(a => a.status === 'scheduled' || a.status === 'pending').length})
                 </button>
                 <button 
                     onClick={() => setActiveTab('history')}
@@ -390,7 +326,7 @@ const AppointmentsView: React.FC = () => {
               ) : (
                   <div className="space-y-3">
                       {filteredAppointments.map(app => (
-                          <div key={app.id} className={`flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-lg border transition-colors bg-white group ${activeTab === 'history' ? 'border-gray-100 opacity-75 grayscale-[0.5] hover:grayscale-0' : activeTab === 'pending' ? 'border-amber-200 hover:border-amber-300 bg-amber-50/30' : 'border-gray-100 hover:border-blue-200'}`}>
+                          <div key={app.id} className={`flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-lg border transition-colors bg-white group ${activeTab === 'history' ? 'border-gray-100 opacity-75 grayscale-[0.5] hover:grayscale-0' : 'border-gray-100 hover:border-blue-200'}`}>
                               <div className="flex items-center gap-4">
                                   <div className={`flex flex-col items-center justify-center w-16 h-16 rounded border text-slate-600 ${app.status === 'checked-in' ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-gray-200'}`}>
                                       <span className="text-xs uppercase font-bold">{new Date(app.date).toLocaleDateString('en-GB', { month: 'short' })}</span>
@@ -408,60 +344,19 @@ const AppointmentsView: React.FC = () => {
                               </div>
 
                               <div className="mt-4 md:mt-0 flex flex-col md:flex-row items-stretch md:items-center gap-3">
-                                  {/* Status Label (Visible in History and Pending) */}
-                                  {(activeTab === 'history' || activeTab === 'pending') && (
+                                  {/* Status Label (Visible in History) */}
+                                  {activeTab === 'history' && (
                                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase text-center ${
-                                         app.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                         app.status === 'suggested' ? 'bg-blue-100 text-blue-700' :
                                          app.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
                                          app.status === 'checked-in' ? 'bg-green-100 text-green-700' :
                                          app.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                          'bg-gray-100 text-gray-500'
                                      }`}>
-                                         {app.status === 'pending' ? 'بانتظار التأكيد' :
-                                          app.status === 'suggested' ? 'تم اقتراح موعد بديل' :
-                                          app.status === 'scheduled' ? t('status_scheduled') : 
+                                         {app.status === 'scheduled' ? t('status_scheduled') : 
                                           app.status === 'checked-in' ? t('status_checked_in') : 
                                           app.status === 'cancelled' ? t('cancel_btn') :
                                           t('status_cancelled')}
                                      </span>
-                                  )}
-
-                                  {/* Action Buttons for PENDING */}
-                                  {user?.role !== UserRole.DOCTOR && activeTab === 'pending' && app.status === 'pending' && (
-                                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
-                                          <button 
-                                            onClick={() => handleApprove(app.id)} 
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-2 min-w-[120px]"
-                                          >
-                                              <i className="fa-solid fa-check-double"></i>
-                                              <span>تأكيد الموعد</span>
-                                          </button>
-                                          <button 
-                                            onClick={() => openSuggestModal(app.id)} 
-                                            className="bg-white border border-blue-200 text-blue-600 hover:border-blue-500 hover:bg-blue-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
-                                          >
-                                              <i className="fa-solid fa-calendar-plus"></i>
-                                              <span>اقتراح موعد آخر</span>
-                                          </button>
-                                          <button 
-                                            onClick={() => handleReject(app.id)} 
-                                            className="bg-white border border-gray-200 text-red-500 hover:border-red-500 hover:bg-red-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
-                                          >
-                                              <i className="fa-solid fa-xmark"></i>
-                                              <span>رفض</span>
-                                          </button>
-                                      </div>
-                                  )}
-
-                                  {/* Info for SUGGESTED status */}
-                                  {app.status === 'suggested' && app.suggestedDate && (
-                                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                                          <div className="text-blue-800 font-bold mb-1"><i className="fa-solid fa-calendar-check mr-1"></i> الموعد المقترح:</div>
-                                          <div className="text-blue-700">{fmtDateTime(app.suggestedDate)}</div>
-                                          {app.suggestedNotes && <div className="text-blue-600 text-xs mt-1">{app.suggestedNotes}</div>}
-                                          <div className="text-xs text-blue-500 mt-2"><i className="fa-solid fa-hourglass-half mr-1"></i> بانتظار موافقة المريض</div>
-                                      </div>
                                   )}
 
                                   {/* Action Buttons for SCHEDULED */}
@@ -734,70 +629,6 @@ const AppointmentsView: React.FC = () => {
               </div>
           )}
 
-          {/* Suggest Alternative Modal */}
-          {isSuggestModalOpen && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setIsSuggestModalOpen(false)}>
-                  <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-fade-in" onClick={e => e.stopPropagation()}>
-                      <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
-                          <h3 className="font-bold text-lg flex items-center gap-2">
-                              <i className="fa-solid fa-calendar-plus"></i>
-                              اقتراح موعد بديل
-                          </h3>
-                          <p className="text-blue-100 text-sm mt-1">سيتم إرسال الموعد المقترح للمريض للموافقة عليه</p>
-                      </div>
-                      <div className="p-6 space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">التاريخ المقترح</label>
-                                  <input 
-                                      type="date" 
-                                      className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                      value={suggestDate} 
-                                      onChange={e => setSuggestDate(e.target.value)} 
-                                      required 
-                                  />
-                              </div>
-                              <div>
-                                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">الوقت المقترح</label>
-                                  <input 
-                                      type="time" 
-                                      className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                      value={suggestTime} 
-                                      onChange={e => setSuggestTime(e.target.value)} 
-                                      required 
-                                  />
-                              </div>
-                          </div>
-                          <div>
-                              <label className="block text-xs font-bold text-slate-500 uppercase mb-2">ملاحظات (اختياري)</label>
-                              <textarea 
-                                  className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
-                                  rows={3}
-                                  placeholder="مثلاً: الطبيب متاح في هذا الوقت فقط..."
-                                  value={suggestNotes} 
-                                  onChange={e => setSuggestNotes(e.target.value)} 
-                              />
-                          </div>
-                          <div className="flex gap-3 pt-2">
-                              <button 
-                                  onClick={handleSuggestAlternative}
-                                  disabled={!suggestDate || !suggestTime}
-                                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2"
-                              >
-                                  <i className="fa-solid fa-paper-plane"></i>
-                                  إرسال الاقتراح
-                              </button>
-                              <button 
-                                  onClick={() => setIsSuggestModalOpen(false)}
-                                  className="px-6 py-3 border border-gray-200 text-slate-600 rounded-lg font-medium hover:bg-gray-50 transition-all"
-                              >
-                                  إلغاء
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          )}
       </div>
     </Layout>
   );
