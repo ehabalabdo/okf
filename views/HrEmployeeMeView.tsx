@@ -1,0 +1,769 @@
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import Layout from '../components/Layout';
+import { HrMeProfile, HrMonthlyReport } from '../types';
+import { hrMeService, hrWebAuthnService, hrAttendanceService, hrReportsService, hrDebugService } from '../services/hrApiServices';
+import { useLanguage } from '../context/LanguageContext';
+import { fmtMinutes, fmtTime } from '../utils/formatters';
+
+const DAY_LABELS_EN = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_LABELS_AR = ['', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت', 'أحد'];
+
+// ───────── component ─────────
+const HrEmployeeMeView: React.FC = () => {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
+
+  const [profile, setProfile] = useState<HrMeProfile | null>(null);
+  const [monthlyReport, setMonthlyReport] = useState<HrMonthlyReport | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [msg, setMsg] = useState<{ text: string; type: 'ok' | 'err' } | null>(null);
+  const [gpsStatus, setGpsStatus] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
+  const coordsRef = useRef<{ lat: number; lng: number } | null>(null);
+  const curMonth = new Date().toISOString().slice(0, 7);
+
+  // WebAuthn support detection
+  const [webAuthnSupported, setWebAuthnSupported] = useState<boolean | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [showDebug, setShowDebug] = useState(false);
+  // Per-device registration tracking
+  const [deviceRegistered, setDeviceRegistered] = useState<boolean>(false);
+
+  // Check if THIS device has registered — sync with server state
+  useEffect(() => {
+    const flag = localStorage.getItem('hr_bio_device');
+    setDeviceRegistered(flag === 'yes');
+  }, []);
+  // If server says no bio registered, clear local flag too
+  useEffect(() => {
+    if (profile && !profile.bioRegistered) {
+      localStorage.removeItem('hr_bio_device');
+      setDeviceRegistered(false);
+    }
+  }, [profile]);
+
+  // ── Detect WebAuthn + platform authenticator on mount ──
+  // NOTE: We default to true and only set false if clearly unavailable.
+  // Some devices (especially iPhone after passkey deletion) may return false
+  // from isUserVerifyingPlatformAuthenticatorAvailable() temporarily.
+  // We still allow registration attempts — the browser will tell us if it fails.
+  useEffect(() => {
+    (async () => {
+      try {
+        if (
+          typeof window === 'undefined' ||
+          !window.PublicKeyCredential
+        ) {
+          console.warn('[WebAuthn] PublicKeyCredential not available');
+          setWebAuthnSupported(false);
+          return;
+        }
+        // Try the check but default to true if it returns false (can be unreliable)
+        if (typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+          const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          console.log('[WebAuthn] Platform authenticator available:', available);
+          // Only block if PublicKeyCredential itself is missing, not based on this check alone
+        }
+        setWebAuthnSupported(true);
+      } catch (e) {
+        console.warn('[WebAuthn] Detection error:', e);
+        // Still allow — let the actual registration attempt decide
+        setWebAuthnSupported(true);
+      }
+    })();
+  }, []);
+
+  // ── load profile + monthly report ──
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [p, r] = await Promise.all([
+        hrMeService.getProfile(),
+        hrReportsService.myMonthly(curMonth).catch(() => null),
+      ]);
+      setProfile(p);
+      setMonthlyReport(r);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [curMonth]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  // ── GPS helper ──
+  const getGps = (): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error(isAr ? 'GPS غير مدعوم' : 'GPS not supported'));
+      setGpsStatus('loading');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const c = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          coordsRef.current = c;
+          setGpsStatus('ok');
+          resolve(c);
+        },
+        () => {
+          setGpsStatus('err');
+          reject(new Error(isAr ? 'فشل تحديد الموقع. يرجى تفعيل GPS' : 'Location unavailable. Enable GPS.'));
+        },
+        { enableHighAccuracy: true, timeout: 15000 }
+      );
+    });
+  };
+
+  // ── WebAuthn Registration ──
+  const handleRegisterBiometric = async () => {
+    setActionLoading(true);
+    setMsg(null);
+    try {
+      const { startRegistration } = await import('@simplewebauthn/browser');
+      console.log('[Bio] Getting register options...');
+      const options = await hrWebAuthnService.getRegisterOptions();
+      console.log('[Bio] Got options, rpId:', (options as any).rp?.id, 'hints:', (options as any).hints);
+      const attResp = await startRegistration(options);
+      console.log('[Bio] startRegistration done, sending to verify...');
+      const result = await hrWebAuthnService.verifyRegistration(attResp);
+      console.log('[Bio] Verify result:', result);
+      if (result.verified) {
+        localStorage.setItem('hr_bio_device', 'yes');
+        setDeviceRegistered(true);
+        setMsg({ text: isAr ? 'تم تسجيل البصمة بنجاح ✓' : 'Biometric registered successfully ✓', type: 'ok' });
+        refresh();
+      } else {
+        setMsg({ text: isAr ? 'فشل التحقق من البصمة' : 'Biometric verification failed', type: 'err' });
+      }
+    } catch (e: any) {
+      console.error('Bio register error:', e);
+      const message = e?.name === 'NotAllowedError'
+        ? (isAr ? 'تم إلغاء عملية البصمة' : 'Biometric operation cancelled')
+        : (e?.message || (isAr ? 'خطأ في تسجيل البصمة' : 'Biometric registration error'));
+      setMsg({ text: message, type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── WebAuthn Authentication → returns bioToken from server ──
+  const authenticateBio = async (): Promise<string | null> => {
+    try {
+      const { startAuthentication } = await import('@simplewebauthn/browser');
+      console.log('[Bio Auth] Getting authenticate options...');
+      const options = await hrWebAuthnService.getAuthenticateOptions();
+      console.log('[Bio Auth] Got options, allowCredentials:', (options as any).allowCredentials?.length);
+      console.log('[Bio Auth] Credential IDs:', (options as any).allowCredentials?.map((c: any) => c.id?.slice(0, 20)));
+      const assertion = await startAuthentication(options);
+      console.log('[Bio Auth] startAuthentication done, verifying...');
+      const result = await hrWebAuthnService.verifyAuthentication(assertion);
+      console.log('[Bio Auth] Verify result:', result);
+      if (result.verified && result.bioToken) {
+        return result.bioToken;
+      }
+      setMsg({ text: isAr ? 'فشل التحقق من البصمة' : 'Biometric verify failed', type: 'err' });
+      return null;
+    } catch (e: any) {
+      console.error('Bio auth failed:', e);
+      if (e?.name === 'NotAllowedError') {
+        // No matching passkey on device — need to reset and re-register
+        setShowResetFlow(true);
+        setMsg({
+          text: isAr
+            ? 'لا توجد بصمة مطابقة على هذا الجهاز. اتبع خطوات إعادة التعيين ↓'
+            : 'No matching biometric on this device. Follow reset steps below ↓',
+          type: 'err',
+        });
+      } else {
+        setMsg({ text: e?.message || (isAr ? 'خطأ في البصمة' : 'Biometric error'), type: 'err' });
+      }
+      return null;
+    }
+  };
+
+  // ── Reset Biometric (clear server + instructions) ──
+  const [showResetFlow, setShowResetFlow] = useState(false);
+  const [resetStep, setResetStep] = useState(0); // 0=intro, 1=deleted from server, 2=ready to register
+
+  const handleResetBiometric = async () => {
+    setActionLoading(true);
+    try {
+      await hrWebAuthnService.resetAll();
+      localStorage.removeItem('hr_bio_device');
+      setDeviceRegistered(false);
+      setResetStep(1);
+      setMsg({ text: isAr ? 'تم مسح البصمات من السيرفر ✓' : 'Server biometrics cleared ✓', type: 'ok' });
+      refresh();
+    } catch (e: any) {
+      setMsg({ text: e?.message || 'Reset error', type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleAfterDeviceCleared = () => {
+    setResetStep(2);
+    setShowResetFlow(false);
+    setMsg({ text: isAr ? 'الحين سجّل بصمة جديدة ↓' : 'Now register a new biometric ↓', type: 'ok' });
+  };
+
+  // ── Check In ──
+  const handleCheckIn = async () => {
+    setActionLoading(true);
+    setMsg(null);
+    try {
+      // 1) GPS
+      const coords = await getGps();
+
+      // 2) Biometric verification → get bioToken
+      const bioToken = await authenticateBio();
+      if (!bioToken) {
+        // authenticateBio already set the real error msg — don't overwrite it
+        setActionLoading(false);
+        return;
+      }
+
+      // 3) Send check-in with bioToken
+      const result = await hrAttendanceService.checkIn({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        bioToken,
+        device_info: navigator.userAgent.slice(0, 120),
+      });
+      setMsg({ text: `${result.message} — ${result.clinicName}`, type: 'ok' });
+      refresh();
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ في تسجيل الحضور' : 'Check-in error'), type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── Check Out ──
+  const handleCheckOut = async () => {
+    setActionLoading(true);
+    setMsg(null);
+    try {
+      const coords = await getGps();
+
+      const bioToken = await authenticateBio();
+      if (!bioToken) {
+        // authenticateBio already set the real error msg — don't overwrite it
+        setActionLoading(false);
+        return;
+      }
+
+      const result = await hrAttendanceService.checkOut({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        bioToken,
+        device_info: navigator.userAgent.slice(0, 120),
+      });
+      setMsg({
+        text: `${result.message} — ${fmtMinutes(result.totalMinutes)} ${isAr ? 'عمل' : 'worked'}`,
+        type: 'ok',
+      });
+      refresh();
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ في تسجيل المغادرة' : 'Check-out error'), type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── Break Out ──
+  const handleBreakOut = async () => {
+    setActionLoading(true);
+    setMsg(null);
+    try {
+      const coords = await getGps();
+      const bioToken = await authenticateBio();
+      if (!bioToken) { setActionLoading(false); return; }
+      const result = await hrAttendanceService.breakOut({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        bioToken,
+        device_info: navigator.userAgent.slice(0, 120),
+      });
+      setMsg({ text: result.message, type: 'ok' });
+      refresh();
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ في بدء الاستراحة' : 'Break out error'), type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── Break In ──
+  const handleBreakIn = async () => {
+    setActionLoading(true);
+    setMsg(null);
+    try {
+      const coords = await getGps();
+      const bioToken = await authenticateBio();
+      if (!bioToken) { setActionLoading(false); return; }
+      const result = await hrAttendanceService.breakIn({
+        latitude: coords.lat,
+        longitude: coords.lng,
+        bioToken,
+        device_info: navigator.userAgent.slice(0, 120),
+      });
+      setMsg({ text: `${result.message} — ${result.breakMinutes}m`, type: 'ok' });
+      refresh();
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ في إنهاء الاستراحة' : 'Break in error'), type: 'err' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── derived state ──
+  const today = profile?.todayAttendance;
+  const checkedIn = !!today?.checkIn;
+  const checkedOut = !!today?.checkOut;
+  const onBreak = !!(today as any)?.onBreak;
+  const sched = profile?.schedule;
+  const summary = monthlyReport?.summary;
+
+  if (loading || webAuthnSupported === null) {
+    return (
+      <Layout title={isAr ? 'بوابة الموظف' : 'Employee Portal'}>
+        <div className="p-12 text-center text-slate-400"><i className="fa-solid fa-circle-notch fa-spin text-3xl"></i></div>
+      </Layout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <Layout title={isAr ? 'بوابة الموظف' : 'Employee Portal'}>
+        <div className="p-12 text-center text-red-400 font-bold">{isAr ? 'فشل تحميل الملف الشخصي' : 'Failed to load profile'}</div>
+      </Layout>
+    );
+  }
+
+  // ── webAuthnSupported is now more permissive — no full-page block ──
+
+  return (
+    <Layout title={isAr ? 'بوابة الموظف' : 'Employee Portal'}>
+      {/* Alert Banner */}
+      {msg && (
+        <div className={`mb-4 p-4 rounded-2xl font-bold text-sm flex items-center gap-2 ${msg.type === 'ok' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+          <i className={`fa-solid ${msg.type === 'ok' ? 'fa-circle-check' : 'fa-triangle-exclamation'}`}></i>
+          {msg.text}
+          <button className="ms-auto opacity-60 hover:opacity-100" onClick={() => setMsg(null)}><i className="fa-solid fa-xmark"></i></button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ── LEFT COLUMN ── */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Profile + Schedule Card */}
+          <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-indigo-200">
+                {profile.fullName.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-extrabold text-slate-800">{profile.fullName}</h2>
+                <p className="text-sm text-slate-400 font-medium">@{profile.username}</p>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-xs font-bold ${profile.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
+                {profile.status === 'active' ? (isAr ? 'نشط' : 'Active') : (isAr ? 'معطل' : 'Inactive')}
+              </div>
+            </div>
+
+            {sched && (
+              <div className="mt-5 pt-5 border-t border-slate-100">
+                <h4 className="text-xs uppercase font-bold text-slate-400 mb-3">{isAr ? 'جدول العمل' : 'Work Schedule'}</h4>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {[1, 2, 3, 4, 5, 6, 7].map(d => (
+                    <span key={d} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${sched.workDays.includes(d) ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-50 text-slate-300'}`}>
+                      {isAr ? DAY_LABELS_AR[d] : DAY_LABELS_EN[d]}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-6 text-sm">
+                  <span className="text-slate-500"><i className="fa-solid fa-clock text-indigo-400 me-1"></i> {sched.startTime} — {sched.endTime}</span>
+                  <span className="text-slate-500"><i className="fa-solid fa-hourglass-half text-amber-400 me-1"></i> {sched.graceMinutes}m {isAr ? 'مهلة' : 'grace'}</span>
+                  {sched.overtimeEnabled && <span className="text-indigo-600 font-bold"><i className="fa-solid fa-bolt me-1"></i> OT</span>}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── BIOMETRIC SECTION ── */}
+          {/* Case 1: No biometric on server at all */}
+          {!profile.bioRegistered && (
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border-2 border-dashed border-indigo-300 p-6 text-center">
+              <i className="fa-solid fa-fingerprint text-5xl text-indigo-500 mb-3"></i>
+              <h3 className="text-lg font-extrabold text-indigo-800 mb-1">
+                {isAr ? 'سجّل بصمتك الآن' : 'Register Your Biometric'}
+              </h3>
+              <p className="text-sm text-indigo-600 mb-4">
+                {isAr ? 'سجّل البصمة أو Face ID عشان تقدر تسجل حضور' : 'Register fingerprint or Face ID to enable attendance'}
+              </p>
+              <button
+                onClick={handleRegisterBiometric}
+                disabled={actionLoading}
+                className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-2xl font-extrabold text-sm transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50"
+              >
+                {actionLoading ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-fingerprint me-2"></i>}
+                {isAr ? 'تسجيل البصمة' : 'Register Biometric'}
+              </button>
+            </div>
+          )}
+
+          {/* Case 2: Biometric exists on server BUT this device not registered */}
+          {profile.bioRegistered && !deviceRegistered && (
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-dashed border-amber-400 p-6 text-center">
+              <i className="fa-solid fa-mobile-screen text-5xl text-amber-500 mb-3"></i>
+              <h3 className="text-lg font-extrabold text-amber-800 mb-1">
+                {isAr ? 'سجّل البصمة على هذا الجهاز' : 'Register Biometric on THIS Device'}
+              </h3>
+              <p className="text-sm text-amber-700 mb-4">
+                {isAr
+                  ? 'البصمة مسجلة على جهاز ثاني. لازم تسجّل على هالموبايل كمان عشان تقدر تسجل حضور منه.'
+                  : 'Biometric is registered on another device. You need to register on THIS phone too.'}
+              </p>
+              <button
+                onClick={handleRegisterBiometric}
+                disabled={actionLoading}
+                className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-2xl font-extrabold text-sm transition-colors shadow-lg shadow-amber-200 disabled:opacity-50"
+              >
+                {actionLoading ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-fingerprint me-2"></i>}
+                {isAr ? 'تسجيل البصمة على هالجهاز' : 'Register on This Device'}
+              </button>
+            </div>
+          )}
+
+          {/* Case 3: This device is registered */}
+          {profile.bioRegistered && deviceRegistered && !showResetFlow && (
+            <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                <i className="fa-solid fa-fingerprint text-emerald-600 text-xl"></i>
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-emerald-700">{isAr ? 'البصمة مسجلة ✓' : 'Biometric Ready ✓'}</p>
+                <p className="text-xs text-emerald-500">{isAr ? 'جاهز لتسجيل الحضور' : 'Ready for attendance'}</p>
+              </div>
+            </div>
+          )}
+
+          {/* ── RESET BIOMETRIC FLOW ── */}
+          {showResetFlow && (
+            <div className="bg-red-50 rounded-2xl border-2 border-red-300 p-6 space-y-4">
+              <div className="text-center">
+                <i className="fa-solid fa-triangle-exclamation text-4xl text-red-400 mb-2"></i>
+                <h3 className="text-lg font-extrabold text-red-700">
+                  {isAr ? 'إعادة تعيين البصمة' : 'Reset Biometric'}
+                </h3>
+                <p className="text-sm text-red-600 mt-1">
+                  {isAr
+                    ? 'البصمات القديمة على الجهاز ما تطابق السيرفر. لازم نمسح ونسجل من جديد.'
+                    : 'Old passkeys on device don\'t match server. Need to clear and re-register.'}
+                </p>
+              </div>
+
+              {resetStep === 0 && (
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-red-700">
+                    {isAr ? 'الخطوة 1: مسح البصمات من السيرفر' : 'Step 1: Clear biometrics from server'}
+                  </p>
+                  <button
+                    onClick={handleResetBiometric}
+                    disabled={actionLoading}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-bold text-sm disabled:opacity-50"
+                  >
+                    {actionLoading ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-trash me-2"></i>}
+                    {isAr ? 'مسح البصمات من السيرفر' : 'Clear Server Biometrics'}
+                  </button>
+                </div>
+              )}
+
+              {resetStep === 1 && (
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-red-700">
+                    {isAr ? 'الخطوة 2: امسح الباسكيز من الجهاز' : 'Step 2: Delete passkeys from device'}
+                  </p>
+                  <div className="bg-white rounded-xl p-4 space-y-3 text-sm">
+                    <p className="font-bold text-slate-700">
+                      <i className="fa-brands fa-apple me-1"></i> {isAr ? 'آيفون:' : 'iPhone:'}
+                    </p>
+                    <p className="text-slate-500 ps-4">
+                      Settings → Passwords → {isAr ? 'ابحث' : 'Search'} "loopjo" → {isAr ? 'امسح' : 'Delete'} <strong>{isAr ? 'كل' : 'ALL'}</strong> {isAr ? 'النتائج' : 'results'}
+                    </p>
+                    <p className="font-bold text-slate-700">
+                      <i className="fa-brands fa-android me-1"></i> {isAr ? 'أندرويد:' : 'Android:'}
+                    </p>
+                    <p className="text-slate-500 ps-4">
+                      Settings → Google → Password Manager → {isAr ? 'ابحث' : 'Search'} "loopjo" → {isAr ? 'امسح' : 'Delete'} <strong>{isAr ? 'كل' : 'ALL'}</strong>
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleAfterDeviceCleared}
+                    className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm"
+                  >
+                    <i className="fa-solid fa-check me-2"></i>
+                    {isAr ? 'تم المسح من الجهاز — سجل بصمة جديدة' : 'Done — Register New Biometric'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── ATTENDANCE CHECK-IN / CHECK-OUT ── */}
+          <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="font-extrabold text-slate-700 uppercase text-sm">{isAr ? 'الحضور والانصراف' : 'Attendance'}</h3>
+              {gpsStatus === 'loading' && <span className="text-xs text-amber-500"><i className="fa-solid fa-circle-notch fa-spin"></i> GPS</span>}
+              {gpsStatus === 'ok' && <span className="text-xs text-emerald-500"><i className="fa-solid fa-location-dot"></i> GPS OK</span>}
+              {gpsStatus === 'err' && <span className="text-xs text-red-500"><i className="fa-solid fa-location-crosshairs"></i> GPS Error</span>}
+            </div>
+
+            {/* Must register biometric first */}
+            {(!profile.bioRegistered || !deviceRegistered) && (
+              <div className="mb-4 p-4 bg-amber-50 rounded-xl text-center border border-amber-200">
+                <p className="text-sm text-amber-700 font-bold">
+                  <i className="fa-solid fa-fingerprint me-1"></i>
+                  {isAr ? 'سجّل بصمتك على هالجهاز أولاً ↑' : 'Register biometric on this device first ↑'}
+                </p>
+              </div>
+            )}
+
+            {/* Biometric info when registered */}
+            {deviceRegistered && !checkedOut && (
+              <div className="mb-4 p-3 bg-indigo-50 rounded-xl text-center">
+                <p className="text-sm text-indigo-600 font-bold">
+                  <i className="fa-solid fa-fingerprint me-1"></i>
+                  {isAr ? 'سيُطلب منك البصمة عند الضغط' : 'You will be prompted for biometric on tap'}
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Check In */}
+              <button
+                onClick={handleCheckIn}
+                disabled={actionLoading || checkedIn || !deviceRegistered}
+                className={`p-6 rounded-2xl font-extrabold text-lg transition-all flex flex-col items-center gap-2 ${
+                  checkedIn || !deviceRegistered
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-200 active:scale-95'
+                }`}
+              >
+                {actionLoading ? (
+                  <i className="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+                ) : (
+                  <i className={`fa-solid fa-right-to-bracket text-3xl ${checkedIn || !deviceRegistered ? '' : 'animate-pulse'}`}></i>
+                )}
+                {checkedIn ? (
+                  <span className="text-sm">{isAr ? 'تم الدخول' : 'Checked In'} ✓</span>
+                ) : (
+                  <span>{isAr ? 'تسجيل دخول' : 'Check In'}</span>
+                )}
+                {checkedIn && today?.checkIn && (
+                  <span className="text-xs font-medium">{fmtTime(today.checkIn)}</span>
+                )}
+              </button>
+
+              {/* Check Out */}
+              <button
+                onClick={handleCheckOut}
+                disabled={actionLoading || !checkedIn || checkedOut || onBreak}
+                className={`p-6 rounded-2xl font-extrabold text-lg transition-all flex flex-col items-center gap-2 ${
+                  !checkedIn || checkedOut || onBreak
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-200 active:scale-95'
+                }`}
+              >
+                {actionLoading ? (
+                  <i className="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+                ) : (
+                  <i className="fa-solid fa-right-from-bracket text-3xl"></i>
+                )}
+                {checkedOut ? (
+                  <span className="text-sm">{isAr ? 'تم الخروج' : 'Checked Out'} ✓</span>
+                ) : (
+                  <span>{isAr ? 'تسجيل خروج' : 'Check Out'}</span>
+                )}
+                {checkedOut && today?.checkOut && (
+                  <span className="text-xs font-medium">{fmtTime(today.checkOut)}</span>
+                )}
+              </button>
+
+              {/* Break Out (Start Break) */}
+              <button
+                onClick={handleBreakOut}
+                disabled={actionLoading || !checkedIn || checkedOut || onBreak || !deviceRegistered}
+                className={`p-6 rounded-2xl font-extrabold text-lg transition-all flex flex-col items-center gap-2 ${
+                  !checkedIn || checkedOut || onBreak || !deviceRegistered
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 shadow-lg shadow-amber-200 active:scale-95'
+                }`}
+              >
+                <i className="fa-solid fa-mug-hot text-3xl"></i>
+                <span>{isAr ? 'بدء استراحة' : 'Start Break'}</span>
+              </button>
+
+              {/* Break In (End Break) */}
+              <button
+                onClick={handleBreakIn}
+                disabled={actionLoading || !onBreak}
+                className={`p-6 rounded-2xl font-extrabold text-lg transition-all flex flex-col items-center gap-2 ${
+                  !onBreak
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-200 active:scale-95 animate-pulse'
+                }`}
+              >
+                <i className="fa-solid fa-person-running text-3xl"></i>
+                <span>{isAr ? 'إنهاء استراحة' : 'End Break'}</span>
+              </button>
+            </div>
+
+            {/* On Break Indicator */}
+            {onBreak && (
+              <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl text-center animate-pulse">
+                <i className="fa-solid fa-mug-hot text-3xl text-amber-500 mb-2"></i>
+                <p className="text-amber-700 font-extrabold">{isAr ? 'أنت في استراحة حالياً' : 'You are currently on break'}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── RIGHT COLUMN ── */}
+        <div className="space-y-6">
+          {/* Today's Status */}
+          <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-5">
+            <h3 className="font-extrabold text-sm text-slate-500 uppercase mb-4">
+              <i className="fa-solid fa-calendar-day me-1 text-indigo-400"></i>
+              {isAr ? 'حالة اليوم' : "Today's Status"}
+            </h3>
+            {today ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'دخول' : 'In'}</span>
+                  <span className="font-bold text-sm font-mono">{fmtTime(today.checkIn)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'خروج' : 'Out'}</span>
+                  <span className="font-bold text-sm font-mono">{fmtTime(today.checkOut)}</span>
+                </div>
+                <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'المجموع' : 'Total'}</span>
+                  <span className="font-extrabold text-slate-800">{fmtMinutes(today.totalMinutes)}</span>
+                </div>
+                {today.lateMinutes > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-amber-500 text-sm">{isAr ? 'تأخير' : 'Late'}</span>
+                    <span className="font-bold text-amber-600">{today.lateMinutes}m</span>
+                  </div>
+                )}
+                {(today as any).totalBreakMinutes > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-orange-500 text-sm">{isAr ? 'استراحات' : 'Breaks'}</span>
+                    <span className="font-bold text-orange-600">{(today as any).totalBreakMinutes}m</span>
+                  </div>
+                )}
+                {today.overtimeMinutes > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-indigo-500 text-sm">{isAr ? 'إضافي' : 'Overtime'}</span>
+                    <span className="font-bold text-indigo-600">{today.overtimeMinutes}m</span>
+                  </div>
+                )}
+                <div className="pt-2 text-center">
+                  <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                    today.status === 'normal' ? 'bg-emerald-100 text-emerald-700' :
+                    today.status === 'late' ? 'bg-amber-100 text-amber-700' :
+                    today.status === 'incomplete' ? 'bg-blue-100 text-blue-700' :
+                    'bg-slate-100 text-slate-500'
+                  }`}>
+                    {today.status === 'normal' ? (isAr ? 'منتظم' : 'Normal') :
+                     today.status === 'late' ? (isAr ? 'متأخر' : 'Late') :
+                     today.status === 'incomplete' ? (isAr ? 'غير مكتمل' : 'Incomplete') :
+                     today.status}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-slate-300">
+                <i className="fa-solid fa-ghost text-3xl mb-2 block"></i>
+                <p className="text-sm font-bold">{isAr ? 'لم تسجل حضور اليوم' : 'No attendance today'}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Monthly Summary */}
+          <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-5">
+            <h3 className="font-extrabold text-sm text-slate-500 uppercase mb-4">
+              <i className="fa-solid fa-chart-pie me-1 text-indigo-400"></i>
+              {isAr ? 'ملخص الشهر' : 'Monthly Summary'}
+            </h3>
+            {summary ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'أيام حضور' : 'Days Present'}</span>
+                  <span className="font-extrabold text-emerald-600">{summary.daysPresent}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'إجمالي العمل' : 'Total Work'}</span>
+                  <span className="font-extrabold text-slate-800">{fmtMinutes(summary.totalWorkMinutes)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'تأخير' : 'Late'}</span>
+                  <span className="font-bold text-amber-600">{fmtMinutes(summary.totalLateMinutes)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-sm">{isAr ? 'إضافي' : 'Overtime'}</span>
+                  <span className="font-bold text-indigo-600">{fmtMinutes(summary.totalOvertimeMinutes)}</span>
+                </div>
+                {summary.totalAbsences > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400 text-sm">{isAr ? 'غياب' : 'Absences'}</span>
+                    <span className="font-bold text-red-500">{summary.totalAbsences}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-center text-slate-300 text-sm py-4">{isAr ? 'لا توجد بيانات' : 'No data yet'}</p>
+            )}
+          </div>
+
+          {/* Quick Info */}
+          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-2 text-xs text-slate-500">
+            <p><i className="fa-solid fa-location-dot text-emerald-400 me-1"></i> {isAr ? 'يجب تفعيل GPS لتسجيل الحضور' : 'GPS must be enabled for attendance'}</p>
+            <p><i className="fa-solid fa-fingerprint text-indigo-400 me-1"></i> {isAr ? 'البصمة مطلوبة للتحقق من هويتك' : 'Biometric required to verify your identity'}</p>
+            <p><i className="fa-solid fa-shield-halved text-emerald-400 me-1"></i> {isAr ? 'البيانات مشفرة ومحمية' : 'Data is encrypted and secure'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── DEBUG PANEL (collapsible) ── */}
+      <div className="mt-6">
+        <button
+          onClick={async () => {
+            if (!showDebug) {
+              try {
+                const d = await hrDebugService.getWebAuthnDiag();
+                setDebugInfo(d);
+              } catch (e: any) {
+                setDebugInfo({ error: e?.message || 'Failed to load debug info' });
+              }
+            }
+            setShowDebug(!showDebug);
+          }}
+          className="text-xs text-slate-400 hover:text-slate-600 font-mono underline"
+        >
+          {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
+        </button>
+        {showDebug && debugInfo && (
+          <div className="mt-2 bg-slate-900 text-green-400 rounded-xl p-4 font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+            {JSON.stringify(debugInfo, null, 2)}
+            {'\n\n'}
+            {`-- Client Side --\nUserAgent: ${navigator.userAgent}\nOrigin: ${window.location.origin}\nHostname: ${window.location.hostname}`}
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+};
+
+export default HrEmployeeMeView;
