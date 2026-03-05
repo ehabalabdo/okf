@@ -5,9 +5,6 @@
 export type ClientStatus = 'trial' | 'active' | 'expired' | 'suspended';
 
 export interface ClientFeatures {
-  dental_lab: boolean;
-  implant_company: boolean;
-  academy: boolean;
   device_results: boolean;
 }
 
@@ -41,10 +38,7 @@ export interface SuperAdmin {
 export enum UserRole {
   ADMIN = 'admin',
   SECRETARY = 'secretary',
-  DOCTOR = 'doctor',
-  LAB_TECH = 'lab_tech',
-  IMPLANT_MANAGER = 'implant_manager',
-  COURSE_MANAGER = 'course_manager'
+  DOCTOR = 'doctor'
 }
 
 // Base Entity for Audit Trails
@@ -300,100 +294,6 @@ export interface Notification extends AuditMetadata {
     relatedPatientId?: string;
     isRead: boolean;
     dueDate?: number; // When should this alert happen?
-}
-
-// --- NEW: Dental Lab Types ---
-export type LabCaseStatus = 'PENDING' | 'IN_PROGRESS' | 'READY' | 'DELIVERED';
-
-export interface LabCase extends AuditMetadata {
-  id: string;
-  visitId: string;
-  patientId: string;
-  patientName: string;
-  doctorId: string;
-  doctorName: string;
-  caseType: string;
-  notes?: string;
-  status: LabCaseStatus;
-  dueDate: number;
-  clientId?: number;
-}
-
-// --- NEW: Implant Company Types (Logistics Only) ---
-export type ImplantOrderStatus = 'PENDING' | 'IN_PRODUCTION' | 'READY' | 'DELIVERED' | 'CANCELLED';
-
-export interface ImplantItem extends AuditMetadata {
-    id: string;
-    brand: string; // e.g. Straumann, Nobel
-    type: string; // e.g. Bone Level, Tissue Level
-    size: string; // e.g. 4.1mm x 10mm
-    quantity: number;
-    minThreshold: number; // For low stock alerts
-}
-
-export interface ImplantOrder extends AuditMetadata {
-    id: string;
-    clinicId: string;
-    clinicName: string;
-    doctorId: string;
-    doctorName: string;
-    
-    // Ordered Item Snapshot
-    itemId: string; // Link to inventory
-    brand: string;
-    type: string;
-    size: string;
-    quantity: number;
-    
-    status: ImplantOrderStatus;
-    requiredDate: number;
-    notes?: string;
-}
-
-// --- NEW: Beauty Academy Types (Completely Separate) ---
-
-export type CourseStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
-export type PaymentStatus = 'PAID' | 'PARTIAL' | 'UNPAID';
-
-export interface Course extends AuditMetadata {
-    id: string;
-    title: string;
-    description?: string;
-    duration: string; // e.g. "3 Months"
-    price: number;
-    instructorName: string;
-    hasCertificate: boolean;
-    status: CourseStatus;
-}
-
-export interface CourseStudent extends AuditMetadata {
-    id: string;
-    name: string;
-    phone: string;
-    gender: Gender;
-    
-    // Enrollment Details
-    courseId: string;
-    courseName: string; // Snapshot
-    enrollmentDate: number;
-    
-    // Financials
-    totalFees: number;
-    paidAmount: number;
-    paymentStatus: PaymentStatus;
-    
-    // Academic
-    isCertified: boolean;
-}
-
-export interface CourseSession extends AuditMetadata {
-    id: string;
-    courseId: string;
-    courseName: string;
-    date: number; // Timestamp
-    topic: string;
-    instructor: string;
-    notes?: string;
 }
 
 // --- NEW: System Settings for White-Labeling ---

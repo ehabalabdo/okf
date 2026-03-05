@@ -145,9 +145,6 @@ const featureCategories: FeatureCategory[] = [
   {
     id: 'specialty', label: 'وحدات متخصصة', labelEn: 'Specialty', icon: 'fa-puzzle-piece', gradient: 'from-teal-500 to-teal-600',
     features: [
-      { icon: 'fa-tooth', title: 'مختبر الأسنان', titleEn: 'Dental Lab', desc: 'إدارة حالات المختبر مع تتبع لحظي.', color: 'teal', details: ['إرسال حالة من الطبيب مباشرة','تتبع (جديد، قيد التنفيذ، جاهز)','ملاحظات ومواصفات تفصيلية','ربط مع ملف المريض','تقارير إنتاجية','إشعارات فورية'] },
-      { icon: 'fa-screwdriver-wrench', title: 'شركة الزراعات', titleEn: 'Implant Co.', desc: 'مخزون زراعات وطلبات وتقارير.', color: 'teal', details: ['كتالوج منتجات الزراعة','تتبع المخزون','طلبات الأطباء','ربط مع المريض والطبيب','تقارير مبيعات','إشعارات انخفاض المخزون'] },
-      { icon: 'fa-graduation-cap', title: 'الأكاديمية', titleEn: 'Academy', desc: 'دورات تدريبية وشهادات وحضور.', color: 'teal', details: ['إنشاء دورات تدريبية','تسجيل طلاب ومجموعات','جدولة جلسات','متابعة حضور','إصدار شهادات إتمام','تقييم المدربين'] },
       { icon: 'fa-microchip', title: 'ربط الأجهزة الطبية', titleEn: 'Device Integration', desc: 'استقبال نتائج HL7 تلقائياً في الملف الطبي.', color: 'teal', details: ['بروتوكول HL7','نتائج مباشرة في الملف','Serial Port و MLLP','تنبيهات القيم غير الطبيعية','أرشفة تلقائية','Bridge Agent سحابي'] },
     ]
   },

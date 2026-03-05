@@ -15,14 +15,14 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const { user, logout } = useAuth();
   const clientCtx = useClientSafe();
-  const features = clientCtx?.client?.enabledFeatures || { dental_lab: false, implant_company: false, academy: false, device_results: false };
+  const features = clientCtx?.client?.enabledFeatures || { device_results: false };
   const { language, toggleLanguage, t } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
 
   // Detect slug from URL to prefix nav links
   const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments',
-    'dental-lab', 'implant-company', 'academy', 'clinic-history', 'device-results', 'device-management',
+    'clinic-history', 'device-results', 'device-management',
     'queue-display', 'patient', 'super-admin'];
   const pathParts = location.pathname.split('/').filter(Boolean);
   const slug = pathParts[0] && !knownTopRoutes.includes(pathParts[0]) ? pathParts[0] : null;
@@ -33,9 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       case UserRole.ADMIN: return 'bg-purple-500/20 text-purple-300 border border-purple-500/30';
       case UserRole.DOCTOR: return 'bg-blue-500/20 text-blue-300 border border-blue-500/30';
       case UserRole.SECRETARY: return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-      case UserRole.LAB_TECH: return 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
-      case UserRole.IMPLANT_MANAGER: return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
-      case UserRole.COURSE_MANAGER: return 'bg-pink-500/20 text-pink-300 border border-pink-500/30';
+
       default: return 'bg-gray-100';
     }
   };
@@ -69,18 +67,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   // --- ACCESS CONTROL LOGIC ---
   const role = user?.role;
-  const isLabTech = role === UserRole.LAB_TECH;
-  const isImplantMgr = role === UserRole.IMPLANT_MANAGER;
-  const isCourseMgr = role === UserRole.COURSE_MANAGER;
-  
-  
   // Clinical Views: Admin, Doctor, Secretary
-  const showClinicalViews = !isLabTech && !isImplantMgr && !isCourseMgr; 
-
-  // Department Visibility — Admin always sees, others only if feature enabled
-  const showLabView = role === UserRole.ADMIN || role === UserRole.LAB_TECH || (features.dental_lab && role === UserRole.DOCTOR);
-  const showImplantView = role === UserRole.ADMIN || role === UserRole.IMPLANT_MANAGER || (features.implant_company && role === UserRole.DOCTOR);
-  const showAcademyView = role === UserRole.ADMIN || role === UserRole.COURSE_MANAGER || (features.academy && (role === UserRole.SECRETARY || role === UserRole.DOCTOR));
+  const showClinicalViews = true; 
 
   // Device results visibility — Admin always sees + management, others only if enabled
   const showDeviceResults = role === UserRole.ADMIN || (features.device_results && (role === UserRole.SECRETARY || role === UserRole.DOCTOR));
@@ -120,15 +108,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
              </>
            )}
            
-           {/* Departments Section */}
-           {(showLabView || showImplantView || showAcademyView) && (
-               <>
-                   {showClinicalViews && <div className="px-4 pb-2 mt-6 text-xs font-bold uppercase text-slate-600 tracking-wider">{t('departments_label')}</div>}
-                   {showLabView && <NavItem to="/dental-lab" icon="fa-solid fa-tooth" label={t('dental_lab_nav')} />}
-                   {showImplantView && <NavItem to="/implant-company" icon="fa-solid fa-box-open" label={t('implant_co_nav')} />}
-                   {showAcademyView && <NavItem to="/academy" icon="fa-solid fa-graduation-cap" label={t('beauty_academy_nav')} />}
-               </>
-           )}
+
 
            {/* HR Section (Admin Only) */}
            {role === UserRole.ADMIN && (
@@ -222,9 +202,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
               </>
             )}
             
-            {showLabView && <NavItem to="/dental-lab" icon="fa-solid fa-tooth" label="Lab" mobile />}
-            {showImplantView && <NavItem to="/implant-company" icon="fa-solid fa-box-open" label="Implants" mobile />}
-            {showAcademyView && <NavItem to="/academy" icon="fa-solid fa-graduation-cap" label="Academy" mobile />}
+
         </nav>
       </main>
       

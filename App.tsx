@@ -14,9 +14,7 @@ import QueueDisplayView from './views/QueueDisplayView';
 import PatientsRegistryView from './views/PatientsRegistryView';
 import PatientProfileView from './views/PatientProfileView';
 import AppointmentsView from './views/AppointmentsView'; 
-import DentalLabView from './views/DentalLabView';
-import ImplantView from './views/ImplantView';
-import CoursesView from './views/CoursesView';
+
 import PatientLoginView from './views/PatientLoginView';
 import PatientDashboardView from './views/PatientDashboardView';
 import ClinicHistoryView from './views/ClinicHistoryView';
@@ -121,7 +119,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   // Detect slug from current URL for proper redirect
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments', 
-    'dental-lab', 'implant-company', 'academy', 'clinic-history', 'device-results', 'device-management', 
+    'clinic-history', 'device-results', 'device-management', 
     'queue-display', 'patient', 'super-admin', 'hr', 'ent'];
   const currentSlug = pathParts[0] && !knownTopRoutes.includes(pathParts[0]) ? pathParts[0] : null;
   const loginPath = currentSlug ? `/${currentSlug}/login` : '/login';
@@ -143,10 +141,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     if (user.role === UserRole.ADMIN) return <RedirectHandler to={`${prefix}/admin`} />;
     if (user.role === UserRole.SECRETARY) return <RedirectHandler to={`${prefix}/reception`} />;
     if (user.role === UserRole.DOCTOR) return <RedirectHandler to={`${prefix}/doctor`} />;
-    if (user.role === UserRole.LAB_TECH) return <RedirectHandler to={`${prefix}/dental-lab`} />;
-    if (user.role === UserRole.IMPLANT_MANAGER) return <RedirectHandler to={`${prefix}/implant-company`} />;
-    if (user.role === UserRole.COURSE_MANAGER) return <RedirectHandler to={`${prefix}/academy`} />;
-    
     return <RedirectHandler to={loginPath} />;
   }
 
@@ -175,9 +169,6 @@ const getHomeRoute = (user: User): string => {
   if (user.role === UserRole.ADMIN) return `${prefix}/admin`;
   if (user.role === UserRole.SECRETARY) return `${prefix}/reception`;
   if (user.role === UserRole.DOCTOR) return `${prefix}/doctor`;
-  if (user.role === UserRole.LAB_TECH) return `${prefix}/dental-lab`;
-  if (user.role === UserRole.IMPLANT_MANAGER) return `${prefix}/implant-company`;
-  if (user.role === UserRole.COURSE_MANAGER) return `${prefix}/academy`;
   return `/${slug}/login`;
 };
 
@@ -232,9 +223,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/patients/:id" element={<SlugRedirectWithId basePath="/patients" />} />
       <Route path="/patients" element={<SlugRedirect path="/patients" />} />
       <Route path="/appointments" element={<SlugRedirect path="/appointments" />} />
-      <Route path="/dental-lab" element={<SlugRedirect path="/dental-lab" />} />
-      <Route path="/implant-company" element={<SlugRedirect path="/implant-company" />} />
-      <Route path="/academy" element={<SlugRedirect path="/academy" />} />
+
       <Route path="/clinic-history" element={<SlugRedirect path="/clinic-history" />} />
       <Route path="/device-results" element={<SlugRedirect path="/device-results" />} />
       <Route path="/device-management" element={<SlugRedirect path="/device-management" />} />
@@ -261,7 +250,7 @@ const ClientSlugRoutes: React.FC = () => {
 
   // Don't treat known routes as slugs
   const knownRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments', 
-    'dental-lab', 'implant-company', 'academy', 'clinic-history', 'device-results', 'device-management', 'queue-display', 
+    'clinic-history', 'device-results', 'device-management', 'queue-display', 
     'patient', 'super-admin', 'hr', 'ent'];
   if (slug && knownRoutes.includes(slug)) {
     return <RedirectHandler to={`/${slug}`} />;
@@ -279,9 +268,7 @@ const ClientSlugRoutes: React.FC = () => {
           <Route path="/patients" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientsRegistryView /></ProtectedRoute>} />
           <Route path="/patients/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientProfileView /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AppointmentsView /></ProtectedRoute>} />
-          <Route path="/dental-lab" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DOCTOR, UserRole.LAB_TECH]}><DentalLabView /></ProtectedRoute>} />
-          <Route path="/implant-company" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DOCTOR, UserRole.IMPLANT_MANAGER]}><ImplantView /></ProtectedRoute>} />
-          <Route path="/academy" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.COURSE_MANAGER, UserRole.SECRETARY]}><CoursesView /></ProtectedRoute>} />
+
           <Route path="/clinic-history" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DOCTOR]}><ClinicHistoryView /></ProtectedRoute>} />
           <Route path="/device-results" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><DeviceResultsView /></ProtectedRoute>} />
           <Route path="/device-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><DeviceManagementView /></ProtectedRoute>} />

@@ -1,5 +1,5 @@
 
-import { Clinic, Patient, User, UserRole, AuditMetadata, ImplantItem, ImplantOrder, Course, CourseStudent } from '../types';
+import { Clinic, Patient, User, UserRole, AuditMetadata } from '../types';
 
 /**
  * MOCK DATABASE ADAPTER (DAL) - HIGH PERFORMANCE MODE
@@ -58,9 +58,6 @@ const SEED_CLINICS: Clinic[] = [
   { id: 'c_cosmetic', name: 'Cosmetic Clinic', type: 'Cosmetic', category: 'clinic', active: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
   
   // 2. BACK-OFFICE / OPERATIONAL DEPARTMENTS
-  { id: 'c_lab', name: 'Dental Lab', type: 'Laboratory', category: 'department', active: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { id: 'c_implant', name: 'Implantology Co.', type: 'Logistics', category: 'department', active: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { id: 'c_courses', name: 'Beauty Courses', type: 'Education', category: 'department', active: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
 ];
 
 // Updated Users to test STRICT ISOLATION
@@ -74,27 +71,8 @@ const SEED_USERS: User[] = [
   // 3. GP Doctor (Sees General Medicine only)
   { uid: 'doc_gp', email: 'gp@medcore.com', name: 'Dr. General', role: UserRole.DOCTOR, clinicIds: ['c_gp'], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
 
-  // 4. Cosmetic Doctor (Sees Laser + Cosmetic + Courses)
+  // 4. Cosmetic Doctor (Sees Laser + Cosmetic)
   { uid: 'doc_beauty', email: 'beauty@medcore.com', name: 'Dr. Beauty', role: UserRole.DOCTOR, clinicIds: ['c_laser', 'c_cosmetic'], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  
-  // 5. Lab Tech (Sees Lab only)
-  //
-
-  // 6. Implant Manager (Sees Implant Co only)
-  //
-
-  // 7. Course Manager (Sees Courses only) - NEW
-  //
-];
-
-// --- SEED COURSES & STUDENTS ---
-const SEED_COURSES: Course[] = [
-    { id: 'crs_1', title: 'Advanced Botox & Fillers', duration: '2 Days', price: 1500, instructorName: 'Dr. Beauty', hasCertificate: true, status: 'ACTIVE', createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-    { id: 'crs_2', title: 'Laser Hair Removal Tech', duration: '1 Week', price: 800, instructorName: 'Sarah Tech', hasCertificate: true, status: 'ACTIVE', createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-];
-
-const SEED_STUDENTS: CourseStudent[] = [
-    { id: 'std_1', name: 'Jessica Student', phone: '0501234567', gender: 'female', courseId: 'crs_1', courseName: 'Advanced Botox & Fillers', enrollmentDate: Date.now(), totalFees: 1500, paidAmount: 500, paymentStatus: 'PARTIAL', isCertified: false, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' }
 ];
 
 class MockAdapter {
@@ -110,10 +88,6 @@ class MockAdapter {
         save('medcore_users', SEED_USERS);
         save('medcore_clinics', SEED_CLINICS);
     }
-
-    if (!load('medcore_implant_inventory', null)) save('medcore_implant_inventory', []);
-    if (!load('medcore_courses', null)) save('medcore_courses', SEED_COURSES);
-    if (!load('medcore_course_students', null)) save('medcore_course_students', SEED_STUDENTS);
     
     // Ensure seeding
     if (!load('medcore_clinics', null)) save('medcore_clinics', SEED_CLINICS);

@@ -44,7 +44,7 @@ function mapClientRow(row: any): Client {
     createdAt: row.createdAt || row.created_at,
     updatedAt: row.updatedAt || row.updated_at,
     isActive: row.isActive !== undefined ? row.isActive : row.is_active,
-    enabledFeatures: row.enabledFeatures || row.enabled_features || { dental_lab: false, implant_company: false, academy: false, device_results: false }
+    enabledFeatures: row.enabledFeatures || row.enabled_features || { device_results: false }
   };
 }
 

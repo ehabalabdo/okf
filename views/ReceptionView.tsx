@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { ClinicService, PatientService, AppointmentService, NotificationService, BillingService, CourseService } from '../services/services';
+import { ClinicService, PatientService, AppointmentService, NotificationService, BillingService } from '../services/services';
 import { api } from '../src/api';
 import { useAuth } from '../context/AuthContext';
 import { useClientSafe } from '../context/ClientContext';
@@ -49,12 +49,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   const loadData = async () => {
     if (!user) return;
     try {
-    const [allApps, activeClinics, notifs, allInvoices, allSessions] = await Promise.all([
+    const [allApps, activeClinics, notifs, allInvoices] = await Promise.all([
         AppointmentService.getAll(user),
         ClinicService.getActive(),
         NotificationService.getPendingReminders(user),
-        BillingService.getAll(user),
-        CourseService.getSessions(user) // Fetch Academy Sessions
+        BillingService.getAll(user)
     ]);
     
     // STRICT FILTER: Reception should ONLY see patient-facing clinics, NOT departments.
@@ -64,22 +63,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
     const today = new Date(); today.setHours(0,0,0,0);
     const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
     
-    // 1. Regular Patient Appointments
+    // Patient Appointments
     const todaysPatientApps = allApps.filter(a => a.date >= today.getTime() && a.date < tomorrow.getTime() && a.status === 'scheduled');
-    
-    // 2. Academy Sessions (Treat as Appointments)
-    const todaysAcademySessions = allSessions.filter(s => s.date >= today.getTime() && s.date < tomorrow.getTime())
-        .map(s => ({
-            id: s.id,
-            date: s.date,
-            patientName: `${s.topic} (Class)`,
-            reason: s.courseName,
-            isClass: true, // Marker for UI
-            clinicName: 'Academy'
-        }));
 
-    // Merge and Sort
-    const unifiedSchedule = [...todaysPatientApps, ...todaysAcademySessions].sort((a: any, b: any) => a.date - b.date);
+    // Sort
+    const unifiedSchedule = [...todaysPatientApps].sort((a: any, b: any) => a.date - b.date);
     
     setTodaysAppointments(unifiedSchedule);
     setClinics(patientClinics);

@@ -41,7 +41,7 @@ export const pgClientsService = {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       isActive: row.is_active,
-      enabledFeatures: row.enabled_features || { dental_lab: false, implant_company: false, academy: false, device_results: false }
+      enabledFeatures: row.enabled_features || { device_results: false }
     }));
   },
 
@@ -58,7 +58,7 @@ export const pgClientsService = {
       ownerUserId: row.owner_user_id,
       createdAt: row.created_at, updatedAt: row.updated_at,
       isActive: row.is_active,
-      enabledFeatures: row.enabled_features || { dental_lab: false, implant_company: false, academy: false, device_results: false }
+      enabledFeatures: row.enabled_features || { device_results: false }
     };
   },
 
@@ -75,7 +75,7 @@ export const pgClientsService = {
       ownerUserId: row.owner_user_id,
       createdAt: row.created_at, updatedAt: row.updated_at,
       isActive: row.is_active,
-      enabledFeatures: row.enabled_features || { dental_lab: false, implant_company: false, academy: false, device_results: false }
+      enabledFeatures: row.enabled_features || { device_results: false }
     };
   },
 

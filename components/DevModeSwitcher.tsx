@@ -8,10 +8,7 @@ import { UserRole, User } from '../types';
 const demoUsers: User[] = [
   { uid: 'demo_admin', name: 'Admin User', email: 'admin@medloop.com', role: UserRole.ADMIN, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
   { uid: 'demo_secretary', name: 'Secretary User', email: 'secretary@medloop.com', role: UserRole.SECRETARY, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { uid: 'demo_doctor', name: 'Dr. Ahmed', email: 'doctor@medloop.com', role: UserRole.DOCTOR, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { uid: 'demo_lab', name: 'Lab Technician', email: 'lab@medloop.com', role: UserRole.LAB_TECH, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { uid: 'demo_implant', name: 'Implant Manager', email: 'implant@medloop.com', role: UserRole.IMPLANT_MANAGER, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' },
-  { uid: 'demo_course', name: 'Course Manager', email: 'academy@medloop.com', role: UserRole.COURSE_MANAGER, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' }
+  { uid: 'demo_doctor', name: 'Dr. Ahmed', email: 'doctor@medloop.com', role: UserRole.DOCTOR, clinicIds: [], isActive: true, createdAt: Date.now(), createdBy: 'system', updatedAt: Date.now(), updatedBy: 'system' }
 ];
 
 const DevModeSwitcher: React.FC = () => {
@@ -34,15 +31,6 @@ const DevModeSwitcher: React.FC = () => {
             break;
         case UserRole.DOCTOR:
             navigate('/doctor');
-            break;
-        case UserRole.LAB_TECH:
-            navigate('/dental-lab');
-            break;
-        case UserRole.IMPLANT_MANAGER:
-            navigate('/implant-company');
-            break;
-        case UserRole.COURSE_MANAGER:
-            navigate('/academy');
             break;
         default:
             navigate('/');
