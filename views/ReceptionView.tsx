@@ -488,33 +488,33 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         )}
 
         {/* 1. FUTURISTIC MEDICAL HOLOGRAPHIC CLOCK WIDGET */}
-        <div dir="ltr" className="relative rounded-[2rem] md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(8,145,178,0.2)] bg-[#0a0f16] border border-sky-900/50 h-[220px] md:h-[280px] group select-none flex items-center">
+        <div dir="ltr" className="relative rounded-[2rem] md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(8,145,178,0.2)] bg-[#0a0f16] border border-amber-900/50 h-[220px] md:h-[280px] group select-none flex items-center">
              
              {/* Holographic Background & Grid */}
              <div className="absolute inset-0 pointer-events-none">
                  {/* Deep Space Glow */}
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[150%] bg-sky-500/10 blur-[120px] rounded-full"></div>
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[150%] bg-amber-500/10 blur-[120px] rounded-full"></div>
                  
                  {/* Hex Grid Overlay */}
                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='103.92304845413263' viewBox='0 0 60 103.92304845413263' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 103.92304845413263L0 86.60254037844386L0 51.96152422706631L30 34.64101615137755L60 51.96152422706631L60 86.60254037844386Z' fill='none' stroke='%2306b6d4' stroke-width='1'/%3E%3Cpath d='M30 51.96152422706631L0 34.64101615137755L0 0L30 -17.32050807568877L60 0L60 34.64101615137755Z' fill='none' stroke='%2306b6d4' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: '60px 103.9px' }}></div>
                  
                  {/* Animated Medical Rings (Center-Right Background) */}
                  <div className="absolute top-1/2 right-[25%] -translate-y-1/2 w-64 h-64 opacity-20">
-                     <div className="absolute inset-0 border-2 border-dashed border-sky-500 rounded-full animate-[spin_20s_linear_infinite]"></div>
+                     <div className="absolute inset-0 border-2 border-dashed border-amber-500 rounded-full animate-[spin_20s_linear_infinite]"></div>
                      <div className="absolute inset-4 border border-amber-500/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
-                     <div className="absolute inset-8 border-4 border-t-sky-400 border-r-transparent border-b-amber-400 border-l-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
+                     <div className="absolute inset-8 border-4 border-t-amber-400 border-r-transparent border-b-amber-400 border-l-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
                      <div className="absolute inset-0 flex items-center justify-center">
-                         <img src="/logo.png" alt="MedLoop Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.8)] animate-pulse" />
+                         <img src="/logo.png" alt="MedLoop Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] animate-pulse" />
                      </div>
                  </div>
 
                  {/* Multi-layered Sine Waves (Bottom) */}
                  <div className="absolute bottom-0 left-0 w-full h-24 opacity-40 flex flex-col justify-end overflow-hidden">
                      <svg viewBox="0 0 2000 100" className="w-[200%] h-full absolute bottom-0 left-0 animate-[wave_8s_linear_infinite]" preserveAspectRatio="none">
-                         <path d="M0,50 Q250,0 500,50 T1000,50 T1500,50 T2000,50" fill="none" stroke="#06b6d4" strokeWidth="2" className="opacity-50" />
+                         <path d="M0,50 Q250,0 500,50 T1000,50 T1500,50 T2000,50" fill="none" stroke="#f59e0b" strokeWidth="2" className="opacity-50" />
                      </svg>
                      <svg viewBox="0 0 2000 100" className="w-[200%] h-full absolute bottom-0 left-0 animate-[wave_6s_linear_infinite_reverse]" preserveAspectRatio="none">
-                         <path d="M0,50 Q250,100 500,50 T1000,50 T1500,50 T2000,50" fill="none" stroke="#3b82f6" strokeWidth="2" className="opacity-30" />
+                         <path d="M0,50 Q250,100 500,50 T1000,50 T1500,50 T2000,50" fill="none" stroke="#d97706" strokeWidth="2" className="opacity-30" />
                      </svg>
                      <style>{`
                          @keyframes wave {
@@ -531,14 +531,14 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                  {/* Left Side: Holographic Time Display */}
                  <div className="flex flex-col items-center md:items-start relative">
                      {/* Decorative Tech Accents */}
-                     <div className="absolute -top-6 -left-4 w-8 h-8 border-t-2 border-l-2 border-sky-500/50"></div>
-                     <div className="absolute -bottom-6 -right-4 w-8 h-8 border-b-2 border-r-2 border-sky-500/50"></div>
+                     <div className="absolute -top-6 -left-4 w-8 h-8 border-t-2 border-l-2 border-amber-500/50"></div>
+                     <div className="absolute -bottom-6 -right-4 w-8 h-8 border-b-2 border-r-2 border-amber-500/50"></div>
                      
                      <div className="flex items-baseline gap-2 text-white">
                          <span className="text-7xl md:text-[8rem] font-light tracking-tighter leading-none">
                              {hh}
                          </span>
-                         <span className="text-5xl md:text-7xl font-light text-sky-500/50 animate-pulse leading-none mb-4 md:mb-8 mx-1">:</span>
+                         <span className="text-5xl md:text-7xl font-light text-amber-500/50 animate-pulse leading-none mb-4 md:mb-8 mx-1">:</span>
                          <span className="text-7xl md:text-[8rem] font-light tracking-tighter leading-none">
                              {mm}
                          </span>
@@ -546,13 +546,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                      
                      {/* High-Tech Seconds Progress */}
                      <div className="flex items-center gap-4 mt-2 md:mt-4 w-full max-w-[320px]">
-                         <div className="text-sky-400 font-mono text-xl md:text-2xl font-bold w-10 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">{String(ss).padStart(2, '0')}</div>
+                         <div className="text-amber-400 font-mono text-xl md:text-2xl font-bold w-10 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">{String(ss).padStart(2, '0')}</div>
                          <div className="flex-1 flex gap-1 h-2">
                              {/* Segmented Progress Bar */}
                              {[...Array(30)].map((_, i) => (
                                  <div 
                                      key={i} 
-                                     className={`flex-1 h-full rounded-sm transition-all duration-300 ${i < (ss / 2) ? 'bg-sky-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'bg-sky-950/50'}`}
+                                     className={`flex-1 h-full rounded-sm transition-all duration-300 ${i < (ss / 2) ? 'bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-amber-950/50'}`}
                                  ></div>
                              ))}
                          </div>
@@ -567,13 +567,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                              <span className="text-white font-bold text-sm md:text-base tracking-widest uppercase drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
                                  {client?.name || 'MEDLOOP CLINIC'}
                              </span>
-                             <span className="text-sky-500/70 text-[10px] font-mono tracking-[0.3em] uppercase">
+                             <span className="text-amber-500/70 text-[10px] font-mono tracking-[0.3em] uppercase">
                                  Reception System // Active
                              </span>
                          </div>
-                         <div className="relative flex items-center justify-center w-6 h-6 rounded-full bg-sky-950 border border-sky-500/50">
-                             <span className="w-2 h-2 bg-sky-400 rounded-full animate-ping absolute"></span>
-                             <span className="w-2 h-2 bg-sky-400 rounded-full relative"></span>
+                         <div className="relative flex items-center justify-center w-6 h-6 rounded-full bg-amber-950 border border-amber-500/50">
+                             <span className="w-2 h-2 bg-amber-400 rounded-full animate-ping absolute"></span>
+                             <span className="w-2 h-2 bg-amber-400 rounded-full relative"></span>
                          </div>
                      </div>
                      
@@ -581,20 +581,20 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                      <div className="text-3xl md:text-4xl font-bold text-white tracking-wide mb-1 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
                          {dayName}
                      </div>
-                     <div className="text-lg md:text-xl text-sky-500/80 font-mono uppercase tracking-widest flex items-center gap-3">
+                     <div className="text-lg md:text-xl text-amber-500/80 font-mono uppercase tracking-widest flex items-center gap-3">
                          {fmtDate(currentTime)}
                      </div>
                      
                      {/* HUD Data Modules */}
                      <div className="flex gap-4 mt-8">
                          {/* Waiting Module */}
-                         <div className="relative bg-[#0f172a]/80 border-l-2 border-sky-500 pl-4 pr-6 py-3 flex items-center gap-4 backdrop-blur-md">
-                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-sky-500/50"></div>
-                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-sky-500/50"></div>
-                            <div className="text-sky-400 text-2xl"><i className="fa-solid fa-users-viewfinder"></i></div>
+                         <div className="relative bg-[#0f172a]/80 border-l-2 border-amber-500 pl-4 pr-6 py-3 flex items-center gap-4 backdrop-blur-md">
+                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-amber-500/50"></div>
+                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-amber-500/50"></div>
+                            <div className="text-amber-400 text-2xl"><i className="fa-solid fa-users-viewfinder"></i></div>
                             <div className="flex flex-col items-start leading-none">
                                 <span className="font-mono text-white text-2xl font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">{String(activeQueue.length).padStart(2, '0')}</span>
-                                <span className="text-[10px] font-mono text-sky-500/70 uppercase tracking-widest mt-1">Waiting</span>
+                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">Waiting</span>
                             </div>
                          </div>
                          
@@ -614,7 +614,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
              </div>
              
              {/* Glitch/Scan Overlay */}
-             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(6,182,212,0.05)_50%)] bg-[length:100%_4px] z-50 opacity-20"></div>
+             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(245,158,11,0.05)_50%)] bg-[length:100%_4px] z-50 opacity-20"></div>
         </div>
 
         {/* ... [Rest of the file remains same] ... */}
