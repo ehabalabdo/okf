@@ -569,6 +569,34 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 </h3>
             </div>
 
+            {/* ENT Medical Forms Quick Access */}
+            <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden mb-8">
+                <div className="p-5 md:p-6 border-b border-gray-100 bg-teal-50/30">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-teal-100 text-teal-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
+                        <div><h2 className="font-bold text-slate-800 leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                        {[
+                            { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100' },
+                            { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
+                            { path: 'ent/audiogram', icon: 'fa-ear-listen', label: 'فحص السمع', color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
+                            { path: 'ent/balance', icon: 'fa-person-walking', label: 'فحص التوازن', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                            { path: 'ent/referral', icon: 'fa-share-from-square', label: 'تحويل طبي', color: 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' },
+                        ].map(item => {
+                            const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
+                            return (
+                                <a key={item.path} href={`/${slug}/${item.path}`}
+                                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all text-center ${item.color}`}>
+                                    <i className={`fa-solid ${item.icon} text-2xl`}></i>
+                                    <span className="text-xs font-bold leading-tight">{item.label}</span>
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
             {/* --- ENTITY MANAGEMENT MODAL --- */}
             {isAddingEntity && (
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm animate-fade-in">
