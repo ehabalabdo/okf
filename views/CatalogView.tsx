@@ -240,7 +240,7 @@ const CatalogView: React.FC = () => {
           onClick={() => setActiveTab('medications')}
           className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
             activeTab === 'medications'
-              ? 'bg-blue-600 text-white shadow-lg'
+              ? 'bg-amber-600 text-white shadow-lg'
               : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
           }`}
         >
@@ -263,7 +263,7 @@ const CatalogView: React.FC = () => {
                 <i className="fa-solid fa-download mr-1"></i> Download Template
               </button>
               <input type="file" ref={serviceFileRef} className="hidden" accept=".xlsx,.xls" onChange={e => handleFileSelect(e, 'services')} />
-              <button onClick={() => serviceFileRef.current?.click()} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-200 transition-all">
+              <button onClick={() => serviceFileRef.current?.click()} className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-200 transition-all">
                 <i className="fa-solid fa-upload mr-1"></i> Upload Excel
               </button>
               <button onClick={() => setShowAddService(true)} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-all">
@@ -342,7 +342,7 @@ const CatalogView: React.FC = () => {
           {/* Header */}
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-lg font-extrabold text-slate-800">
-              <i className="fa-solid fa-pills text-blue-500 mr-2"></i>
+              <i className="fa-solid fa-pills text-amber-500 mr-2"></i>
               Medications Catalog
             </h2>
             <div className="flex gap-2 flex-wrap">
@@ -350,10 +350,10 @@ const CatalogView: React.FC = () => {
                 <i className="fa-solid fa-download mr-1"></i> Download Template
               </button>
               <input type="file" ref={medFileRef} className="hidden" accept=".xlsx,.xls" onChange={e => handleFileSelect(e, 'medications')} />
-              <button onClick={() => medFileRef.current?.click()} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-200 transition-all">
+              <button onClick={() => medFileRef.current?.click()} className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-200 transition-all">
                 <i className="fa-solid fa-upload mr-1"></i> Upload Excel
               </button>
-              <button onClick={() => setShowAddMed(true)} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-all">
+              <button onClick={() => setShowAddMed(true)} className="px-3 py-2 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition-all">
                 <i className="fa-solid fa-plus mr-1"></i> Add Medication
               </button>
             </div>
@@ -361,7 +361,7 @@ const CatalogView: React.FC = () => {
 
           {/* Add Medication Form */}
           {showAddMed && (
-            <div className="p-4 bg-blue-50 border-b border-blue-100">
+            <div className="p-4 bg-amber-50 border-b border-amber-100">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                 <input className="p-2 rounded-lg border text-sm" placeholder="Brand Name" value={newMed.brandName} onChange={e => setNewMed({ ...newMed, brandName: e.target.value })} />
                 <input className="p-2 rounded-lg border text-sm" placeholder="Generic Name" value={newMed.genericName} onChange={e => setNewMed({ ...newMed, genericName: e.target.value })} />
@@ -381,7 +381,7 @@ const CatalogView: React.FC = () => {
                 <input className="p-2 rounded-lg border text-sm" placeholder="Default Duration" value={newMed.defaultDuration} onChange={e => setNewMed({ ...newMed, defaultDuration: e.target.value })} />
                 <input className="p-2 rounded-lg border text-sm" placeholder="Notes" value={newMed.notes} onChange={e => setNewMed({ ...newMed, notes: e.target.value })} />
                 <div className="flex gap-2">
-                  <button onClick={handleAddMed} className="flex-1 bg-blue-600 text-white rounded-lg font-bold text-sm hover:bg-blue-700">Save</button>
+                  <button onClick={handleAddMed} className="flex-1 bg-amber-600 text-white rounded-lg font-bold text-sm hover:bg-amber-700">Save</button>
                   <button onClick={() => setShowAddMed(false)} className="px-3 bg-white border rounded-lg text-sm text-slate-500 hover:bg-slate-50">Cancel</button>
                 </div>
               </div>
@@ -413,7 +413,7 @@ const CatalogView: React.FC = () => {
                     <tr key={med.id} className={`hover:bg-slate-50 transition-colors ${!med.active ? 'opacity-50' : ''}`}>
                       <td className="p-3 font-medium text-slate-800">{med.brandName || '—'}</td>
                       <td className="p-3 text-slate-600 italic">{med.genericName || '—'}</td>
-                      <td className="p-3"><span className="bg-blue-50 px-2 py-0.5 rounded text-xs font-bold text-blue-700">{med.strength || '—'}</span></td>
+                      <td className="p-3"><span className="bg-amber-50 px-2 py-0.5 rounded text-xs font-bold text-amber-700">{med.strength || '—'}</span></td>
                       <td className="p-3 text-slate-500">{med.dosageForm || '—'}</td>
                       <td className="p-3 text-slate-500">{med.route || '—'}</td>
                       <td className="p-3 text-slate-500 text-xs">{med.defaultDose ? `${med.defaultDose} ${med.defaultFrequency} × ${med.defaultDuration}` : '—'}</td>
@@ -443,7 +443,7 @@ const CatalogView: React.FC = () => {
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-100 flex justify-between items-center">
               <h3 className="text-lg font-extrabold text-slate-800">
-                <i className={`fa-solid ${importModal.type === 'services' ? 'fa-briefcase-medical text-emerald-500' : 'fa-pills text-blue-500'} mr-2`}></i>
+                <i className={`fa-solid ${importModal.type === 'services' ? 'fa-briefcase-medical text-emerald-500' : 'fa-pills text-amber-500'} mr-2`}></i>
                 Import Preview — {importModal.rows.length} rows
               </h3>
               <button onClick={() => { setImportModal(null); setImportResult(null); }} className="text-slate-400 hover:text-slate-700">
@@ -458,7 +458,7 @@ const CatalogView: React.FC = () => {
                   <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-bold text-sm">
                     <i className="fa-solid fa-circle-plus"></i> Created: {importResult.created}
                   </div>
-                  <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-bold text-sm">
+                  <div className="flex items-center gap-2 bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg font-bold text-sm">
                     <i className="fa-solid fa-pen"></i> Updated: {importResult.updated}
                   </div>
                   {importResult.failed > 0 && (

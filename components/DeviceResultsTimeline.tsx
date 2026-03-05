@@ -51,7 +51,7 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
       case 'glucose': return { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-200' };
       case 'chemistry': return { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-200' };
       case 'xray': return { bg: 'bg-sky-100', text: 'text-sky-600', border: 'border-sky-200' };
-      default: return { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' };
+      default: return { bg: 'bg-amber-100', text: 'text-amber-600', border: 'border-amber-200' };
     }
   };
 
@@ -94,10 +94,10 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
     <div className="animate-fade-in space-y-6">
       {/* Summary Bar */}
       <div className="flex flex-wrap gap-3">
-        <div className="bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">
-          <i className="fa-solid fa-vials text-blue-500"></i>
-          <span className="text-blue-700 font-bold">{results.length}</span>
-          <span className="text-blue-500 text-xs">إجمالي النتائج</span>
+        <div className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">
+          <i className="fa-solid fa-vials text-amber-500"></i>
+          <span className="text-amber-700 font-bold">{results.length}</span>
+          <span className="text-amber-500 text-xs">إجمالي النتائج</span>
         </div>
         {results.some(r => r.isAbnormal) && (
           <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">

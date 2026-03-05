@@ -398,7 +398,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                               <div className="flex items-center gap-3 mb-2">
                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm ${
                                       u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
-                                      u.role === 'doctor' ? 'bg-blue-100 text-blue-600' :
+                                      u.role === 'doctor' ? 'bg-amber-100 text-amber-600' :
                                       u.role === 'lab_tech' ? 'bg-amber-100 text-amber-600' :
                                       'bg-green-100 text-green-600'
                                   }`}>
@@ -571,14 +571,14 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
 
             {/* ENT Medical Forms Quick Access */}
             <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden mb-8">
-                <div className="p-5 md:p-6 border-b border-gray-100 bg-blue-50/30">
+                <div className="p-5 md:p-6 border-b border-gray-100 bg-amber-50/30">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-blue-100 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
+                        <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
                         <div><h2 className="font-bold text-slate-800 leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
-                            { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100' },
+                            { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
                             { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
                             { path: 'ent/audiogram', icon: 'fa-ear-listen', label: 'فحص السمع', color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
                             { path: 'ent/balance', icon: 'fa-person-walking', label: 'فحص التوازن', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
@@ -642,7 +642,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                         data={patientClinics} 
                         category="clinic" 
                         icon="fa-hospital-user" 
-                        colorClass="bg-blue-50/20 text-blue-600" 
+                        colorClass="bg-amber-50/20 text-amber-600" 
                     />
                     
                     <EntityTable 
@@ -749,7 +749,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                 <div className="flex items-center gap-3">
                                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border transition-transform ${
                                         user.role === 'admin' ? 'bg-purple-100 text-purple-600 border-purple-200' :
-                                        user.role === 'doctor' ? 'bg-blue-100 text-blue-600 border-blue-200' :
+                                        user.role === 'doctor' ? 'bg-amber-100 text-amber-600 border-amber-200' :
                                         user.role === 'lab_tech' ? 'bg-amber-100 text-amber-600 border-amber-200' :
                                         user.role === 'implant_manager' ? 'bg-sky-100 text-sky-600 border-sky-200' :
                                         'bg-emerald-100 text-emerald-600 border-emerald-200'
@@ -768,7 +768,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                 <div className="flex flex-col gap-1">
                                     <span className={`w-fit px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase tracking-tighter shadow-sm border ${
                                         user.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                                        user.role === 'doctor' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                        user.role === 'doctor' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                                         user.role === 'lab_tech' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                                         user.role === 'implant_manager' ? 'bg-sky-50 text-sky-700 border-sky-100' :
                                         'bg-emerald-50 text-emerald-700 border-emerald-100'

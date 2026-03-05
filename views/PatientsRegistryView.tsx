@@ -62,7 +62,7 @@ const PatientsRegistryView: React.FC = () => {
   const StatusBadge = ({ status }: { status: string }) => {
     const styles: Record<string, string> = {
       'waiting': 'bg-amber-100 text-amber-700',
-      'in-progress': 'bg-blue-100 text-blue-700',
+      'in-progress': 'bg-amber-100 text-amber-700',
       'completed': 'bg-green-100 text-green-700'
     };
     const label = status === 'waiting' ? t('waiting') : status === 'in-progress' ? t('in_progress') : t('completed');
@@ -135,7 +135,7 @@ const PatientsRegistryView: React.FC = () => {
                     <tr 
                         key={p.id} 
                         onClick={() => navigate(slug ? `/${slug}/patients/${p.id}` : `/patients/${p.id}`)}
-                        className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
+                        className="hover:bg-amber-50/50 cursor-pointer transition-colors group"
                     >
                        <td className="px-6 py-4">
                           <div className="font-bold text-slate-800 group-hover:text-primary transition-colors">{p.name}</div>

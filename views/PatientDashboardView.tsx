@@ -290,7 +290,7 @@ const PatientDashboardView: React.FC = () => {
                     {visit.prescriptions && visit.prescriptions.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {visit.prescriptions.map((rx, i) => (
-                          <span key={i} className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-100">
+                          <span key={i} className="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold border border-amber-100">
                             💊 {rx.drugName} {rx.dosage}
                           </span>
                         ))}

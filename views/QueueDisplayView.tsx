@@ -265,7 +265,7 @@ const QueueDisplayView: React.FC = () => {
       {/* Futuristic Background Elements */}
       <div className="absolute inset-0 pointer-events-none z-0">
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-sky-600/10 blur-[150px] rounded-full"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[150px] rounded-full"></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-amber-600/10 blur-[150px] rounded-full"></div>
           <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='103.92304845413263' viewBox='0 0 60 103.92304845413263' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 103.92304845413263L0 86.60254037844386L0 51.96152422706631L30 34.64101615137755L60 51.96152422706631L60 86.60254037844386Z' fill='none' stroke='%2306b6d4' stroke-width='1'/%3E%3Cpath d='M30 51.96152422706631L0 34.64101615137755L0 0L30 -17.32050807568877L60 0L60 34.64101615137755Z' fill='none' stroke='%2306b6d4' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: '60px 103.9px' }}></div>
       </div>
 
@@ -289,7 +289,7 @@ const QueueDisplayView: React.FC = () => {
             </div>
             <button 
                 onClick={testAudio}
-                className="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-3 bg-blue-500/10 text-blue-400 border border-blue-500/50 hover:bg-blue-500/20"
+                className="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-3 bg-amber-500/10 text-amber-400 border border-amber-500/50 hover:bg-amber-500/20"
             >
                 <i className="fa-solid fa-play"></i>
                 تجربة الصوت
@@ -388,7 +388,7 @@ const QueueDisplayView: React.FC = () => {
                    </div>
 
                    <div className="text-sky-100/80 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-950/50 border border-blue-900/50 flex items-center justify-center text-blue-400">
+                      <div className="w-10 h-10 rounded-xl bg-amber-950/50 border border-amber-900/50 flex items-center justify-center text-amber-400">
                           <i className="fa-solid fa-house-medical"></i>
                       </div>
                       <span className="font-medium tracking-wide">{clinics[p.currentVisit.clinicId] || '...'}</span>

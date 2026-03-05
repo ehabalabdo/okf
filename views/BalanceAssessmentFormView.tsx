@@ -182,7 +182,7 @@ const BalanceAssessmentView: React.FC = () => {
           {/* VNG Tests */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-eye text-blue-500"></i> فحوصات VNG
+              <i className="fa-solid fa-eye text-amber-500"></i> فحوصات VNG
             </h2>
             <div className="space-y-4">
               {/* Saccade */}

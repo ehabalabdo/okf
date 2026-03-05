@@ -149,7 +149,7 @@ const DeviceResultsView: React.FC = () => {
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl">
             <i className="fa-solid fa-vials"></i>
           </div>
           <div>
@@ -218,7 +218,7 @@ const DeviceResultsView: React.FC = () => {
                           result.deviceType === 'ecg' ? 'bg-pink-100 text-pink-600' :
                           result.deviceType === 'glucose' ? 'bg-orange-100 text-orange-600' :
                           result.deviceType === 'chemistry' ? 'bg-purple-100 text-purple-600' :
-                          'bg-blue-100 text-blue-600'
+                          'bg-amber-100 text-amber-600'
                         }`}>
                           <i className={getDeviceIcon(result.deviceType)}></i>
                         </div>
@@ -346,7 +346,7 @@ const DeviceResultsView: React.FC = () => {
                     className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-primary hover:bg-primary/5 transition-all text-right disabled:opacity-50"
                   >
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm shrink-0 ${
-                      patient.gender === 'male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'
+                      patient.gender === 'male' ? 'bg-amber-100 text-amber-600' : 'bg-pink-100 text-pink-600'
                     }`}>
                       <i className="fa-solid fa-user"></i>
                     </div>

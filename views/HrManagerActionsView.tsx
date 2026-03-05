@@ -187,7 +187,7 @@ const HrManagerActionsView: React.FC = () => {
       <div className="flex gap-2 mb-6 bg-white rounded-2xl shadow-soft border p-2">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition ${tab === t.key ? 'bg-blue-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition ${tab === t.key ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'}`}>
             <i className={`fa-solid ${t.icon}`}></i>
             {isAr ? t.labelAr : t.label}
           </button>
@@ -212,7 +212,7 @@ const HrManagerActionsView: React.FC = () => {
               </select>
             </div>
             <button onClick={() => setShowDedForm(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl font-bold text-sm">
+              className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-xl font-bold text-sm">
               <i className="fa-solid fa-plus me-1"></i> {isAr ? 'إضافة خصم' : 'Add Deduction'}
             </button>
           </div>
@@ -222,7 +222,7 @@ const HrManagerActionsView: React.FC = () => {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowDedForm(false)}>
               <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
                 <h3 className="text-lg font-extrabold text-slate-800 mb-4">
-                  <i className="fa-solid fa-money-bill-transfer text-blue-500 me-2"></i>
+                  <i className="fa-solid fa-money-bill-transfer text-amber-500 me-2"></i>
                   {isAr ? 'خصم جديد' : 'New Deduction'}
                 </h3>
                 <div className="space-y-4">
@@ -247,7 +247,7 @@ const HrManagerActionsView: React.FC = () => {
                   </div>
                   <div className="flex gap-3">
                     <button onClick={handleAddDeduction} disabled={saving || !dedForm.employee_id || !dedForm.amount}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-50">
+                      className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-50">
                       {saving && <i className="fa-solid fa-circle-notch fa-spin me-2"></i>}
                       {isAr ? 'إضافة' : 'Add'}
                     </button>
@@ -408,7 +408,7 @@ const HrManagerActionsView: React.FC = () => {
               </select>
             </div>
             <button onClick={() => setShowNotifForm(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl font-bold text-sm">
+              className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-xl font-bold text-sm">
               <i className="fa-solid fa-bell me-1"></i> {isAr ? 'إرسال إشعار' : 'Send Notification'}
             </button>
           </div>
@@ -418,7 +418,7 @@ const HrManagerActionsView: React.FC = () => {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowNotifForm(false)}>
               <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
                 <h3 className="text-lg font-extrabold text-slate-800 mb-4">
-                  <i className="fa-solid fa-bell text-blue-500 me-2"></i>
+                  <i className="fa-solid fa-bell text-amber-500 me-2"></i>
                   {isAr ? 'إشعار جديد' : 'New Notification'}
                 </h3>
                 <div className="space-y-4">
@@ -438,7 +438,7 @@ const HrManagerActionsView: React.FC = () => {
                   </div>
                   <div className="flex gap-3">
                     <button onClick={handleAddNotification} disabled={saving || !notifForm.employee_id || !notifForm.message}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-50">
+                      className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-50">
                       {saving && <i className="fa-solid fa-circle-notch fa-spin me-2"></i>}
                       {isAr ? 'إرسال' : 'Send'}
                     </button>
@@ -459,14 +459,14 @@ const HrManagerActionsView: React.FC = () => {
                 {isAr ? 'لا توجد إشعارات' : 'No notifications'}
               </div>
             ) : notifications.map(n => (
-              <div key={n.id} className={`bg-white rounded-2xl shadow-soft border p-4 flex items-start gap-3 ${!n.isRead ? 'border-blue-300 bg-blue-50/30' : ''}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${n.isRead ? 'bg-slate-100' : 'bg-blue-100'}`}>
-                  <i className={`fa-solid fa-bell ${n.isRead ? 'text-slate-400' : 'text-blue-500'}`}></i>
+              <div key={n.id} className={`bg-white rounded-2xl shadow-soft border p-4 flex items-start gap-3 ${!n.isRead ? 'border-amber-300 bg-amber-50/30' : ''}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${n.isRead ? 'bg-slate-100' : 'bg-amber-100'}`}>
+                  <i className={`fa-solid fa-bell ${n.isRead ? 'text-slate-400' : 'text-amber-500'}`}></i>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-sm text-slate-800">{empName(n.employeeId)}</span>
-                    {!n.isRead && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">{isAr ? 'جديد' : 'NEW'}</span>}
+                    {!n.isRead && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold">{isAr ? 'جديد' : 'NEW'}</span>}
                   </div>
                   <p className="text-sm text-slate-600">{n.message}</p>
                   <p className="text-xs text-slate-400 mt-1">{fmtDateTime(n.createdAt)}</p>

@@ -112,15 +112,15 @@
               sans: ['Plus Jakarta Sans', 'Cairo', 'sans-serif'],
             },
             colors: {
-              primary: '#2563EB', // Brand Blue (from logo)
-              secondary: '#7CB342', // Brand Green (from logo)
-              accent: '#E8961F', // Brand Orange (from logo)
-              dark: '#0f172a', // Slate 900
+              primary: '#E8961F', // Brand Orange (dominant - from logo)
+              secondary: '#2563EB', // Brand Blue (from logo)
+              accent: '#7CB342', // Brand Green (from logo)
+              dark: '#1a1a2e', // Dark navy
               surface: '#ffffff',
             },
             boxShadow: {
               'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-              'glow': '0 0 15px rgba(37, 99, 235, 0.3)',
+              'glow': '0 0 15px rgba(232, 150, 31, 0.4)',
               'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
             },
             animation: {
@@ -142,10 +142,10 @@
         /* Subtle mesh gradient background */
         background-color: #f0f4f8;
         background-image: 
-          radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, rgba(124, 179, 66, 0.08) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-          radial-gradient(at 0% 100%, rgba(232, 150, 31, 0.08) 0px, transparent 50%);
+          radial-gradient(at 0% 0%, rgba(232, 150, 31, 0.08) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(232, 150, 31, 0.06) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(124, 179, 66, 0.06) 0px, transparent 50%);
         background-attachment: fixed;
         transition: background-color 0.3s ease, color 0.3s ease;
       }
@@ -175,7 +175,7 @@
       }
       
       .glass-sidebar {
-        background: linear-gradient(180deg, #1e3a5f 0%, #1e293b 100%);
+        background: linear-gradient(180deg, #2a1f0e 0%, #1a1a2e 100%);
       }
 
       /* 
@@ -186,8 +186,8 @@
       html.dark body {
         background-color: #020617; 
         background-image: 
-          radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, rgba(124, 179, 66, 0.1) 0px, transparent 50%);
+          radial-gradient(at 0% 0%, rgba(232, 150, 31, 0.12) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(232, 150, 31, 0.08) 0px, transparent 50%);
       }
       html.dark .bg-white {
         background-color: #1e293b !important; /* Slate 800 */

@@ -42,6 +42,6 @@ export const STATUS_COLORS: Record<string, string> = {
   absent: 'bg-red-100 text-red-700',
   late: 'bg-amber-100 text-amber-700',
   weekend: 'bg-slate-100 text-slate-500',
-  holiday: 'bg-blue-100 text-blue-600',
+  holiday: 'bg-amber-100 text-amber-600',
   leave: 'bg-purple-100 text-purple-600',
 };

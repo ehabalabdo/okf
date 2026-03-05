@@ -254,7 +254,7 @@ const ClinicHistoryView: React.FC = () => {
       case 'completed':
         return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
       case 'in-progress':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
       case 'waiting':
         return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
       default:
@@ -340,14 +340,14 @@ const ClinicHistoryView: React.FC = () => {
             icon="fa-solid fa-users"
             label={isAr ? 'إجمالي المرضى' : 'Total Patients'}
             value={totals.patients}
-            color="from-blue-500 to-sky-400"
+            color="from-amber-500 to-sky-400"
           />
           <StatCard
             icon="fa-solid fa-stethoscope"
             label={isAr ? 'إجمالي الزيارات' : 'Total Visits'}
             value={totals.visits}
             subValue={`${totals.completed} ${isAr ? 'مكتمل' : 'completed'}`}
-            color="from-emerald-500 to-blue-400"
+            color="from-emerald-500 to-amber-400"
           />
           <StatCard
             icon="fa-solid fa-money-bill-wave"
@@ -400,7 +400,7 @@ const ClinicHistoryView: React.FC = () => {
                       </span>
                     )}
                     {stats.inProgressNow > 0 && (
-                      <span className="hidden md:flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold">
+                      <span className="hidden md:flex items-center gap-1 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
                         <i className="fa-solid fa-user-doctor"></i>
                         {stats.inProgressNow} {isAr ? 'جاري' : 'in progress'}
                       </span>

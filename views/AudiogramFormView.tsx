@@ -100,11 +100,11 @@ const AudiogramFormView: React.FC = () => {
             ))}
           </tr>
           <tr>
-            <td className="p-2 font-medium text-blue-600">أذن يسرى <span className="text-xs">(X)</span></td>
+            <td className="p-2 font-medium text-amber-600">أذن يسرى <span className="text-xs">(X)</span></td>
             {frequencies.map(f => (
               <td key={f} className="p-1">
                 <input type="number" value={form[leftKey][f] ?? ''} onChange={e => updateFreq(leftKey, f, e.target.value)}
-                  className="w-16 p-1 text-center rounded border border-slate-200 dark:border-slate-600 bg-blue-50 dark:bg-blue-900/10 text-slate-800 dark:text-white" min="-10" max="120" />
+                  className="w-16 p-1 text-center rounded border border-slate-200 dark:border-slate-600 bg-amber-50 dark:bg-amber-900/10 text-slate-800 dark:text-white" min="-10" max="120" />
               </td>
             ))}
           </tr>
@@ -182,9 +182,9 @@ const AudiogramFormView: React.FC = () => {
                   className="w-full p-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 text-center" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-blue-600 mb-1">SRT يسرى (dB)</label>
+                <label className="block text-xs font-medium text-amber-600 mb-1">SRT يسرى (dB)</label>
                 <input type="number" value={form.leftSRT ?? ''} onChange={e => setForm(f => ({ ...f, leftSRT: e.target.value ? Number(e.target.value) : undefined }))}
-                  className="w-full p-2 rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-900/10 dark:border-blue-800 text-center" />
+                  className="w-full p-2 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 text-center" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-red-600 mb-1">SDS يمنى (%)</label>
@@ -192,9 +192,9 @@ const AudiogramFormView: React.FC = () => {
                   className="w-full p-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 text-center" min="0" max="100" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-blue-600 mb-1">SDS يسرى (%)</label>
+                <label className="block text-xs font-medium text-amber-600 mb-1">SDS يسرى (%)</label>
                 <input type="number" value={form.leftSDS ?? ''} onChange={e => setForm(f => ({ ...f, leftSDS: e.target.value ? Number(e.target.value) : undefined }))}
-                  className="w-full p-2 rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-900/10 dark:border-blue-800 text-center" min="0" max="100" />
+                  className="w-full p-2 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 text-center" min="0" max="100" />
               </div>
             </div>
           </div>
@@ -202,7 +202,7 @@ const AudiogramFormView: React.FC = () => {
           {/* Tympanometry */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-chart-area text-blue-500"></i> قياس طبلية الأذن (Tympanometry)
+              <i className="fa-solid fa-chart-area text-amber-500"></i> قياس طبلية الأذن (Tympanometry)
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Right Ear */}
@@ -235,14 +235,14 @@ const AudiogramFormView: React.FC = () => {
                 </div>
               </div>
               {/* Left Ear */}
-              <div className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-200 dark:border-blue-800">
-                <h3 className="font-bold text-blue-700 dark:text-blue-300 mb-3">أذن يسرى</h3>
+              <div className="p-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-xl border border-amber-200 dark:border-amber-800">
+                <h3 className="font-bold text-amber-700 dark:text-amber-300 mb-3">أذن يسرى</h3>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-medium mb-1">النوع</label>
                     <div className="flex gap-2">{tympTypes.map(t => (
                       <button key={t} onClick={() => setForm(f => ({ ...f, leftTympanogram: t }))}
-                        className={`px-3 py-1 rounded-lg text-sm font-medium ${form.leftTympanogram === t ? 'bg-blue-500 text-white' : 'bg-white dark:bg-slate-700'}`}>{t}</button>
+                        className={`px-3 py-1 rounded-lg text-sm font-medium ${form.leftTympanogram === t ? 'bg-amber-500 text-white' : 'bg-white dark:bg-slate-700'}`}>{t}</button>
                     ))}</div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -284,7 +284,7 @@ const AudiogramFormView: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-blue-600 mb-2">أذن يسرى</label>
+                <label className="block text-sm font-medium text-amber-600 mb-2">أذن يسرى</label>
                 <div className="flex gap-3">
                   {['pass', 'refer'].map(v => (
                     <button key={v} onClick={() => setForm(f => ({ ...f, leftOAE: v }))}
@@ -316,7 +316,7 @@ const AudiogramFormView: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-blue-600 mb-2">مستوى السمع - يسرى</label>
+                  <label className="block text-sm font-medium text-amber-600 mb-2">مستوى السمع - يسرى</label>
                   <div className="grid grid-cols-2 gap-2">
                     {hearingLevels.map(h => (
                       <button key={h.value} onClick={() => setForm(f => ({ ...f, leftHearingLevel: h.value }))}

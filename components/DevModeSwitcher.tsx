@@ -69,7 +69,7 @@ const DevModeSwitcher: React.FC = () => {
                 >
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 ${
                         u.role === 'admin' ? 'bg-purple-100 text-purple-600' : 
-                        u.role === 'doctor' ? 'bg-blue-100 text-blue-600' :
+                        u.role === 'doctor' ? 'bg-amber-100 text-amber-600' :
                         u.role === 'secretary' ? 'bg-emerald-100 text-emerald-600' :
                         'bg-gray-100 text-gray-600'
                     }`}>

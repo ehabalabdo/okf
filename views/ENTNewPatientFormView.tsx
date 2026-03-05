@@ -104,12 +104,12 @@ const ENTNewPatientFormView: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir="rtl">
         {/* Header */}
         <div className="max-w-5xl mx-auto mb-6">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <i className="fa-solid fa-user-plus text-white text-2xl"></i>
               </div>
               <div>
@@ -124,7 +124,7 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Patient Selection */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-user text-blue-500"></i> اختيار المريض
+              <i className="fa-solid fa-user text-amber-500"></i> اختيار المريض
             </h2>
             <input
               type="text"
@@ -137,7 +137,7 @@ const ENTNewPatientFormView: React.FC = () => {
               <div className="max-h-40 overflow-y-auto space-y-1">
                 {filteredPatients.map(p => (
                   <button key={p.id} onClick={() => { setSelectedPatientId(p.id); setSearchTerm(''); }}
-                    className={`w-full text-right p-3 rounded-xl transition ${selectedPatientId === p.id ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
+                    className={`w-full text-right p-3 rounded-xl transition ${selectedPatientId === p.id ? 'bg-amber-100 dark:bg-amber-900/30 border-amber-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
                     <span className="font-semibold">{p.name}</span>
                     <span className="text-slate-500 mr-3">{p.phone}</span>
                   </button>
@@ -145,9 +145,9 @@ const ENTNewPatientFormView: React.FC = () => {
               </div>
             )}
             {selectedPatient && (
-              <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                <p className="font-bold text-blue-800 dark:text-blue-300">{selectedPatient.name}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? 'ذكر' : 'أنثى'} | العمر: {selectedPatient.age}</p>
+              <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+                <p className="font-bold text-amber-800 dark:text-amber-300">{selectedPatient.name}</p>
+                <p className="text-sm text-amber-600 dark:text-amber-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? 'ذكر' : 'أنثى'} | العمر: {selectedPatient.age}</p>
               </div>
             )}
           </div>
@@ -176,7 +176,7 @@ const ENTNewPatientFormView: React.FC = () => {
                   <div className="flex gap-2 flex-wrap">
                     {(['right', 'left', 'both', 'none'] as const).map(side => (
                       <button key={side} onClick={() => setForm(f => ({ ...f, symptomSide: side }))}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.symptomSide === side ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.symptomSide === side ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
                         {{ right: 'يمين', left: 'يسار', both: 'كلاهما', none: 'غير محدد' }[side]}
                       </button>
                     ))}
@@ -223,7 +223,7 @@ const ENTNewPatientFormView: React.FC = () => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.previousENTTreatment}
                     onChange={e => setForm(f => ({ ...f, previousENTTreatment: e.target.checked }))}
-                    className="w-5 h-5 rounded text-blue-500" />
+                    className="w-5 h-5 rounded text-amber-500" />
                   <span className="text-slate-700 dark:text-slate-300">هل تلقى علاج أنف أذن حنجرة سابقاً؟</span>
                 </label>
               </div>
@@ -236,7 +236,7 @@ const ENTNewPatientFormView: React.FC = () => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.previousENTSurgery}
                     onChange={e => setForm(f => ({ ...f, previousENTSurgery: e.target.checked }))}
-                    className="w-5 h-5 rounded text-blue-500" />
+                    className="w-5 h-5 rounded text-amber-500" />
                   <span className="text-slate-700 dark:text-slate-300">هل أجرى عمليات جراحية في الأنف أو الأذن أو الحنجرة؟</span>
                 </label>
               </div>
@@ -261,7 +261,7 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Submit */}
           <div className="flex justify-center pb-8">
             <button onClick={handleSubmit} disabled={saving}
-              className="px-12 py-4 bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
+              className="px-12 py-4 bg-gradient-to-r from-amber-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
               {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> جاري الحفظ...</> 
                 : saved ? <><i className="fa-solid fa-check ml-2"></i> تم الحفظ بنجاح</>
                 : <><i className="fa-solid fa-save ml-2"></i> حفظ الاستبيان</>}

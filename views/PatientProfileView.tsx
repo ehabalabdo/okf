@@ -264,7 +264,7 @@ const PatientProfileView: React.FC = () => {
        {/* Profile Header */}
        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-4xl shadow-inner ${
-               patient.gender === 'male' ? 'bg-blue-100 text-blue-500' : 'bg-pink-100 text-pink-500'
+               patient.gender === 'male' ? 'bg-amber-100 text-amber-500' : 'bg-pink-100 text-pink-500'
            }`}>
                <i className="fa-solid fa-user"></i>
            </div>
@@ -274,7 +274,7 @@ const PatientProfileView: React.FC = () => {
                    <h1 className="text-3xl font-bold text-slate-800">{patient.name}</h1>
                    {patient.currentVisit?.visitId && (
                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase w-fit mx-auto md:mx-0 ${
-                       patient.currentVisit.status === 'in-progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                       patient.currentVisit.status === 'in-progress' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
                    }`}>
                        {patient.currentVisit.status}
                    </span>
@@ -315,7 +315,7 @@ const PatientProfileView: React.FC = () => {
                            {user?.role === UserRole.ADMIN && !isEditingBasic && (
                                <button
                                    onClick={handleEditBasic}
-                                   className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
+                                   className="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
                                >
                                    <i className="fa-solid fa-pen"></i> تعديل
                                </button>
@@ -511,7 +511,7 @@ const PatientProfileView: React.FC = () => {
                                                {/* 2. History Section */}
                                                {(visit.presentIllness || visit.pastMedicalHistory || visit.surgicalHistory || visit.currentMedications || visit.allergies || visit.familyHistory || visit.socialHistory) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
-                                                   <div className="text-[11px] font-bold text-blue-600 uppercase mb-2 flex items-center gap-1">
+                                                   <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-book-medical text-[10px]"></i> التاريخ المرضي
                                                    </div>
                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -543,7 +543,7 @@ const PatientProfileView: React.FC = () => {
                                                {/* 3. Examination */}
                                                {(visit.generalExamination || visit.systemicExamination || hasVitals) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
-                                                   <div className="text-[11px] font-bold text-blue-600 uppercase mb-2 flex items-center gap-1">
+                                                   <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-stethoscope text-[10px]"></i> الفحص السريري
                                                    </div>
                                                    {visit.generalExamination && (
@@ -572,7 +572,7 @@ const PatientProfileView: React.FC = () => {
                                                            </span>
                                                          )}
                                                          {visit.vitalSigns?.respiratoryRate && (
-                                                           <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[11px] font-medium">
+                                                           <span className="bg-amber-50 text-amber-700 px-2 py-1 rounded text-[11px] font-medium">
                                                              🫁 {visit.vitalSigns.respiratoryRate}/min
                                                            </span>
                                                          )}
@@ -608,13 +608,13 @@ const PatientProfileView: React.FC = () => {
 
                                                {/* 5. Prescriptions */}
                                                {visit.prescriptions && visit.prescriptions.length > 0 && (
-                                                 <div className="bg-white p-3 rounded-lg border border-blue-100">
-                                                   <div className="text-[11px] font-bold text-blue-600 uppercase mb-2 flex items-center gap-1">
+                                                 <div className="bg-white p-3 rounded-lg border border-amber-100">
+                                                   <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-prescription text-[10px]"></i> الوصفة الطبية
                                                    </div>
                                                    <div className="flex flex-wrap gap-1.5">
                                                      {visit.prescriptions.map((rx, i) => (
-                                                       <span key={i} className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg text-[11px] font-bold border border-blue-100">
+                                                       <span key={i} className="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg text-[11px] font-bold border border-amber-100">
                                                          💊 {rx.drugName} {rx.dosage} {rx.frequency ? `• ${rx.frequency}` : ''} {rx.duration ? `• ${rx.duration}` : ''}
                                                        </span>
                                                      ))}
@@ -717,7 +717,7 @@ const PatientProfileView: React.FC = () => {
                                </div>
                                <div className="text-right shrink-0">
                                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                                       visit.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                       visit.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                                    }`}>
                                        {visit.status}
                                    </span>

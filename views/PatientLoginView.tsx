@@ -29,7 +29,7 @@ const PatientLoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4" dir={dir}>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4" dir={dir}>
       <div className="max-w-md w-full">
         {/* Logo Section */}
         <div className="text-center mb-8">
@@ -56,7 +56,7 @@ const PatientLoginView: React.FC = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
                 placeholder="مثال: 0791234567"
                 required
                 disabled={loading}
@@ -72,7 +72,7 @@ const PatientLoginView: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
                 placeholder="أدخل كلمة المرور"
                 required
                 disabled={loading}
@@ -82,7 +82,7 @@ const PatientLoginView: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -101,7 +101,7 @@ const PatientLoginView: React.FC = () => {
           <div className="mt-6 pt-6 border-t border-gray-100 text-center">
             <button
               onClick={() => navigate('/login')}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-2 mx-auto"
+              className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center justify-center gap-2 mx-auto"
             >
               <i className="fa-solid fa-arrow-left"></i>
               تسجيل دخول الموظفين

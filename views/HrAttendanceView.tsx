@@ -8,7 +8,7 @@ import { fmtTime, fmtMinutes, fmtDate } from '../utils/formatters';
 const STATUS_COLORS: Record<string, string> = {
   normal: 'bg-emerald-100 text-emerald-700',
   late: 'bg-amber-100 text-amber-700',
-  incomplete: 'bg-blue-100 text-blue-700',
+  incomplete: 'bg-amber-100 text-amber-700',
   absent: 'bg-red-100 text-red-600',
   weekend: 'bg-slate-100 text-slate-500',
 };
@@ -47,7 +47,7 @@ function downloadCSV(rows: HrAttendanceRecord[]) {
 const EVENT_ICONS: Record<string, string> = {
   check_in: 'fa-right-to-bracket text-emerald-500',
   break_out: 'fa-mug-hot text-amber-500',
-  break_in: 'fa-play text-blue-500',
+  break_in: 'fa-play text-amber-500',
   check_out: 'fa-right-from-bracket text-rose-500',
 };
 
@@ -143,7 +143,7 @@ const HrAttendanceView: React.FC = () => {
           <div className="text-xs font-bold uppercase text-slate-400">{isAr ? 'متأخر' : 'Late'}</div>
         </div>
         <div className="bg-white p-4 rounded-2xl shadow-soft border border-gray-100 text-center">
-          <div className="text-2xl font-extrabold text-blue-600">{incompleteCount}</div>
+          <div className="text-2xl font-extrabold text-amber-600">{incompleteCount}</div>
           <div className="text-xs font-bold uppercase text-slate-400">{isAr ? 'غير مكتمل' : 'Incomplete'}</div>
         </div>
         <div className="bg-white p-4 rounded-2xl shadow-soft border border-gray-100 text-center">
@@ -236,7 +236,7 @@ const HrAttendanceView: React.FC = () => {
                         {r.lateMinutes > 0 ? <span className="text-amber-600 font-bold">{r.lateMinutes}m</span> : '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        {r.overtimeMinutes > 0 ? <span className="text-blue-600 font-bold">{r.overtimeMinutes}m</span> : '—'}
+                        {r.overtimeMinutes > 0 ? <span className="text-amber-600 font-bold">{r.overtimeMinutes}m</span> : '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[r.status] || 'bg-slate-100 text-slate-500'}`}>

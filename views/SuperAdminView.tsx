@@ -165,7 +165,7 @@ const SuperAdminView: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      trial: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+      trial: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
       active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
       expired: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
       suspended: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
@@ -258,7 +258,7 @@ const SuperAdminView: React.FC = () => {
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow border border-slate-200 dark:border-slate-700">
           <p className="text-slate-500 text-xs mb-1">تجربة</p>
-          <p className="text-2xl font-bold text-blue-600">{clients.filter(c => c.status === 'trial').length}</p>
+          <p className="text-2xl font-bold text-amber-600">{clients.filter(c => c.status === 'trial').length}</p>
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow border border-slate-200 dark:border-slate-700">
           <p className="text-slate-500 text-xs mb-1">منتهين</p>
@@ -306,9 +306,9 @@ const SuperAdminView: React.FC = () => {
                       <div className="flex flex-wrap gap-4 mt-1 text-xs text-slate-400">
                         {client.status === 'trial' && (() => {
                           const remaining = getRemainingDays(client.trialEndsAt);
-                          return <span>التجربة تنتهي: <b className="text-blue-600">{formatDate(client.trialEndsAt)}</b>
+                          return <span>التجربة تنتهي: <b className="text-amber-600">{formatDate(client.trialEndsAt)}</b>
                             {remaining !== null && (
-                              <b className={`mr-1 ${remaining <= 5 ? 'text-red-500' : remaining <= 14 ? 'text-amber-500' : 'text-blue-500'}`}>
+                              <b className={`mr-1 ${remaining <= 5 ? 'text-red-500' : remaining <= 14 ? 'text-amber-500' : 'text-amber-500'}`}>
                                 ({remaining > 0 ? `${remaining} يوم متبقي` : 'منتهي'})
                               </b>
                             )}
@@ -338,7 +338,7 @@ const SuperAdminView: React.FC = () => {
                           placeholder="أيام"
                         />
                         {client.status === 'trial' ? (
-                          <button onClick={() => handleExtendTrial(client.id)} className="flex-1 bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-blue-600 transition">
+                          <button onClick={() => handleExtendTrial(client.id)} className="flex-1 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-amber-600 transition">
                             <i className="fa-solid fa-clock-rotate-left ml-1"></i> تمديد تجربة
                           </button>
                         ) : (
@@ -442,8 +442,8 @@ const SuperAdminView: React.FC = () => {
                   className="w-full px-4 py-2.5 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-200 dark:border-blue-800 mt-4">
-                <p className="text-blue-700 dark:text-blue-300 text-sm font-bold mb-1"><i className="fa-solid fa-user-shield ml-1"></i> بيانات المدير (أول مستخدم)</p>
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 border border-amber-200 dark:border-amber-800 mt-4">
+                <p className="text-amber-700 dark:text-amber-300 text-sm font-bold mb-1"><i className="fa-solid fa-user-shield ml-1"></i> بيانات المدير (أول مستخدم)</p>
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">اسم المدير *</label>

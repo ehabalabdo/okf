@@ -250,9 +250,9 @@ const HrPayrollView: React.FC = () => {
                   <p className="text-[10px] text-red-500 font-bold mt-1">⚠ {isAr ? 'تجاوز 180 دقيقة' : '>180 min threshold'}</p>
                 )}
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-xs text-blue-400 mb-1">{isAr ? 'دقائق إضافية' : 'OT Min.'}</p>
-                <p className="text-2xl font-extrabold text-blue-600">{selectedPayslip.suggestedOvertimeMinutes}</p>
+              <div className="bg-amber-50 rounded-xl p-4 text-center">
+                <p className="text-xs text-amber-400 mb-1">{isAr ? 'دقائق إضافية' : 'OT Min.'}</p>
+                <p className="text-2xl font-extrabold text-amber-600">{selectedPayslip.suggestedOvertimeMinutes}</p>
               </div>
               <div className="bg-orange-50 rounded-xl p-4 text-center">
                 <p className="text-xs text-orange-400 mb-1">{isAr ? 'دقائق استراحة' : 'Break Min.'}</p>
@@ -344,7 +344,7 @@ const HrPayrollView: React.FC = () => {
                   )}
                 </div>
                 {!editMode && selectedPayslip.overtimeMultiplier !== 1 && (
-                  <p className="text-xs text-blue-500 text-right">× {selectedPayslip.overtimeMultiplier} {isAr ? 'مضاعف' : 'multiplier'}</p>
+                  <p className="text-xs text-amber-500 text-right">× {selectedPayslip.overtimeMultiplier} {isAr ? 'مضاعف' : 'multiplier'}</p>
                 )}
 
                 <div className="border-t-2 border-slate-300 pt-4 mt-4">
@@ -371,7 +371,7 @@ const HrPayrollView: React.FC = () => {
                 {editMode ? (
                   <>
                     <button onClick={handleSaveEdit} disabled={actionLoading}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm disabled:opacity-50">
+                      className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-bold text-sm disabled:opacity-50">
                       {actionLoading && <i className="fa-solid fa-circle-notch fa-spin me-2"></i>}
                       <i className="fa-solid fa-floppy-disk me-1"></i> {isAr ? 'حفظ التعديلات' : 'Save Changes'}
                     </button>
@@ -402,7 +402,7 @@ const HrPayrollView: React.FC = () => {
             {selectedPayslip.status === 'approved' && (
               <div className="mt-4" data-no-print>
                 <button onClick={() => handleDownloadPdf(selectedPayslip.id, selectedPayslip.employeeName || `payslip-${selectedPayslip.id}`)}
-                  className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm transition">
+                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-bold text-sm transition">
                   <i className="fa-solid fa-file-pdf"></i> {isAr ? 'تحميل PDF' : 'Download PDF'}
                 </button>
               </div>
@@ -422,7 +422,7 @@ const HrPayrollView: React.FC = () => {
               </div>
               {(!run || run.status === 'draft') && (
                 <button onClick={handleGenerate} disabled={generating}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-50 transition">
+                  className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-50 transition">
                   {generating ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-calculator me-2"></i>}
                   {run ? (isAr ? 'إعادة حساب المسودة' : 'Recalculate Draft') : (isAr ? 'إنشاء مسودة الرواتب' : 'Generate Draft Payroll')}
                 </button>
@@ -458,9 +458,9 @@ const HrPayrollView: React.FC = () => {
                 <p className="text-xs text-yellow-500 mb-1">{isAr ? 'مسودة' : 'Draft'}</p>
                 <p className="text-lg font-extrabold text-yellow-600">{draftCount}</p>
               </div>
-              <div className="bg-blue-50 rounded-2xl border border-blue-200 p-4 text-center">
-                <p className="text-xs text-blue-500 mb-1">{isAr ? 'إجمالي صافي' : 'Total Net'}</p>
-                <p className="text-lg font-extrabold text-blue-600">{fmtMoney(totalNet)}</p>
+              <div className="bg-amber-50 rounded-2xl border border-amber-200 p-4 text-center">
+                <p className="text-xs text-amber-500 mb-1">{isAr ? 'إجمالي صافي' : 'Total Net'}</p>
+                <p className="text-lg font-extrabold text-amber-600">{fmtMoney(totalNet)}</p>
               </div>
             </div>
           )}
@@ -504,7 +504,7 @@ const HrPayrollView: React.FC = () => {
                         <span className="text-red-600 font-bold">{ps.suggestedAbsentDays}d</span>
                       </td>
                       <td className="text-center px-3 py-3 hidden md:table-cell">
-                        <span className="text-blue-600 font-bold">{ps.suggestedOvertimeMinutes}m</span>
+                        <span className="text-amber-600 font-bold">{ps.suggestedOvertimeMinutes}m</span>
                       </td>
                       <td className="text-center px-3 py-3 font-mono font-bold text-emerald-600">{ps.netSalary.toFixed(2)}</td>
                       <td className="text-center px-3 py-3">
@@ -514,7 +514,7 @@ const HrPayrollView: React.FC = () => {
                       </td>
                       <td className="text-center px-3 py-3">
                         <button onClick={() => openPayslip(ps)}
-                          className="text-blue-500 hover:text-blue-700 font-bold text-xs transition">
+                          className="text-amber-500 hover:text-amber-700 font-bold text-xs transition">
                           <i className="fa-solid fa-eye me-1"></i> {isAr ? 'تفاصيل' : 'Details'}
                         </button>
                       </td>

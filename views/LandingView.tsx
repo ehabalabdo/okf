@@ -117,7 +117,7 @@ const featureCategories: FeatureCategory[] = [
     ]
   },
   {
-    id: 'medical', label: 'الملف الطبي', labelEn: 'Medical', icon: 'fa-stethoscope', gradient: 'from-blue-500 to-blue-600',
+    id: 'medical', label: 'الملف الطبي', labelEn: 'Medical', icon: 'fa-stethoscope', gradient: 'from-amber-500 to-amber-600',
     features: [
       { icon: 'fa-user-doctor', title: 'لوحة الطبيب', titleEn: 'Doctor Dashboard', desc: 'تشخيص، وصفات، خطط علاجية، مرفقات.', color: 'teal', details: ['ملف طبي شامل لكل مريض','تشخيصات وملاحظات تفصيلية','وصفات طبية قابلة للطباعة','رفع صور وأشعة وتحاليل','خطط علاجية متعددة الجلسات','قوالب جاهزة للتشخيصات الشائعة'] },
       { icon: 'fa-clipboard-list', title: 'السجل السريري', titleEn: 'Clinical History', desc: 'تاريخ كامل لكل زيارة وعلاج.', color: 'teal', details: ['عرض زمني للزيارات','تصفية حسب التاريخ أو النوع','ملاحظات ومرفقات لكل زيارة','طباعة ملخص السجل','مشاركة مع طبيب آخر','أرشيف كامل قابل للبحث'] },
@@ -126,7 +126,7 @@ const featureCategories: FeatureCategory[] = [
     ]
   },
   {
-    id: 'financial', label: 'المالية', labelEn: 'Finance', icon: 'fa-coins', gradient: 'from-sky-500 to-blue-600',
+    id: 'financial', label: 'المالية', labelEn: 'Finance', icon: 'fa-coins', gradient: 'from-sky-500 to-amber-600',
     features: [
       { icon: 'fa-file-invoice-dollar', title: 'الفواتير والمحاسبة', titleEn: 'Billing', desc: 'فواتير تفصيلية ودفعات جزئية وتقارير مالية.', color: 'cyan', details: ['فواتير تفصيلية مع بنود','دفعات جزئية ومتابعة المتبقي','تقارير يومية وشهرية وسنوية','طباعة احترافية','خصومات مرنة','ربط مع ملف المريض'] },
       { icon: 'fa-tags', title: 'كتالوج الخدمات', titleEn: 'Service Catalog', desc: 'إدارة الخدمات والأسعار بمرونة تامة.', color: 'cyan', details: ['قائمة خدمات شاملة','تصنيف حسب القسم','تعديل أسعار مع حفظ التاريخ','ربط مع الفواتير','تصدير إلى Excel','دعم العملات المختلفة'] },
@@ -143,13 +143,13 @@ const featureCategories: FeatureCategory[] = [
     ]
   },
   {
-    id: 'specialty', label: 'وحدات متخصصة', labelEn: 'Specialty', icon: 'fa-puzzle-piece', gradient: 'from-blue-500 to-blue-600',
+    id: 'specialty', label: 'وحدات متخصصة', labelEn: 'Specialty', icon: 'fa-puzzle-piece', gradient: 'from-amber-500 to-amber-600',
     features: [
       { icon: 'fa-microchip', title: 'ربط الأجهزة الطبية', titleEn: 'Device Integration', desc: 'استقبال نتائج HL7 تلقائياً في الملف الطبي.', color: 'teal', details: ['بروتوكول HL7','نتائج مباشرة في الملف','Serial Port و MLLP','تنبيهات القيم غير الطبيعية','أرشفة تلقائية','Bridge Agent سحابي'] },
     ]
   },
   {
-    id: 'platform', label: 'المنصة', labelEn: 'Platform', icon: 'fa-shield-halved', gradient: 'from-blue-500 to-sky-600',
+    id: 'platform', label: 'المنصة', labelEn: 'Platform', icon: 'fa-shield-halved', gradient: 'from-amber-500 to-sky-600',
     features: [
       { icon: 'fa-shield-halved', title: 'الأمان والخصوصية', titleEn: 'Security', desc: 'تشفير، صلاحيات، حماية متقدمة.', color: 'teal', details: ['تشفير SSL/TLS','صلاحيات متعددة المستويات','Rate Limiting + Helmet + CORS','JWT Token','تسجيل أنشطة','فصل بيانات العملاء'] },
       { icon: 'fa-language', title: 'عربي وإنجليزي', titleEn: 'Multi-Language', desc: 'تبديل فوري بين اللغتين.', color: 'teal', details: ['واجهة عربية RTL كاملة','تبديل فوري للإنجليزية','تقارير وفواتير بكلتا اللغتين','تذكر اللغة المفضلة','خدمات وتشخيصات بكلتا اللغتين','قابل لإضافة لغات مستقبلاً'] },
@@ -168,8 +168,8 @@ const automationSteps = [
   { icon: 'fa-bell', label: 'إشعار للطبيب', color: 'from-sky-500 to-sky-500' },
   { icon: 'fa-user-check', label: 'تسجيل الحضور', color: 'from-sky-500 to-sky-500' },
   { icon: 'fa-stethoscope', label: 'فحص وتشخيص', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-file-invoice-dollar', label: 'فاتورة تلقائية', color: 'from-sky-500 to-blue-500' },
-  { icon: 'fa-chart-line', label: 'تقرير KPI', color: 'from-blue-500 to-blue-500' },
+  { icon: 'fa-file-invoice-dollar', label: 'فاتورة تلقائية', color: 'from-sky-500 to-amber-500' },
+  { icon: 'fa-chart-line', label: 'تقرير KPI', color: 'from-amber-500 to-amber-500' },
 ];
 
 /* ═══════════════════════ COMPONENT ══════════════════════════════ */
@@ -217,11 +217,11 @@ const LandingView: React.FC = () => {
 
   const colorMap: Record<string, { bg: string; text: string; border: string; glow: string }> = {
     cyan:    { bg: 'bg-sky-500/10',    text: 'text-sky-400',    border: 'border-sky-500/20',    glow: 'shadow-sky-500/20' },
-    teal:    { bg: 'bg-blue-500/10',   text: 'text-blue-400',   border: 'border-blue-500/20',   glow: 'shadow-blue-500/20' },
+    teal:    { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   glow: 'shadow-amber-500/20' },
     emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', glow: 'shadow-emerald-500/20' },
     amber:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   glow: 'shadow-amber-500/20' },
-    violet:  { bg: 'bg-blue-500/10',  text: 'text-blue-400',  border: 'border-blue-500/20',  glow: 'shadow-blue-500/20' },
-    rose:    { bg: 'bg-blue-500/10',    text: 'text-blue-400',    border: 'border-blue-500/20',    glow: 'shadow-blue-500/20' },
+    violet:  { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  glow: 'shadow-amber-500/20' },
+    rose:    { bg: 'bg-amber-500/10',    text: 'text-amber-400',    border: 'border-amber-500/20',    glow: 'shadow-amber-500/20' },
     sky:     { bg: 'bg-sky-500/10',     text: 'text-sky-400',     border: 'border-sky-500/20',     glow: 'shadow-sky-500/20' },
     green:   { bg: 'bg-green-500/10',   text: 'text-green-400',   border: 'border-green-500/20',   glow: 'shadow-green-500/20' },
   };
@@ -235,7 +235,7 @@ const LandingView: React.FC = () => {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-950/90 backdrop-blur-xl shadow-2xl shadow-black/20 border-b border-white/5' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <i className="fa-solid fa-stethoscope text-blue-400 text-2xl"></i>
+            <i className="fa-solid fa-stethoscope text-amber-400 text-2xl"></i>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Dr. Tarek Khrais</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -276,7 +276,7 @@ const LandingView: React.FC = () => {
         <motion.div
           animate={{ y: [0, -20, 0], x: [0, 10, 0], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[15%] w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"
+          className="absolute top-[20%] right-[15%] w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"
         />
         <motion.div
           animate={{ y: [0, 30, 0], x: [0, -15, 0], opacity: [0.2, 0.5, 0.2] }}
@@ -297,10 +297,10 @@ const LandingView: React.FC = () => {
                 className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md mb-8"
               >
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                 </span>
-                <span className="text-xs font-medium text-blue-300 tracking-wider uppercase" style={{ fontFamily: "'Cairo', sans-serif" }}>
+                <span className="text-xs font-medium text-amber-300 tracking-wider uppercase" style={{ fontFamily: "'Cairo', sans-serif" }}>
                   نظام إدارة طبية متكامل
                 </span>
               </motion.div>
@@ -359,7 +359,7 @@ const LandingView: React.FC = () => {
                 transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col sm:flex-row gap-5 justify-end lg:justify-start"
               >
-                <a href="#contact" className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-sky-600 text-white font-bold rounded-2xl text-[16px] text-center overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(45,212,191,0.4)]">
+                <a href="#contact" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl text-[16px] text-center overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(45,212,191,0.4)]">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                   <span className="relative z-10 flex items-center justify-center gap-3">
                     اطلب عرض تجريبي
@@ -389,20 +389,20 @@ const LandingView: React.FC = () => {
                     {/* Top bar */}
                     <div className="flex items-center justify-between mb-8 border-b border-white/[0.05] pb-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-blue-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
+                        <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
                         <div className="w-3 h-3 rounded-full bg-sky-500/80 shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
-                        <div className="w-3 h-3 rounded-full bg-blue-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
+                        <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
                       </div>
                       <div className="flex items-center gap-3 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/[0.05]">
-                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_10px_rgba(45,212,191,0.8)]"></span>
-                        <span className="text-[10px] text-blue-300 font-mono tracking-widest uppercase">System Active</span>
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_10px_rgba(45,212,191,0.8)]"></span>
+                        <span className="text-[10px] text-amber-300 font-mono tracking-widest uppercase">System Active</span>
                       </div>
                     </div>
 
                     {/* Holographic Stats Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       {[
-                        { label: 'المرضى النشطين', val: '124', icon: 'fa-users', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+                        { label: 'المرضى النشطين', val: '124', icon: 'fa-users', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
                         { label: 'معدل الإشغال', val: '92%', icon: 'fa-chart-pie', color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
                       ].map((stat, i) => (
                         <div key={i} className={`relative p-4 rounded-2xl border ${stat.border} ${stat.bg} overflow-hidden group`}>
@@ -420,10 +420,10 @@ const LandingView: React.FC = () => {
 
                     {/* Animated Activity Stream */}
                     <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
                       <div className="text-[11px] text-white/40 mb-4 font-medium flex justify-between items-center">
                         <span>تدفق العمليات المباشر</span>
-                        <i className="fa-solid fa-satellite-dish text-blue-400/50 animate-pulse"></i>
+                        <i className="fa-solid fa-satellite-dish text-amber-400/50 animate-pulse"></i>
                       </div>
                       
                       <div className="space-y-3">
@@ -458,7 +458,7 @@ const LandingView: React.FC = () => {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
             <div className="w-6 h-10 rounded-full border-2 border-white/10 flex items-start justify-center pt-2 backdrop-blur-sm bg-white/[0.02]">
-              <div className="w-1 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]" />
+              <div className="w-1 h-2 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]" />
             </div>
           </motion.div>
         </div>
@@ -474,7 +474,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-microchip animate-pulse"></i> سير عمل مؤتمت
             </motion.div>
@@ -485,7 +485,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
-              رحلة المريض — <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400">من الحجز حتى الفاتورة</span>
+              رحلة المريض — <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">من الحجز حتى الفاتورة</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -513,7 +513,7 @@ const LandingView: React.FC = () => {
                     ${activeFlowStep === i ? 'scale-110' : 'scale-100 opacity-50 hover:opacity-100'}`}
                   onClick={() => setActiveFlowStep(i)}
                 >
-                  <SpotlightCard className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl p-0.5 transition-all duration-500 ${activeFlowStep === i ? 'bg-gradient-to-br from-blue-400 to-sky-500 shadow-[0_0_30px_rgba(45,212,191,0.3)]' : 'bg-white/[0.05]'}`}>
+                  <SpotlightCard className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl p-0.5 transition-all duration-500 ${activeFlowStep === i ? 'bg-gradient-to-br from-amber-400 to-sky-500 shadow-[0_0_30px_rgba(45,212,191,0.3)]' : 'bg-white/[0.05]'}`}>
                     <div className="w-full h-full bg-[#0a0f1c] rounded-[14px] flex items-center justify-center relative overflow-hidden">
                       <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
                       <i className={`fa-solid ${step.icon} text-2xl md:text-3xl relative z-10 ${activeFlowStep === i ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'text-slate-400'}`}></i>
@@ -528,24 +528,24 @@ const LandingView: React.FC = () => {
                   {activeFlowStep === i && (
                     <motion.div 
                       layoutId="activeStepIndicator"
-                      className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-blue-400 to-sky-400 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)]" 
+                      className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-amber-400 to-sky-400 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)]" 
                     />
                   )}
                 </motion.div>
 
                 {i < automationSteps.length - 1 && (
                   <div className="hidden md:flex items-center mx-2 relative z-10">
-                    <div className={`w-12 h-0.5 transition-all duration-500 relative overflow-hidden ${activeFlowStep >= i ? 'bg-blue-500/30' : 'bg-transparent'}`}>
+                    <div className={`w-12 h-0.5 transition-all duration-500 relative overflow-hidden ${activeFlowStep >= i ? 'bg-amber-500/30' : 'bg-transparent'}`}>
                       {activeFlowStep >= i && (
                         <motion.div 
                           initial={{ x: '-100%' }}
                           animate={{ x: '100%' }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400 to-transparent"
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400 to-transparent"
                         />
                       )}
                     </div>
-                    <i className={`fa-solid fa-chevron-left text-[10px] -ml-1 transition-colors duration-500 ${activeFlowStep >= i ? 'text-blue-400 drop-shadow-[0_0_5px_rgba(45,212,191,0.8)]' : 'text-white/[0.05]'}`}></i>
+                    <i className={`fa-solid fa-chevron-left text-[10px] -ml-1 transition-colors duration-500 ${activeFlowStep >= i ? 'text-amber-400 drop-shadow-[0_0_5px_rgba(45,212,191,0.8)]' : 'text-white/[0.05]'}`}></i>
                   </div>
                 )}
               </React.Fragment>
@@ -564,7 +564,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-eye animate-pulse"></i> تطور ملموس
             </motion.div>
@@ -575,7 +575,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              تخيّل مركزك بعد <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">٦ أشهر</span>
+              تخيّل مركزك بعد <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">٦ أشهر</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -625,7 +625,7 @@ const LandingView: React.FC = () => {
       {/* ════════════════ TRADITIONAL VS MED LOOP (V4: The Paradigm Shift) ════════════════ */}
       <section className="py-32 px-6 bg-[#060a13] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-[40rem] h-[40rem] bg-red-500/5 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-amber-500/5 rounded-full blur-[150px] pointer-events-none" />
         
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-20">
@@ -658,7 +658,7 @@ const LandingView: React.FC = () => {
             >
               <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-red-500/20 to-transparent">
                 <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-10 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-blue-500 opacity-50" />
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-amber-500 opacity-50" />
                   
                   <div className="flex items-center gap-4 mb-10">
                     <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-xl">
@@ -696,16 +696,16 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-blue-400 to-sky-500 shadow-[0_0_40px_rgba(45,212,191,0.15)]">
+              <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-amber-400 to-sky-500 shadow-[0_0_40px_rgba(45,212,191,0.15)]">
                 <div className="h-full bg-[#0a0f1c]/95 backdrop-blur-xl rounded-[23px] p-10 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-sky-500" />
-                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[60px] pointer-events-none" />
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-sky-500" />
+                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[60px] pointer-events-none" />
                   
                   <div className="flex items-center gap-4 mb-10 relative z-10">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-sky-500 flex items-center justify-center text-white text-xl shadow-[0_0_20px_rgba(45,212,191,0.4)]">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-sky-500 flex items-center justify-center text-white text-xl shadow-[0_0_20px_rgba(45,212,191,0.4)]">
                       <i className="fa-solid fa-shield-halved"></i>
                     </div>
-                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">عيادة د. طارق خريس</h3>
+                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-sky-400">عيادة د. طارق خريس</h3>
                   </div>
                   
                   <div className="space-y-5 relative z-10">
@@ -719,8 +719,8 @@ const LandingView: React.FC = () => {
                       'واجهة عصرية وسهلة تعمل من المتصفح مباشرة',
                     ].map((t, i) => (
                       <div key={i} className="flex items-start gap-4">
-                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(45,212,191,0.3)]">
-                          <i className="fa-solid fa-check text-blue-400 text-xs"></i>
+                        <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(45,212,191,0.3)]">
+                          <i className="fa-solid fa-check text-amber-400 text-xs"></i>
                         </div>
                         <span className="text-white/90 text-base font-medium leading-relaxed">{t}</span>
                       </div>
@@ -804,7 +804,7 @@ const LandingView: React.FC = () => {
             className="text-center mt-16"
           >
             <div className="inline-flex items-center gap-3 px-8 py-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl backdrop-blur-sm shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_10px_rgba(20,184,166,0.8)]"></div>
+              <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_10px_rgba(20,184,166,0.8)]"></div>
               <span className="text-slate-400 font-mono tracking-wide">
                 https://<strong className="text-white font-bold">your-clinic</strong>.medloop.com
               </span>
@@ -823,7 +823,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-cubes animate-pulse"></i> {allFeatures.length}+ ميزة متكاملة
             </motion.div>
@@ -834,7 +834,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              كل ما يحتاجه مركزك في <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">منصة واحدة</span>
+              كل ما يحتاجه مركزك في <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">منصة واحدة</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -956,7 +956,7 @@ const LandingView: React.FC = () => {
                 <SpotlightCard className="p-px rounded-[2rem] bg-gradient-to-b from-white/[0.15] to-white/[0.02] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
                   <div className="bg-[#0a0f1c] rounded-[31px] overflow-hidden relative">
                     {/* Top Gradient Bar */}
-                    <div className={`h-2 w-full bg-gradient-to-r ${cat?.gradient || 'from-blue-400 to-sky-500'}`} />
+                    <div className={`h-2 w-full bg-gradient-to-r ${cat?.gradient || 'from-amber-400 to-sky-500'}`} />
                     
                     {/* Ambient Glow */}
                     <div className={`absolute top-0 right-0 w-64 h-64 ${c.bg} rounded-full blur-[80px] pointer-events-none`} />
@@ -999,7 +999,7 @@ const LandingView: React.FC = () => {
                       </div>
                       
                       <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/[0.05]">
-                        <a href="#contact" onClick={closeModal} className={`flex-1 text-center px-8 py-4 bg-gradient-to-r ${cat?.gradient || 'from-blue-400 to-sky-500'} text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-[1.02]`}>
+                        <a href="#contact" onClick={closeModal} className={`flex-1 text-center px-8 py-4 bg-gradient-to-r ${cat?.gradient || 'from-amber-400 to-sky-500'} text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-[1.02]`}>
                           <i className="fa-solid fa-rocket ml-2"></i> ابدأ التحول الرقمي
                         </a>
                         <button onClick={closeModal} className="px-8 py-4 bg-white/[0.05] border border-white/[0.1] text-white font-bold rounded-2xl hover:bg-white/[0.1] transition-all duration-300">
@@ -1025,7 +1025,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-microchip animate-pulse"></i> البنية التقنية
             </motion.div>
@@ -1036,7 +1036,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              بنية تحتية <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">موثوقة وآمنة</span>
+              بنية تحتية <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">موثوقة وآمنة</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -1104,7 +1104,7 @@ const LandingView: React.FC = () => {
                     { icon: 'fa-code', label: 'TypeScript' },
                   ].map((t, j) => (
                     <div key={`${i}-${j}`} className="flex items-center gap-3 text-slate-500">
-                      <i className={`fa-solid ${t.icon} text-blue-500/50`}></i>
+                      <i className={`fa-solid ${t.icon} text-amber-500/50`}></i>
                       <span className="font-mono text-sm tracking-wider">{t.label}</span>
                     </div>
                   ))}
@@ -1125,7 +1125,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-circle-play animate-pulse"></i> شاهد النظام
             </motion.div>
@@ -1136,7 +1136,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              شاهد كيف يعمل <span className="text-blue-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">النظام</span> من الداخل
+              شاهد كيف يعمل <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">النظام</span> من الداخل
             </motion.h2>
           </div>
 
@@ -1155,7 +1155,7 @@ const LandingView: React.FC = () => {
                 
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-colors duration-500 pointer-events-none group-has-[:playing]:hidden">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-50 animate-pulse" />
+                    <div className="absolute inset-0 bg-amber-500 rounded-full blur-xl opacity-50 animate-pulse" />
                     <div className="w-24 h-24 rounded-full bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform duration-500 relative z-10">
                       <i className="fa-solid fa-play text-white text-3xl ml-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
                     </div>
@@ -1177,7 +1177,7 @@ const LandingView: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
               <i className="fa-solid fa-headset animate-pulse"></i> تواصل معنا
             </motion.div>
@@ -1188,7 +1188,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              نحن هنا <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">لخدمتك</span>
+              نحن هنا <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">لخدمتك</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -1271,27 +1271,27 @@ const LandingView: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <SpotlightCard className="p-px rounded-[3rem] bg-gradient-to-b from-blue-400 to-sky-500 shadow-[0_0_80px_rgba(45,212,191,0.2)]">
+            <SpotlightCard className="p-px rounded-[3rem] bg-gradient-to-b from-amber-400 to-sky-500 shadow-[0_0_80px_rgba(45,212,191,0.2)]">
               <div className="bg-[#0a0f1c]/95 backdrop-blur-2xl rounded-[2.9rem] p-12 md:p-20 relative overflow-hidden">
-                <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]" />
+                <div className="absolute -top-32 -right-32 w-64 h-64 bg-amber-500/20 rounded-full blur-[80px]" />
                 <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-sky-500/20 rounded-full blur-[80px]" />
                 
                 <div className="relative z-10">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-sky-500 rounded-3xl flex items-center justify-center text-white text-4xl mx-auto mb-10 shadow-[0_0_30px_rgba(45,212,191,0.5)]">
+                  <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-sky-500 rounded-3xl flex items-center justify-center text-white text-4xl mx-auto mb-10 shadow-[0_0_30px_rgba(45,212,191,0.5)]">
                     <i className="fa-solid fa-rocket"></i>
                   </div>
                   
                   <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight text-white">
                     جاهز تنقل مركزك
                     <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400">للمستوى التالي؟</span>
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">للمستوى التالي؟</span>
                   </h2>
                   
                   <p className="text-slate-400 mb-12 text-xl max-w-2xl mx-auto font-light">
                     وفّر وقت فريقك، نظّم عملك، وقدّم تجربة أفضل لمرضاك. ابدأ اليوم مع عيادة د. طارق خريس.
                   </p>
                   
-                  <a href="#contact" className="inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-blue-500 to-sky-600 text-white font-bold rounded-2xl hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] transition-all duration-300 hover:scale-[1.02] text-lg group">
+                  <a href="#contact" className="inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] transition-all duration-300 hover:scale-[1.02] text-lg group">
                     <span>اطلب عرض تجريبي خاص</span>
                     <i className="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform duration-300"></i>
                   </a>
@@ -1309,7 +1309,7 @@ const LandingView: React.FC = () => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center p-2">
-              <i className="fa-solid fa-stethoscope text-blue-400 text-lg"></i>
+              <i className="fa-solid fa-stethoscope text-amber-400 text-lg"></i>
             </div>
             <div className="flex flex-col">
               <span className="text-white font-bold tracking-wider">Dr. Tarek Khrais - ENT</span>
@@ -1320,7 +1320,7 @@ const LandingView: React.FC = () => {
           <div className="flex items-center gap-6 text-slate-500 text-sm">
             <span className="flex items-center gap-2">
               من تطوير 
-              <a href="https://okf.vercel.app" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors font-bold flex items-center gap-1 group">
+              <a href="https://okf.vercel.app" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 transition-colors font-bold flex items-center gap-1 group">
                 OKF Systems
                 <i className="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-50 group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all"></i>
               </a>
@@ -1332,8 +1332,8 @@ const LandingView: React.FC = () => {
       {/* ════════════════ FLOATING WHATSAPP (V4: Holographic Orb) ════════════════ */}
       <a href="https://wa.me/962790904030" target="_blank" rel="noopener noreferrer"
          className="fixed bottom-8 left-8 z-50 group">
-        <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-40 group-hover:opacity-60 animate-pulse transition-opacity duration-500" />
-        <div className="relative w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl shadow-[0_0_30px_rgba(20,184,166,0.5)] group-hover:scale-110 transition-transform duration-500 border border-blue-300/50">
+        <div className="absolute inset-0 bg-amber-500 rounded-full blur-xl opacity-40 group-hover:opacity-60 animate-pulse transition-opacity duration-500" />
+        <div className="relative w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-3xl shadow-[0_0_30px_rgba(20,184,166,0.5)] group-hover:scale-110 transition-transform duration-500 border border-amber-300/50">
           <i className="fa-brands fa-whatsapp drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
         </div>
       </a>

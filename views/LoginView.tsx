@@ -123,7 +123,7 @@ const LoginView: React.FC = () => {
             onClick={() => { setLoginMode('hr'); setError(''); }}
             className={`flex-1 py-2.5 text-xs font-bold transition-all ${
               loginMode === 'hr'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-amber-500 text-white'
                 : 'bg-slate-800/50 text-slate-400 hover:text-white'
             }`}
           >

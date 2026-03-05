@@ -289,7 +289,7 @@ const AppointmentsView: React.FC = () => {
           
           <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
              <div className="flex items-center gap-3">
-                 <div className="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center">
+                 <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-full flex items-center justify-center">
                      <i className="fa-regular fa-calendar-check"></i>
                  </div>
                  <h2 className="font-bold text-slate-800">{t('appointments_title')}</h2>
@@ -326,7 +326,7 @@ const AppointmentsView: React.FC = () => {
               ) : (
                   <div className="space-y-3">
                       {filteredAppointments.map(app => (
-                          <div key={app.id} className={`flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-lg border transition-colors bg-white group ${activeTab === 'history' ? 'border-gray-100 opacity-75 grayscale-[0.5] hover:grayscale-0' : 'border-gray-100 hover:border-blue-200'}`}>
+                          <div key={app.id} className={`flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-lg border transition-colors bg-white group ${activeTab === 'history' ? 'border-gray-100 opacity-75 grayscale-[0.5] hover:grayscale-0' : 'border-gray-100 hover:border-amber-200'}`}>
                               <div className="flex items-center gap-4">
                                   <div className={`flex flex-col items-center justify-center w-16 h-16 rounded border text-slate-600 ${app.status === 'checked-in' ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-gray-200'}`}>
                                       <span className="text-xs uppercase font-bold">{new Date(app.date).toLocaleDateString('en-GB', { month: 'short' })}</span>
@@ -347,7 +347,7 @@ const AppointmentsView: React.FC = () => {
                                   {/* Status Label (Visible in History) */}
                                   {activeTab === 'history' && (
                                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase text-center ${
-                                         app.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                                         app.status === 'scheduled' ? 'bg-amber-100 text-amber-700' :
                                          app.status === 'checked-in' ? 'bg-green-100 text-green-700' :
                                          app.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                          'bg-gray-100 text-gray-500'
@@ -371,7 +371,7 @@ const AppointmentsView: React.FC = () => {
                                           </button>
                                           <button 
                                             onClick={() => openEditModal(app)} 
-                                            className="bg-white border border-gray-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
+                                            className="bg-white border border-gray-200 text-slate-600 hover:border-amber-500 hover:text-amber-600 px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
                                           >
                                               <i className="fa-solid fa-pen"></i>
                                               <span>{t('edit_btn')}</span>
@@ -482,7 +482,7 @@ const AppointmentsView: React.FC = () => {
                                                             <button
                                                                 key={p.id}
                                                                 type="button"
-                                                                className={`w-full text-left px-3 py-2.5 hover:bg-blue-50 transition-colors flex items-center justify-between border-b border-slate-50 last:border-0 ${formData.patientId === p.id ? 'bg-blue-50' : ''}`}
+                                                                className={`w-full text-left px-3 py-2.5 hover:bg-amber-50 transition-colors flex items-center justify-between border-b border-slate-50 last:border-0 ${formData.patientId === p.id ? 'bg-amber-50' : ''}`}
                                                                 onClick={() => {
                                                                     setFormData({...formData, patientId: p.id});
                                                                     setPatientSearch('');
@@ -523,7 +523,7 @@ const AppointmentsView: React.FC = () => {
                                             </select>
                                         </div>
                                         <input type="tel" placeholder={t('phone')} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" value={formData.newPhone} onChange={e => setFormData({...formData, newPhone: e.target.value})} required={patientMode === 'new'} />
-                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs text-blue-800">
+                                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">
                                            <i className="fa-solid fa-info-circle mr-2"></i>
                                            <strong>ملاحظة:</strong> رقم الهاتف سيكون اسم المستخدم، وكلمة المرور ستُولّد تلقائياً
                                         </div>

@@ -422,7 +422,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                 <div className="max-h-64 overflow-y-auto">
                     {notifications.length === 0 ? <div className="p-6 text-center text-xs text-slate-400">No new alerts</div> : (
                         notifications.map(n => (
-                            <div key={n.id} className="p-4 border-b border-slate-50 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => { NotificationService.markAsRead(user!, n.id); loadData(); }}>
+                            <div key={n.id} className="p-4 border-b border-slate-50 hover:bg-amber-50 transition-colors cursor-pointer" onClick={() => { NotificationService.markAsRead(user!, n.id); loadData(); }}>
                                 <div className="flex justify-between mb-1">
                                     <span className="text-xs font-bold text-primary">{n.title}</span>
                                     <span className="text-[10px] text-slate-400">{fmtDate(n.dueDate || 0)}</span>
@@ -501,8 +501,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                  {/* Animated Medical Rings (Center-Right Background) */}
                  <div className="absolute top-1/2 right-[25%] -translate-y-1/2 w-64 h-64 opacity-20">
                      <div className="absolute inset-0 border-2 border-dashed border-sky-500 rounded-full animate-[spin_20s_linear_infinite]"></div>
-                     <div className="absolute inset-4 border border-blue-500/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
-                     <div className="absolute inset-8 border-4 border-t-sky-400 border-r-transparent border-b-blue-400 border-l-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
+                     <div className="absolute inset-4 border border-amber-500/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+                     <div className="absolute inset-8 border-4 border-t-sky-400 border-r-transparent border-b-amber-400 border-l-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
                      <div className="absolute inset-0 flex items-center justify-center">
                          <img src="/logo.png" alt="MedLoop Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.8)] animate-pulse" />
                      </div>
@@ -599,13 +599,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                          </div>
                          
                          {/* Clinics Module */}
-                         <div className="relative bg-[#0f172a]/80 border-l-2 border-blue-500 pl-4 pr-6 py-3 flex items-center gap-4 backdrop-blur-md">
-                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-blue-500/50"></div>
-                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-blue-500/50"></div>
-                            <div className="text-blue-400 text-2xl"><i className="fa-solid fa-network-wired"></i></div>
+                         <div className="relative bg-[#0f172a]/80 border-l-2 border-amber-500 pl-4 pr-6 py-3 flex items-center gap-4 backdrop-blur-md">
+                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-amber-500/50"></div>
+                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-amber-500/50"></div>
+                            <div className="text-amber-400 text-2xl"><i className="fa-solid fa-network-wired"></i></div>
                             <div className="flex flex-col items-start leading-none">
                                 <span className="font-mono text-white text-2xl font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">{String(clinics.length).padStart(2, '0')}</span>
-                                <span className="text-[10px] font-mono text-blue-500/70 uppercase tracking-widest mt-1">Clinics</span>
+                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">Clinics</span>
                             </div>
                          </div>
                      </div>
@@ -643,7 +643,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                  <select className="input-modern" value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value as Gender})}><option value="male">{t('male')}</option><option value="female">{t('female')}</option></select>
                             </div>
                             <input type="tel" placeholder={t('phone')} className="input-modern" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
                                <i className="fa-solid fa-info-circle mr-2"></i>
                                <strong>ملاحظة:</strong> رقم الهاتف سيكون اسم المستخدم، وكلمة المرور ستُولّد تلقائياً
                             </div>
@@ -705,14 +705,14 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
 
         {/* ENT Medical Forms Quick Access */}
         <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
-            <div className="p-5 md:p-6 border-b border-gray-100 bg-blue-50/30">
+            <div className="p-5 md:p-6 border-b border-gray-100 bg-amber-50/30">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-blue-100 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
+                    <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
                     <div><h2 className="font-bold text-slate-800 leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                     {[
-                        { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100' },
+                        { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
                         { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
                         { path: 'ent/audiogram', icon: 'fa-ear-listen', label: 'فحص السمع', color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
                         { path: 'ent/balance', icon: 'fa-person-walking', label: 'فحص التوازن', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
@@ -765,7 +765,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                         </div>
                                         <div className="text-end shrink-0">
                                             <div className="text-[12px] font-bold text-slate-900">{new Date(p.currentVisit.date).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</div>
-                                            <div className={`text-[9px] font-extrabold uppercase px-3 py-1 rounded-full mt-2 inline-block ${p.currentVisit.status === 'in-progress' ? 'bg-blue-100 text-blue-600 animate-pulse' : 'bg-amber-100 text-amber-600'}`}>{p.currentVisit.status}</div>
+                                            <div className={`text-[9px] font-extrabold uppercase px-3 py-1 rounded-full mt-2 inline-block ${p.currentVisit.status === 'in-progress' ? 'bg-amber-100 text-amber-600 animate-pulse' : 'bg-amber-100 text-amber-600'}`}>{p.currentVisit.status}</div>
                                         </div>
                                     </div>
                                 );
@@ -777,12 +777,12 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
 
             {/* --- TODAYS APPOINTMENTS & CLASSES (PRIORITY #2) --- */}
             <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden flex flex-col">
-                <div className="p-5 md:p-6 border-b border-gray-100 flex justify-between items-center bg-blue-50/20">
+                <div className="p-5 md:p-6 border-b border-gray-100 flex justify-between items-center bg-amber-50/20">
                     <div className="flex items-center gap-3">
-                        <div className="bg-blue-100 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-regular fa-calendar-check"></i></div>
+                        <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-regular fa-calendar-check"></i></div>
                         <div><h2 className="font-bold text-slate-800 leading-tight">Scheduled Today</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">Appointments & Classes</p></div>
                     </div>
-                    <span className="bg-blue-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">{todaysAppointments.length}</span>
+                    <span className="bg-amber-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">{todaysAppointments.length}</span>
                 </div>
                 <div className="p-4 md:p-6 overflow-auto max-h-[500px]">
                     {todaysAppointments.length === 0 ? (
@@ -790,9 +790,9 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             {todaysAppointments.map(app => (
-                                <div key={app.id} className={`flex items-center justify-between p-5 border rounded-3xl hover:border-blue-300 transition-all group hover:shadow-xl ${app.isClass ? 'bg-purple-50 border-purple-100' : 'bg-white border-slate-100'}`}>
+                                <div key={app.id} className={`flex items-center justify-between p-5 border rounded-3xl hover:border-amber-300 transition-all group hover:shadow-xl ${app.isClass ? 'bg-purple-50 border-purple-100' : 'bg-white border-slate-100'}`}>
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-14 h-14 text-white rounded-2xl flex flex-col items-center justify-center shrink-0 shadow-lg transition-colors ${app.isClass ? 'bg-purple-600 group-hover:bg-purple-700' : 'bg-slate-900 group-hover:bg-blue-600'}`}>
+                                        <div className={`w-14 h-14 text-white rounded-2xl flex flex-col items-center justify-center shrink-0 shadow-lg transition-colors ${app.isClass ? 'bg-purple-600 group-hover:bg-purple-700' : 'bg-slate-900 group-hover:bg-amber-600'}`}>
                                             {app.isClass ? (
                                                 <i className="fa-solid fa-chalkboard-user text-2xl"></i>
                                             ) : (

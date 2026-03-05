@@ -309,7 +309,7 @@ const DeviceManagementView: React.FC = () => {
 
         {/* Header Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard icon="fa-microchip" label="إجمالي الأجهزة" value={devices.length} color="bg-blue-500" />
+          <StatCard icon="fa-microchip" label="إجمالي الأجهزة" value={devices.length} color="bg-amber-500" />
           <StatCard icon="fa-circle-check" label="أجهزة نشطة" value={devices.filter(d => d.isActive).length} color="bg-emerald-500" />
           <StatCard icon="fa-wifi" label="متصل الآن" value={devices.filter(d => d.isActive && d.lastSeenAt && (Date.now() - new Date(d.lastSeenAt).getTime() < 5 * 60 * 1000)).length} color="bg-violet-500" />
           <StatCard icon="fa-key" label="مفاتيح API" value={apiKeys.filter(k => k.is_active).length} color="bg-amber-500" />
@@ -534,15 +534,15 @@ const DeviceManagementView: React.FC = () => {
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-50 flex justify-between items-center">
                   <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                    <i className="fa-solid fa-link text-blue-500"></i> اتصالات HL7 النشطة
+                    <i className="fa-solid fa-link text-amber-500"></i> اتصالات HL7 النشطة
                   </h3>
-                  <span className="bg-blue-100 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">{hl7Connections.length}</span>
+                  <span className="bg-amber-100 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">{hl7Connections.length}</span>
                 </div>
                 <div className="divide-y divide-slate-50">
                   {hl7Connections.map((conn: any, i: number) => (
                     <div key={i} className="flex items-center justify-between p-4 hover:bg-slate-50/50" dir="ltr">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-500 flex items-center justify-center">
                           <i className="fa-solid fa-tower-broadcast text-sm"></i>
                         </div>
                         <div>
@@ -605,7 +605,7 @@ const DeviceManagementView: React.FC = () => {
             {/* HL7 Quick Reference */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-circle-question text-blue-500"></i> مرجع سريع — بنية رسالة HL7
+                <i className="fa-solid fa-circle-question text-amber-500"></i> مرجع سريع — بنية رسالة HL7
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm" dir="ltr">
@@ -618,13 +618,13 @@ const DeviceManagementView: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     <tr><td className="p-3 font-mono font-bold text-violet-600">MSH</td><td className="p-3 text-slate-600">ترويسة الرسالة (المرسل، المستقبل، النوع)</td><td className="p-3 font-mono text-xs text-slate-400">MSH|^~\&|Lab|Clinic|...</td></tr>
-                    <tr><td className="p-3 font-mono font-bold text-blue-600">PID</td><td className="p-3 text-slate-600">بيانات المريض (الرقم، الاسم، الجنس)</td><td className="p-3 font-mono text-xs text-slate-400">PID|||12345||Ahmad^M...</td></tr>
+                    <tr><td className="p-3 font-mono font-bold text-amber-600">PID</td><td className="p-3 text-slate-600">بيانات المريض (الرقم، الاسم، الجنس)</td><td className="p-3 font-mono text-xs text-slate-400">PID|||12345||Ahmad^M...</td></tr>
                     <tr><td className="p-3 font-mono font-bold text-emerald-600">OBR</td><td className="p-3 text-slate-600">طلب الفحص (اسم التحليل)</td><td className="p-3 font-mono text-xs text-slate-400">OBR|1||LAB001|CBC^...</td></tr>
                     <tr><td className="p-3 font-mono font-bold text-rose-600">OBX</td><td className="p-3 text-slate-600">نتيجة التحليل (القيمة، الوحدة، المرجع)</td><td className="p-3 font-mono text-xs text-slate-400">OBX|1|NM|WBC||7.2|...</td></tr>
                   </tbody>
                 </table>
               </div>
-              <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-700">
+              <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-700">
                 <strong>MLLP Protocol:</strong> الأجهزة الطبية ترسل رسائل HL7 عبر TCP مغلفة بـ MLLP (Start: <code className="bg-white px-1 rounded">0x0B</code> • End: <code className="bg-white px-1 rounded">0x1C 0x0D</code>). Bridge Agent يستمع على Port <code className="bg-white px-1 rounded">2575</code> افتراضياً.
               </div>
             </div>
@@ -739,7 +739,7 @@ const DeviceManagementView: React.FC = () => {
               </h3>
 
               {/* Step 1 */}
-              <StepCard step={1} title="سجّل الجهاز" icon="fa-microchip" color="bg-blue-500">
+              <StepCard step={1} title="سجّل الجهاز" icon="fa-microchip" color="bg-amber-500">
                 <p>اذهب لتبويب "الأجهزة" واضغط "إضافة جهاز". اختر نوع الجهاز وطريقة الاتصال (LAN أو Serial أو HL7).</p>
                 <p className="text-slate-400 mt-1">احفظ الـ <strong>Device ID</strong> — ستحتاجه في الخطوة التالية.</p>
               </StepCard>

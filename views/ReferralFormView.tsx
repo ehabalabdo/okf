@@ -203,23 +203,23 @@ const ReferralFormView: React.FC = () => {
           {/* Referring Doctor (pre-filled) */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-user-doctor text-blue-500"></i> الطبيب المحوِل
+              <i className="fa-solid fa-user-doctor text-amber-500"></i> الطبيب المحوِل
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اسم الطبيب</label>
                 <input type="text" value={form.referringDoctorName} onChange={e => setForm(f => ({ ...f, referringDoctorName: e.target.value }))}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-blue-50 dark:bg-blue-900/10 text-slate-800 dark:text-white" />
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-amber-50 dark:bg-amber-900/10 text-slate-800 dark:text-white" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">العيادة</label>
                 <input type="text" value={form.referringClinic} onChange={e => setForm(f => ({ ...f, referringClinic: e.target.value }))}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-blue-50 dark:bg-blue-900/10 text-slate-800 dark:text-white" />
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-amber-50 dark:bg-amber-900/10 text-slate-800 dark:text-white" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">الهاتف</label>
                 <input type="text" value={form.referringDoctorPhone} onChange={e => setForm(f => ({ ...f, referringDoctorPhone: e.target.value }))}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-blue-50 dark:bg-blue-900/10 text-slate-800 dark:text-white" />
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-amber-50 dark:bg-amber-900/10 text-slate-800 dark:text-white" />
               </div>
             </div>
           </div>
