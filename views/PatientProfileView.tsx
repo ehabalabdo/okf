@@ -18,9 +18,16 @@ const PatientProfileView: React.FC = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
-  const [activeTab, setActiveTab] = useState<'basic' | 'timeline' | 'clinical' | 'devices'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'timeline' | 'clinical' | 'devices' | 'ent-forms'>('basic');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // ENT Forms State
+  const [entForms, setEntForms] = useState<any>(null);
+  const [entLoading, setEntLoading] = useState(false);
+  const [entExpanded, setEntExpanded] = useState<string | null>(null);
+  const [entDetail, setEntDetail] = useState<any>(null);
+  const [entDetailLoading, setEntDetailLoading] = useState(false);
 
   // Edit State for Clinical Tab
   const [diagnosis, setDiagnosis] = useState('');
@@ -123,6 +130,17 @@ const PatientProfileView: React.FC = () => {
         
         return () => clearInterval(interval);
     }, [user, id]);
+
+  // Load ENT forms when tab is selected
+  useEffect(() => {
+    if (activeTab === 'ent-forms' && patient && !entForms && !entLoading) {
+      setEntLoading(true);
+      api.get(`/ent-forms/patient/${patient.id}/all`)
+        .then((data: any) => setEntForms(data))
+        .catch(() => setEntForms(null))
+        .finally(() => setEntLoading(false));
+    }
+  }, [activeTab, patient?.id]);
 
   const handleSaveClinical = async () => {
      if(!patient || !user) return;
@@ -233,6 +251,13 @@ const PatientProfileView: React.FC = () => {
       );
   };
 
+  const DetailField = ({ label, value, span2 }: { label: string, value: any, span2?: boolean }) => (
+    <div className={span2 ? 'md:col-span-2' : ''}>
+      <div className="text-xs font-bold uppercase text-slate-400 mb-1">{label}</div>
+      <div className="text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-100">{value || '—'}</div>
+    </div>
+  );
+
   return (
     <Layout title={patient.name}>
        
@@ -275,6 +300,7 @@ const PatientProfileView: React.FC = () => {
            <TabButton id="timeline" label={t('tab_timeline')} icon="fa-solid fa-clock-rotate-left" />
            <TabButton id="clinical" label={t('tab_clinical')} icon="fa-solid fa-file-medical" />
            <TabButton id="devices" label="نتائج الأجهزة" icon="fa-solid fa-microscope" />
+           <TabButton id="ent-forms" label="نماذج ENT" icon="fa-solid fa-stethoscope" />
        </div>
 
        {/* Tab Content */}
@@ -777,6 +803,180 @@ const PatientProfileView: React.FC = () => {
            {activeTab === 'devices' && (
                <div className="animate-fade-in">
                    <DeviceResultsTimeline patientId={patient.id} />
+               </div>
+           )}
+
+           {/* TAB 5: ENT FORMS */}
+           {activeTab === 'ent-forms' && (
+               <div className="animate-fade-in">
+                   {entLoading ? (
+                     <div className="flex items-center justify-center py-20">
+                       <i className="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+                     </div>
+                   ) : !entForms ? (
+                     <div className="text-center text-slate-400 py-20">
+                       <i className="fa-solid fa-folder-open text-4xl mb-3"></i>
+                       <p>لا توجد نماذج محفوظة</p>
+                     </div>
+                   ) : (
+                     <div className="space-y-6">
+                       {/* Summary Cards */}
+                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                         {[
+                           { key: 'newPatientForms', label: 'استبيان مريض جديد', icon: 'fa-file-medical', color: 'blue', endpoint: 'new-patient' },
+                           { key: 'followUpForms', label: 'متابعة', icon: 'fa-file-lines', color: 'green', endpoint: 'follow-up' },
+                           { key: 'audiograms', label: 'فحص السمع', icon: 'fa-ear-listen', color: 'purple', endpoint: 'audiogram' },
+                           { key: 'balanceAssessments', label: 'فحص التوازن', icon: 'fa-person-walking', color: 'amber', endpoint: 'balance-assessment' },
+                           { key: 'referrals', label: 'تحويل طبي', icon: 'fa-share-from-square', color: 'rose', endpoint: 'referral' },
+                         ].map(cat => {
+                           const count = entForms[cat.key]?.length || 0;
+                           return (
+                             <button key={cat.key} onClick={() => { setEntExpanded(entExpanded === cat.key ? null : cat.key); setEntDetail(null); }}
+                               className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all text-center ${
+                                 entExpanded === cat.key
+                                   ? `bg-${cat.color}-100 border-${cat.color}-400 ring-2 ring-${cat.color}-300`
+                                   : `bg-${cat.color}-50 border-${cat.color}-200 hover:bg-${cat.color}-100`
+                               }`}>
+                               <i className={`fa-solid ${cat.icon} text-2xl text-${cat.color}-600`}></i>
+                               <span className="text-xs font-bold leading-tight">{cat.label}</span>
+                               <span className={`text-lg font-black text-${cat.color}-700`}>{count}</span>
+                             </button>
+                           );
+                         })}
+                       </div>
+
+                       {/* Expanded List */}
+                       {entExpanded && entForms[entExpanded] && entForms[entExpanded].length > 0 && (
+                         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
+                           <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                             <i className="fa-solid fa-list"></i>
+                             السجلات ({entForms[entExpanded].length})
+                           </h3>
+                           <div className="space-y-2">
+                             {entForms[entExpanded].map((form: any, idx: number) => {
+                               const formType = entExpanded === 'newPatientForms' ? 'new-patient'
+                                 : entExpanded === 'followUpForms' ? 'follow-up'
+                                 : entExpanded === 'audiograms' ? 'audiogram'
+                                 : entExpanded === 'balanceAssessments' ? 'balance-assessment'
+                                 : 'referral';
+                               const summary = form.chief_complaint || form.follow_up_reason || form.hearing_level || form.vestibular_function || form.referred_to_specialty || '—';
+                               return (
+                                 <button key={form.id} onClick={async () => {
+                                   setEntDetailLoading(true);
+                                   try {
+                                     const data = await api.get(`/ent-forms/${formType}/${patient.id}`);
+                                     const found = (data as any[]).find((d: any) => d.id === form.id);
+                                     setEntDetail({ type: formType, data: found || form });
+                                   } catch { setEntDetail({ type: formType, data: form }); }
+                                   setEntDetailLoading(false);
+                                 }}
+                                   className={`w-full text-right p-4 rounded-xl border transition-all flex justify-between items-center ${
+                                     entDetail?.data?.id === form.id ? 'bg-white border-primary shadow-md' : 'bg-white border-slate-100 hover:border-primary/40 hover:shadow-sm'
+                                   }`}>
+                                   <div>
+                                     <span className="text-sm font-bold text-slate-700">#{idx + 1}</span>
+                                     <span className="text-xs text-slate-400 mr-3">{new Date(form.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                   </div>
+                                   <span className="text-xs text-slate-500 max-w-[200px] truncate">{summary}</span>
+                                 </button>
+                               );
+                             })}
+                           </div>
+                         </div>
+                       )}
+
+                       {entExpanded && entForms[entExpanded]?.length === 0 && (
+                         <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 text-center text-slate-400">
+                           <i className="fa-solid fa-inbox text-3xl mb-2"></i>
+                           <p>لا توجد سجلات من هذا النوع</p>
+                         </div>
+                       )}
+
+                       {/* Detail View */}
+                       {entDetailLoading && (
+                         <div className="flex items-center justify-center py-10">
+                           <i className="fa-solid fa-spinner fa-spin text-2xl text-primary"></i>
+                         </div>
+                       )}
+                       {entDetail && !entDetailLoading && (
+                         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" dir="rtl">
+                           <div className="flex items-center justify-between mb-4">
+                             <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                               <i className="fa-solid fa-file-medical text-primary"></i> تفاصيل النموذج
+                             </h3>
+                             <span className="text-xs text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                           </div>
+                           
+                           {entDetail.type === 'new-patient' && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                               <DetailField label="الشكوى الرئيسية" value={entDetail.data.chief_complaint} />
+                               <DetailField label="مدة الأعراض" value={entDetail.data.symptom_duration} />
+                               <DetailField label="جهة الأعراض" value={{right:'يمين',left:'يسار',both:'كلاهما',none:'غير محدد'}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
+                               <DetailField label="علاج ENT سابق" value={entDetail.data.previous_ent_treatment ? `نعم — ${entDetail.data.previous_ent_details}` : 'لا'} />
+                               <DetailField label="عمليات ENT سابقة" value={entDetail.data.previous_ent_surgery ? `نعم — ${entDetail.data.previous_ent_surgery_details}` : 'لا'} />
+                               {entDetail.data.symptoms && typeof entDetail.data.symptoms === 'object' && (
+                                 <div className="md:col-span-2">
+                                   <div className="text-xs font-bold uppercase text-slate-400 mb-2">الأعراض</div>
+                                   <div className="flex flex-wrap gap-2">
+                                     {Object.entries(entDetail.data.symptoms).filter(([k, v]) => v === true).map(([k]) => (
+                                       <span key={k} className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
+                                         {{earPain:'ألم أذن',hearingLoss:'ضعف سمع',tinnitus:'طنين',earDischarge:'إفرازات أذن',vertigo:'دوخة',nasalObstruction:'انسداد أنف',nasalDischarge:'إفرازات أنف',sneezing:'عطاس',soreThroat:'ألم حلق',voiceChange:'تغير صوت',dysphagia:'صعوبة بلع',snoring:'شخير',sleepApnea:'انقطاع نفس',facialPain:'ألم وجه',headache:'صداع',nosebleeds:'رعاف',lossOfSmell:'فقدان شم',neckMass:'كتلة رقبة'}[k] || k}
+                                       </span>
+                                     ))}
+                                     {entDetail.data.symptoms.other && <span className="bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-xs font-bold border border-amber-200">{entDetail.data.symptoms.other}</span>}
+                                   </div>
+                                 </div>
+                               )}
+                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                             </div>
+                           )}
+
+                           {entDetail.type === 'follow-up' && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                               <DetailField label="سبب المتابعة" value={entDetail.data.follow_up_reason} />
+                               <DetailField label="التشخيص السابق" value={entDetail.data.previous_diagnosis} />
+                               <DetailField label="الالتزام بالعلاج" value={{full:'كامل',partial:'جزئي',none:'لا يوجد'}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
+                               <DetailField label="تقييم الأعراض" value={{improved:'تحسن',same:'كما هي',worsened:'تفاقمت'}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
+                               <DetailField label="أعراض جديدة" value={entDetail.data.new_symptoms} />
+                               <DetailField label="فعالية الأدوية" value={entDetail.data.medication_effectiveness} />
+                               {entDetail.data.is_surgical_follow_up && <DetailField label="العملية الجراحية" value={entDetail.data.surgical_procedure} />}
+                               {entDetail.data.is_surgical_follow_up && <DetailField label="التئام الجرح" value={entDetail.data.wound_healing} />}
+                               <DetailField label="الخطوات القادمة" value={entDetail.data.next_steps} />
+                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                             </div>
+                           )}
+
+                           {entDetail.type === 'audiogram' && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                               <DetailField label="مستوى السمع" value={entDetail.data.hearing_level} />
+                               <DetailField label="نوع ضعف السمع" value={entDetail.data.hearing_loss_type} />
+                               <DetailField label="توصية بسماعة" value={entDetail.data.recommend_hearing_aid ? 'نعم' : 'لا'} />
+                               <DetailField label="OAE" value={entDetail.data.oae} />
+                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                             </div>
+                           )}
+
+                           {entDetail.type === 'balance-assessment' && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                               <DetailField label="وظيفة الدهليز" value={entDetail.data.vestibular_function} />
+                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                             </div>
+                           )}
+
+                           {entDetail.type === 'referral' && (
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                               <DetailField label="الطبيب المحوّل" value={entDetail.data.referring_doctor} />
+                               <DetailField label="التخصص" value={entDetail.data.referred_to_specialty} />
+                               <DetailField label="الطبيب المحال إليه" value={entDetail.data.referred_to_doctor} />
+                               <DetailField label="المستشفى" value={entDetail.data.referred_to_hospital} />
+                               <DetailField label="الاستعجال" value={{routine:'عادي',urgent:'مستعجل',emergency:'طوارئ'}[entDetail.data.urgency as string] || entDetail.data.urgency} />
+                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                             </div>
+                           )}
+                         </div>
+                       )}
+                     </div>
+                   )}
                </div>
            )}
 
