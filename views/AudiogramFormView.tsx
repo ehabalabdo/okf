@@ -202,7 +202,7 @@ const AudiogramFormView: React.FC = () => {
           {/* Tympanometry */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-chart-area text-teal-500"></i> قياس طبلية الأذن (Tympanometry)
+              <i className="fa-solid fa-chart-area text-blue-500"></i> قياس طبلية الأذن (Tympanometry)
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Right Ear */}
@@ -269,7 +269,7 @@ const AudiogramFormView: React.FC = () => {
           {/* OAE */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-signal text-cyan-500"></i> الانبعاث السمعي (OAE)
+              <i className="fa-solid fa-signal text-sky-500"></i> الانبعاث السمعي (OAE)
             </h2>
             <div className="grid grid-cols-2 gap-6">
               <div>

@@ -340,14 +340,14 @@ const ClinicHistoryView: React.FC = () => {
             icon="fa-solid fa-users"
             label={isAr ? 'إجمالي المرضى' : 'Total Patients'}
             value={totals.patients}
-            color="from-blue-500 to-cyan-400"
+            color="from-blue-500 to-sky-400"
           />
           <StatCard
             icon="fa-solid fa-stethoscope"
             label={isAr ? 'إجمالي الزيارات' : 'Total Visits'}
             value={totals.visits}
             subValue={`${totals.completed} ${isAr ? 'مكتمل' : 'completed'}`}
-            color="from-emerald-500 to-teal-400"
+            color="from-emerald-500 to-blue-400"
           />
           <StatCard
             icon="fa-solid fa-money-bill-wave"
@@ -380,7 +380,7 @@ const ClinicHistoryView: React.FC = () => {
                   className="w-full flex items-center justify-between p-5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center text-white text-lg shadow-lg shadow-primary/20">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-sky-400 flex items-center justify-center text-white text-lg shadow-lg shadow-primary/20">
                       <i className="fa-solid fa-hospital"></i>
                     </div>
                     <div className={`text-${isAr ? 'right' : 'left'}`}>

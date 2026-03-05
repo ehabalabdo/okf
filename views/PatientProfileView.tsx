@@ -511,7 +511,7 @@ const PatientProfileView: React.FC = () => {
                                                {/* 2. History Section */}
                                                {(visit.presentIllness || visit.pastMedicalHistory || visit.surgicalHistory || visit.currentMedications || visit.allergies || visit.familyHistory || visit.socialHistory) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
-                                                   <div className="text-[11px] font-bold text-indigo-600 uppercase mb-2 flex items-center gap-1">
+                                                   <div className="text-[11px] font-bold text-blue-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-book-medical text-[10px]"></i> التاريخ المرضي
                                                    </div>
                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -543,7 +543,7 @@ const PatientProfileView: React.FC = () => {
                                                {/* 3. Examination */}
                                                {(visit.generalExamination || visit.systemicExamination || hasVitals) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
-                                                   <div className="text-[11px] font-bold text-teal-600 uppercase mb-2 flex items-center gap-1">
+                                                   <div className="text-[11px] font-bold text-blue-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-stethoscope text-[10px]"></i> الفحص السريري
                                                    </div>
                                                    {visit.generalExamination && (
@@ -643,14 +643,14 @@ const PatientProfileView: React.FC = () => {
 
                                                {/* 7. Imaging Orders */}
                                                {hasImaging && (
-                                                 <div className="bg-white p-3 rounded-lg border border-cyan-100">
-                                                   <div className="text-[11px] font-bold text-cyan-600 uppercase mb-2 flex items-center gap-1">
+                                                 <div className="bg-white p-3 rounded-lg border border-sky-100">
+                                                   <div className="text-[11px] font-bold text-sky-600 uppercase mb-2 flex items-center gap-1">
                                                      <i className="fa-solid fa-x-ray text-[10px]"></i> طلبات الأشعة
                                                    </div>
                                                    <div className="space-y-1.5">
                                                      {visit.imagingOrders!.map((img, i) => (
-                                                       <div key={i} className="flex items-center justify-between bg-cyan-50 px-3 py-1.5 rounded-lg text-xs">
-                                                         <span className="font-medium text-cyan-800">📷 {img.imagingType} - {img.bodyPart}</span>
+                                                       <div key={i} className="flex items-center justify-between bg-sky-50 px-3 py-1.5 rounded-lg text-xs">
+                                                         <span className="font-medium text-sky-800">📷 {img.imagingType} - {img.bodyPart}</span>
                                                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${img.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                                            {img.status === 'Completed' ? '✓ مكتمل' : '⏳ معلق'}
                                                          </span>

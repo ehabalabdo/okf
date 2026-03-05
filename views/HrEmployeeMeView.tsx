@@ -359,7 +359,7 @@ const HrEmployeeMeView: React.FC = () => {
           {/* Profile + Schedule Card */}
           <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-6">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-indigo-200">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-blue-200">
                 {profile.fullName.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1">
@@ -376,15 +376,15 @@ const HrEmployeeMeView: React.FC = () => {
                 <h4 className="text-xs uppercase font-bold text-slate-400 mb-3">{isAr ? 'جدول العمل' : 'Work Schedule'}</h4>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {[1, 2, 3, 4, 5, 6, 7].map(d => (
-                    <span key={d} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${sched.workDays.includes(d) ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-50 text-slate-300'}`}>
+                    <span key={d} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${sched.workDays.includes(d) ? 'bg-blue-100 text-blue-700' : 'bg-slate-50 text-slate-300'}`}>
                       {isAr ? DAY_LABELS_AR[d] : DAY_LABELS_EN[d]}
                     </span>
                   ))}
                 </div>
                 <div className="flex gap-6 text-sm">
-                  <span className="text-slate-500"><i className="fa-solid fa-clock text-indigo-400 me-1"></i> {sched.startTime} — {sched.endTime}</span>
+                  <span className="text-slate-500"><i className="fa-solid fa-clock text-blue-400 me-1"></i> {sched.startTime} — {sched.endTime}</span>
                   <span className="text-slate-500"><i className="fa-solid fa-hourglass-half text-amber-400 me-1"></i> {sched.graceMinutes}m {isAr ? 'مهلة' : 'grace'}</span>
-                  {sched.overtimeEnabled && <span className="text-indigo-600 font-bold"><i className="fa-solid fa-bolt me-1"></i> OT</span>}
+                  {sched.overtimeEnabled && <span className="text-blue-600 font-bold"><i className="fa-solid fa-bolt me-1"></i> OT</span>}
                 </div>
               </div>
             )}
@@ -393,18 +393,18 @@ const HrEmployeeMeView: React.FC = () => {
           {/* ── BIOMETRIC SECTION ── */}
           {/* Case 1: No biometric on server at all */}
           {!profile.bioRegistered && (
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border-2 border-dashed border-indigo-300 p-6 text-center">
-              <i className="fa-solid fa-fingerprint text-5xl text-indigo-500 mb-3"></i>
-              <h3 className="text-lg font-extrabold text-indigo-800 mb-1">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border-2 border-dashed border-blue-300 p-6 text-center">
+              <i className="fa-solid fa-fingerprint text-5xl text-blue-500 mb-3"></i>
+              <h3 className="text-lg font-extrabold text-blue-800 mb-1">
                 {isAr ? 'سجّل بصمتك الآن' : 'Register Your Biometric'}
               </h3>
-              <p className="text-sm text-indigo-600 mb-4">
+              <p className="text-sm text-blue-600 mb-4">
                 {isAr ? 'سجّل البصمة أو Face ID عشان تقدر تسجل حضور' : 'Register fingerprint or Face ID to enable attendance'}
               </p>
               <button
                 onClick={handleRegisterBiometric}
                 disabled={actionLoading}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-2xl font-extrabold text-sm transition-colors shadow-lg shadow-indigo-200 disabled:opacity-50"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-2xl font-extrabold text-sm transition-colors shadow-lg shadow-blue-200 disabled:opacity-50"
               >
                 {actionLoading ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-fingerprint me-2"></i>}
                 {isAr ? 'تسجيل البصمة' : 'Register Biometric'}
@@ -500,7 +500,7 @@ const HrEmployeeMeView: React.FC = () => {
                   </div>
                   <button
                     onClick={handleAfterDeviceCleared}
-                    className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm"
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold text-sm"
                   >
                     <i className="fa-solid fa-check me-2"></i>
                     {isAr ? 'تم المسح من الجهاز — سجل بصمة جديدة' : 'Done — Register New Biometric'}
@@ -531,8 +531,8 @@ const HrEmployeeMeView: React.FC = () => {
 
             {/* Biometric info when registered */}
             {deviceRegistered && !checkedOut && (
-              <div className="mb-4 p-3 bg-indigo-50 rounded-xl text-center">
-                <p className="text-sm text-indigo-600 font-bold">
+              <div className="mb-4 p-3 bg-blue-50 rounded-xl text-center">
+                <p className="text-sm text-blue-600 font-bold">
                   <i className="fa-solid fa-fingerprint me-1"></i>
                   {isAr ? 'سيُطلب منك البصمة عند الضغط' : 'You will be prompted for biometric on tap'}
                 </p>
@@ -611,7 +611,7 @@ const HrEmployeeMeView: React.FC = () => {
                 className={`p-6 rounded-2xl font-extrabold text-lg transition-all flex flex-col items-center gap-2 ${
                   !onBreak
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-200 active:scale-95 animate-pulse'
+                    : 'bg-gradient-to-br from-blue-500 to-sky-600 text-white hover:from-blue-600 hover:to-sky-700 shadow-lg shadow-blue-200 active:scale-95 animate-pulse'
                 }`}
               >
                 <i className="fa-solid fa-person-running text-3xl"></i>
@@ -634,7 +634,7 @@ const HrEmployeeMeView: React.FC = () => {
           {/* Today's Status */}
           <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-5">
             <h3 className="font-extrabold text-sm text-slate-500 uppercase mb-4">
-              <i className="fa-solid fa-calendar-day me-1 text-indigo-400"></i>
+              <i className="fa-solid fa-calendar-day me-1 text-blue-400"></i>
               {isAr ? 'حالة اليوم' : "Today's Status"}
             </h3>
             {today ? (
@@ -665,8 +665,8 @@ const HrEmployeeMeView: React.FC = () => {
                 )}
                 {today.overtimeMinutes > 0 && (
                   <div className="flex items-center justify-between">
-                    <span className="text-indigo-500 text-sm">{isAr ? 'إضافي' : 'Overtime'}</span>
-                    <span className="font-bold text-indigo-600">{today.overtimeMinutes}m</span>
+                    <span className="text-blue-500 text-sm">{isAr ? 'إضافي' : 'Overtime'}</span>
+                    <span className="font-bold text-blue-600">{today.overtimeMinutes}m</span>
                   </div>
                 )}
                 <div className="pt-2 text-center">
@@ -694,7 +694,7 @@ const HrEmployeeMeView: React.FC = () => {
           {/* Monthly Summary */}
           <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-5">
             <h3 className="font-extrabold text-sm text-slate-500 uppercase mb-4">
-              <i className="fa-solid fa-chart-pie me-1 text-indigo-400"></i>
+              <i className="fa-solid fa-chart-pie me-1 text-blue-400"></i>
               {isAr ? 'ملخص الشهر' : 'Monthly Summary'}
             </h3>
             {summary ? (
@@ -713,7 +713,7 @@ const HrEmployeeMeView: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 text-sm">{isAr ? 'إضافي' : 'Overtime'}</span>
-                  <span className="font-bold text-indigo-600">{fmtMinutes(summary.totalOvertimeMinutes)}</span>
+                  <span className="font-bold text-blue-600">{fmtMinutes(summary.totalOvertimeMinutes)}</span>
                 </div>
                 {summary.totalAbsences > 0 && (
                   <div className="flex items-center justify-between">
@@ -730,7 +730,7 @@ const HrEmployeeMeView: React.FC = () => {
           {/* Quick Info */}
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-2 text-xs text-slate-500">
             <p><i className="fa-solid fa-location-dot text-emerald-400 me-1"></i> {isAr ? 'يجب تفعيل GPS لتسجيل الحضور' : 'GPS must be enabled for attendance'}</p>
-            <p><i className="fa-solid fa-fingerprint text-indigo-400 me-1"></i> {isAr ? 'البصمة مطلوبة للتحقق من هويتك' : 'Biometric required to verify your identity'}</p>
+            <p><i className="fa-solid fa-fingerprint text-blue-400 me-1"></i> {isAr ? 'البصمة مطلوبة للتحقق من هويتك' : 'Biometric required to verify your identity'}</p>
             <p><i className="fa-solid fa-shield-halved text-emerald-400 me-1"></i> {isAr ? 'البيانات مشفرة ومحمية' : 'Data is encrypted and secure'}</p>
           </div>
         </div>

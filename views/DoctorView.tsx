@@ -550,10 +550,10 @@ const DoctorView: React.FC = () => {
   );
 
   const tabs: { key: SoapTab; label: string; icon: string; color: string }[] = [
-    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-teal-600' },
+    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-blue-600' },
     { key: 'chief', label: 'Chief Complaint', icon: 'fa-comment-medical', color: 'bg-slate-800' },
-    { key: 'history', label: 'History', icon: 'fa-clock-rotate-left', color: 'bg-indigo-600' },
-    { key: 'exam', label: 'Examination', icon: 'fa-stethoscope', color: 'bg-teal-600' },
+    { key: 'history', label: 'History', icon: 'fa-clock-rotate-left', color: 'bg-blue-600' },
+    { key: 'exam', label: 'Examination', icon: 'fa-stethoscope', color: 'bg-blue-600' },
     { key: 'assessment', label: 'Assessment', icon: 'fa-diagnoses', color: 'bg-purple-600' },
     { key: 'plan', label: 'Plan & Orders', icon: 'fa-clipboard-list', color: 'bg-blue-600' },
     { key: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
@@ -774,7 +774,7 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'history' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-clock-rotate-left text-indigo-500"></i> Medical History
+                          <i className="fa-solid fa-clock-rotate-left text-blue-500"></i> Medical History
                         </h3>
                         
                         {[
@@ -789,7 +789,7 @@ const DoctorView: React.FC = () => {
                           <div key={field.label}>
                             <label className="text-xs font-bold text-slate-600 mb-1 block">{field.label}</label>
                             <textarea
-                              className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-indigo-400 transition-all text-sm text-slate-800 resize-none"
+                              className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-400 transition-all text-sm text-slate-800 resize-none"
                               placeholder={field.placeholder}
                               value={field.value}
                               onChange={e => field.setter(e.target.value)}
@@ -803,17 +803,17 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'exam' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-stethoscope text-teal-500"></i> Examination
+                          <i className="fa-solid fa-stethoscope text-blue-500"></i> Examination
                         </h3>
 
                         <div>
                           <label className="text-xs font-bold text-slate-600 mb-1 block">General Examination</label>
-                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-teal-400 transition-all text-sm resize-none" placeholder="General appearance, consciousness, orientation..." value={generalExamination} onChange={e => setGeneralExamination(e.target.value)} />
+                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-400 transition-all text-sm resize-none" placeholder="General appearance, consciousness, orientation..." value={generalExamination} onChange={e => setGeneralExamination(e.target.value)} />
                         </div>
 
                         {/* Vital Signs */}
-                        <div className="bg-teal-50 rounded-xl border border-teal-100 p-4">
-                          <h4 className="text-xs font-bold text-teal-800 mb-3 uppercase"><i className="fa-solid fa-heart-pulse mr-1"></i> Vital Signs</h4>
+                        <div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
+                          <h4 className="text-xs font-bold text-blue-800 mb-3 uppercase"><i className="fa-solid fa-heart-pulse mr-1"></i> Vital Signs</h4>
                           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             <div>
                               <label className="text-[10px] font-bold text-slate-500 block mb-1">Blood Pressure</label>
@@ -840,7 +840,7 @@ const DoctorView: React.FC = () => {
 
                         <div>
                           <label className="text-xs font-bold text-slate-600 mb-1 block">Systemic Examination</label>
-                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-teal-400 transition-all text-sm resize-none" placeholder="Cardiovascular, Respiratory, Abdominal, Neurological..." value={systemicExamination} onChange={e => setSystemicExamination(e.target.value)} />
+                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-400 transition-all text-sm resize-none" placeholder="Cardiovascular, Respiratory, Abdominal, Neurological..." value={systemicExamination} onChange={e => setSystemicExamination(e.target.value)} />
                         </div>
                       </div>
                     )}
@@ -921,8 +921,8 @@ const DoctorView: React.FC = () => {
                         </div>
 
                         {/* B) Imaging Orders */}
-                        <div className="bg-indigo-50/50 rounded-xl border border-indigo-100 p-4">
-                          <h4 className="text-sm font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                        <div className="bg-blue-50/50 rounded-xl border border-blue-100 p-4">
+                          <h4 className="text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
                             <i className="fa-solid fa-x-ray"></i> Imaging Orders
                           </h4>
                           <div className="flex gap-2 mb-3 flex-wrap">
@@ -935,7 +935,7 @@ const DoctorView: React.FC = () => {
                             </select>
                             <input className="flex-1 p-2 rounded-lg border text-sm bg-white" placeholder="Body Part (e.g. Chest, Abdomen)" value={newImaging.bodyPart} onChange={e => setNewImaging({...newImaging, bodyPart: e.target.value})} />
                             <input className="w-32 p-2 rounded-lg border text-sm bg-white" placeholder="Notes" value={newImaging.notes} onChange={e => setNewImaging({...newImaging, notes: e.target.value})} />
-                            <button onClick={addImagingOrder} className="bg-indigo-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-indigo-700">
+                            <button onClick={addImagingOrder} className="bg-blue-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-blue-700">
                               <i className="fa-solid fa-plus mr-1"></i> Add
                             </button>
                           </div>
@@ -945,7 +945,7 @@ const DoctorView: React.FC = () => {
                           {imagingOrders.length > 0 && (
                             <div className="space-y-2">
                               {imagingOrders.map(img => (
-                                <div key={img.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
+                                <div key={img.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
                                   <div className="flex items-center gap-3">
                                     <button onClick={() => toggleImagingStatus(img.id)} className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${img.status === 'Completed' ? 'bg-green-500 text-white' : 'bg-amber-100 text-amber-600 border border-amber-300'}`}>
                                       {img.status === 'Completed' ? <i className="fa-solid fa-check"></i> : <i className="fa-regular fa-clock"></i>}
@@ -957,7 +957,7 @@ const DoctorView: React.FC = () => {
                                   </div>
                                   <div className="flex items-center gap-2">
                                     {img.reportFileUrl && <i className="fa-solid fa-paperclip text-green-500 text-xs"></i>}
-                                    <button onClick={() => { setAttachingImagingId(img.id); imagingFileInputRef.current?.click(); }} className="text-indigo-400 hover:text-indigo-600 text-xs" title="Attach report">
+                                    <button onClick={() => { setAttachingImagingId(img.id); imagingFileInputRef.current?.click(); }} className="text-blue-400 hover:text-blue-600 text-xs" title="Attach report">
                                       <i className="fa-solid fa-cloud-arrow-up"></i>
                                     </button>
                                     <button onClick={() => removeImagingOrder(img.id)} className="text-slate-300 hover:text-red-500">
@@ -1166,11 +1166,11 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'ent-forms' && (
                       <div className="space-y-5 animate-fadeIn" dir="rtl">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-stethoscope text-teal-500"></i> نماذج الأنف والأذن والحنجرة
+                          <i className="fa-solid fa-stethoscope text-blue-500"></i> نماذج الأنف والأذن والحنجرة
                         </h3>
                         {entLoading ? (
                           <div className="flex items-center justify-center py-16">
-                            <i className="fa-solid fa-spinner fa-spin text-3xl text-teal-500"></i>
+                            <i className="fa-solid fa-spinner fa-spin text-3xl text-blue-500"></i>
                           </div>
                         ) : !entForms ? (
                           <div className="text-center text-slate-400 py-16">
@@ -1222,7 +1222,7 @@ const DoctorView: React.FC = () => {
                                         setEntDetailLoading(false);
                                       }}
                                         className={`w-full text-right p-3 rounded-xl border transition-all flex justify-between items-center gap-2 ${
-                                          entDetail?.data?.id === form.id ? 'bg-white border-teal-400 shadow-md' : 'bg-white border-slate-100 hover:border-teal-300'
+                                          entDetail?.data?.id === form.id ? 'bg-white border-blue-400 shadow-md' : 'bg-white border-slate-100 hover:border-blue-300'
                                         }`}>
                                         <div className="flex items-center gap-2">
                                           <span className="text-xs font-bold text-slate-600">#{idx + 1}</span>
@@ -1246,14 +1246,14 @@ const DoctorView: React.FC = () => {
                             {/* Detail View */}
                             {entDetailLoading && (
                               <div className="flex items-center justify-center py-8">
-                                <i className="fa-solid fa-spinner fa-spin text-xl text-teal-500"></i>
+                                <i className="fa-solid fa-spinner fa-spin text-xl text-blue-500"></i>
                               </div>
                             )}
                             {entDetail && !entDetailLoading && (
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                                 <div className="flex items-center justify-between mb-4">
                                   <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <i className="fa-solid fa-file-medical text-teal-500"></i> تفاصيل النموذج
+                                    <i className="fa-solid fa-file-medical text-blue-500"></i> تفاصيل النموذج
                                   </h4>
                                   <span className="text-[10px] text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                 </div>

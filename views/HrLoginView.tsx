@@ -39,11 +39,11 @@ const HrLoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
             <i className="fa-solid fa-id-badge text-white text-2xl"></i>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-800">
@@ -61,7 +61,7 @@ const HrLoginView: React.FC = () => {
               </label>
               <input
                 type="text"
-                className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm"
+                className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm"
                 placeholder={isAr ? 'أدخل اسم المستخدم' : 'Enter username'}
                 value={username}
                 onChange={e => setUsername(e.target.value)}
@@ -74,7 +74,7 @@ const HrLoginView: React.FC = () => {
               </label>
               <input
                 type="password"
-                className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm"
+                className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm"
                 placeholder="••••••••"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -90,7 +90,7 @@ const HrLoginView: React.FC = () => {
             <button
               type="submit"
               disabled={loading || !username || !password}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-extrabold text-sm hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-extrabold text-sm hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg shadow-blue-200 disabled:opacity-50"
             >
               {loading ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-right-to-bracket me-2"></i>}
               {isAr ? 'تسجيل الدخول' : 'Sign In'}
@@ -102,7 +102,7 @@ const HrLoginView: React.FC = () => {
         <div className="text-center mt-4">
           <button
             onClick={() => navigate(`/${slug}/login`)}
-            className="text-sm text-slate-400 hover:text-indigo-500 transition-colors"
+            className="text-sm text-slate-400 hover:text-blue-500 transition-colors"
           >
             <i className="fa-solid fa-arrow-left me-1"></i> {isAr ? 'تسجيل دخول الموظفين (نظام)' : 'Staff Login'}
           </button>

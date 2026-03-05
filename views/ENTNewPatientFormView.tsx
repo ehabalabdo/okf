@@ -109,7 +109,7 @@ const ENTNewPatientFormView: React.FC = () => {
         <div className="max-w-5xl mx-auto mb-6">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <i className="fa-solid fa-user-plus text-white text-2xl"></i>
               </div>
               <div>
@@ -261,7 +261,7 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Submit */}
           <div className="flex justify-center pb-8">
             <button onClick={handleSubmit} disabled={saving}
-              className="px-12 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
+              className="px-12 py-4 bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
               {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> جاري الحفظ...</> 
                 : saved ? <><i className="fa-solid fa-check ml-2"></i> تم الحفظ بنجاح</>
                 : <><i className="fa-solid fa-save ml-2"></i> حفظ الاستبيان</>}

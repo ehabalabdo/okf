@@ -215,7 +215,7 @@ const HrEmployeesView: React.FC = () => {
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-5 rounded-2xl shadow-soft border border-gray-100 flex items-center gap-4">
-          <div className="h-12 w-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+          <div className="h-12 w-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
             <i className="fa-solid fa-users"></i>
           </div>
           <div>
@@ -247,7 +247,7 @@ const HrEmployeesView: React.FC = () => {
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 mb-6">
-        <button onClick={openAdd} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-lg transition-all flex items-center gap-2">
+        <button onClick={openAdd} className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition-all flex items-center gap-2">
           <i className="fa-solid fa-plus"></i> {isAr ? 'إضافة موظف' : 'Add Employee'}
         </button>
         <button onClick={() => {
@@ -374,7 +374,7 @@ const HrEmployeesView: React.FC = () => {
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-8">
-            <div className="bg-indigo-600 p-5 rounded-t-2xl flex justify-between items-center text-white">
+            <div className="bg-blue-600 p-5 rounded-t-2xl flex justify-between items-center text-white">
               <h3 className="text-lg font-bold">
                 <i className="fa-solid fa-user-plus mr-2"></i>
                 {editingId ? (isAr ? 'تعديل موظف' : 'Edit Employee') : (isAr ? 'إضافة موظف' : 'Add Employee')}
@@ -394,19 +394,19 @@ const HrEmployeesView: React.FC = () => {
               {/* Basic Info */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'الاسم الكامل' : 'Full Name'} *</label>
-                <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
+                <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
               </div>
 
               {!editingId && (
                 <>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'اسم المستخدم' : 'Username'} *</label>
-                    <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none font-mono" value={form.username} onChange={e => setForm({ ...form, username: e.target.value.toLowerCase().replace(/\s/g, '') })} />
+                    <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none font-mono" value={form.username} onChange={e => setForm({ ...form, username: e.target.value.toLowerCase().replace(/\s/g, '') })} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'كلمة المرور' : 'Password'} *</label>
                     <div className="flex gap-2">
-                      <input type="text" className="flex-1 p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none font-mono" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+                      <input type="text" className="flex-1 p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none font-mono" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
                       <button type="button" onClick={() => setForm({ ...form, password: generatePassword() })} className="px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500" title="Generate">
                         <i className="fa-solid fa-rotate"></i>
                       </button>
@@ -421,22 +421,22 @@ const HrEmployeesView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'الهاتف' : 'Phone'}</label>
-                  <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+                  <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'الإيميل' : 'Email'}</label>
-                  <input type="email" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                  <input type="email" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'الراتب الأساسي (JOD)' : 'Basic Salary (JOD)'}</label>
-                  <input type="number" step="0.01" min="0" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.basic_salary} onChange={e => setForm({ ...form, basic_salary: parseFloat(e.target.value) || 0 })} />
+                  <input type="number" step="0.01" min="0" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.basic_salary} onChange={e => setForm({ ...form, basic_salary: parseFloat(e.target.value) || 0 })} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'الصلاحية' : 'Role'}</label>
-                  <select className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.role} onChange={e => setForm({ ...form, role: e.target.value as any })}>
+                  <select className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.role} onChange={e => setForm({ ...form, role: e.target.value as any })}>
                     <option value="HR_EMPLOYEE">{isAr ? 'موظف' : 'Employee'}</option>
                     <option value="HR_ADMIN">{isAr ? 'مسؤول HR' : 'HR Admin'}</option>
                   </select>
@@ -446,7 +446,7 @@ const HrEmployeesView: React.FC = () => {
               {/* Schedule Section */}
               <div className="border-t border-slate-100 pt-4 mt-4">
                 <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                  <i className="fa-solid fa-clock text-indigo-500"></i> {isAr ? 'جدول العمل' : 'Work Schedule'}
+                  <i className="fa-solid fa-clock text-blue-500"></i> {isAr ? 'جدول العمل' : 'Work Schedule'}
                 </h4>
 
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{isAr ? 'أيام العمل' : 'Work Days'}</label>
@@ -461,7 +461,7 @@ const HrEmployeesView: React.FC = () => {
                           : [...form.work_days, d.value].sort();
                         setForm({ ...form, work_days: wd });
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${form.work_days.includes(d.value) ? 'bg-indigo-600 text-white shadow' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${form.work_days.includes(d.value) ? 'bg-blue-600 text-white shadow' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                     >
                       {isAr ? d.labelAr : d.label}
                     </button>
@@ -471,22 +471,22 @@ const HrEmployeesView: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'بداية الدوام' : 'Start Time'}</label>
-                    <input type="time" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })} />
+                    <input type="time" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'نهاية الدوام' : 'End Time'}</label>
-                    <input type="time" className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.end_time} onChange={e => setForm({ ...form, end_time: e.target.value })} />
+                    <input type="time" className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.end_time} onChange={e => setForm({ ...form, end_time: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{isAr ? 'فترة السماح (دقائق)' : 'Grace (min)'}</label>
-                    <input type="number" min={0} max={60} className="w-full p-3 rounded-xl border border-gray-200 focus:border-indigo-400 outline-none" value={form.grace_minutes} onChange={e => setForm({ ...form, grace_minutes: parseInt(e.target.value) || 0 })} />
+                    <input type="number" min={0} max={60} className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-400 outline-none" value={form.grace_minutes} onChange={e => setForm({ ...form, grace_minutes: parseInt(e.target.value) || 0 })} />
                   </div>
                   <div className="flex items-end pb-1">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={form.overtime_enabled} onChange={e => setForm({ ...form, overtime_enabled: e.target.checked })} className="w-5 h-5 rounded accent-indigo-600" />
+                      <input type="checkbox" checked={form.overtime_enabled} onChange={e => setForm({ ...form, overtime_enabled: e.target.checked })} className="w-5 h-5 rounded accent-blue-600" />
                       <span className="text-sm font-bold text-slate-700">{isAr ? 'حساب إضافي' : 'Overtime'}</span>
                     </label>
                   </div>
@@ -498,7 +498,7 @@ const HrEmployeesView: React.FC = () => {
               <button onClick={() => setShowForm(false)} className="flex-1 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">
                 {isAr ? 'إلغاء' : 'Cancel'}
               </button>
-              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-xl font-bold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
+              <button onClick={handleSave} disabled={saving} className="flex-1 py-3 rounded-xl font-bold bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
                 {saving ? <i className="fa-solid fa-circle-notch fa-spin"></i> : (editingId ? (isAr ? 'حفظ التعديلات' : 'Save Changes') : (isAr ? 'إنشاء' : 'Create'))}
               </button>
             </div>
@@ -561,7 +561,7 @@ const HrEmployeesView: React.FC = () => {
                   );
                 }
               }}
-              className="w-full mb-4 py-2.5 rounded-xl border-2 border-dashed border-indigo-200 text-indigo-600 font-bold text-sm hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full mb-4 py-2.5 rounded-xl border-2 border-dashed border-blue-200 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
             >
               <i className="fa-solid fa-crosshairs"></i> {isAr ? 'استخدم موقعي الحالي' : 'Use My Current Location'}
             </button>
@@ -570,7 +570,7 @@ const HrEmployeesView: React.FC = () => {
               <button onClick={() => setShowLocationModal(false)} className="flex-1 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100">
                 {isAr ? 'إلغاء' : 'Cancel'}
               </button>
-              <button onClick={handleSaveLocation} className="flex-1 py-3 rounded-xl font-bold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">
+              <button onClick={handleSaveLocation} className="flex-1 py-3 rounded-xl font-bold bg-blue-600 text-white shadow-lg hover:bg-blue-700">
                 {isAr ? 'حفظ' : 'Save'}
               </button>
             </div>

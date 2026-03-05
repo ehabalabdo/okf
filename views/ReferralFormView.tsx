@@ -156,12 +156,12 @@ const ReferralFormView: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-sky-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir="rtl">
         {/* Header */}
         <div className="max-w-5xl mx-auto mb-6">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-sky-500 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <i className="fa-solid fa-share-from-square text-white text-2xl"></i>
               </div>
               <div>
@@ -176,7 +176,7 @@ const ReferralFormView: React.FC = () => {
           {/* Patient Selection */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-user text-cyan-500"></i> اختيار المريض
+              <i className="fa-solid fa-user text-sky-500"></i> اختيار المريض
             </h2>
             <input type="text" placeholder="ابحث بالاسم أو رقم الهاتف..." value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -193,9 +193,9 @@ const ReferralFormView: React.FC = () => {
               </div>
             )}
             {selectedPatient && (
-              <div className="mt-3 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                <p className="font-bold text-cyan-800 dark:text-cyan-300">{selectedPatient.name}</p>
-                <p className="text-sm text-cyan-600 dark:text-cyan-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? 'ذكر' : 'أنثى'} | العمر: {selectedPatient.age}</p>
+              <div className="mt-3 p-4 bg-sky-50 dark:bg-sky-900/20 rounded-xl border border-sky-200 dark:border-sky-800">
+                <p className="font-bold text-sky-800 dark:text-sky-300">{selectedPatient.name}</p>
+                <p className="text-sm text-sky-600 dark:text-sky-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? 'ذكر' : 'أنثى'} | العمر: {selectedPatient.age}</p>
               </div>
             )}
           </div>
@@ -326,7 +326,7 @@ const ReferralFormView: React.FC = () => {
           {/* Actions */}
           <div className="flex justify-center gap-4 pb-8 flex-wrap">
             <button onClick={handleSubmit} disabled={saving}
-              className="px-10 py-4 bg-gradient-to-r from-cyan-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
+              className="px-10 py-4 bg-gradient-to-r from-sky-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
               {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> جاري الحفظ...</>
                 : saved ? <><i className="fa-solid fa-check ml-2"></i> تم الحفظ بنجاح</>
                 : <><i className="fa-solid fa-save ml-2"></i> حفظ نموذج التحويل</>}

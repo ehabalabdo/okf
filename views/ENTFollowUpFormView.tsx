@@ -78,7 +78,7 @@ const ENTFollowUpFormView: React.FC = () => {
         <div className="max-w-5xl mx-auto mb-6">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <i className="fa-solid fa-rotate text-white text-2xl"></i>
               </div>
               <div>
@@ -199,13 +199,13 @@ const ENTFollowUpFormView: React.FC = () => {
           {/* Medication Effectiveness */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-capsules text-indigo-500"></i> فعالية الأدوية
+              <i className="fa-solid fa-capsules text-blue-500"></i> فعالية الأدوية
             </h2>
             <div className="space-y-4">
               <div className="flex gap-3 flex-wrap">
                 {([['effective', 'فعّالة'], ['partially', 'فعالة جزئياً'], ['not_effective', 'غير فعالة']] as const).map(([val, label]) => (
                   <button key={val} onClick={() => setForm(f => ({ ...f, medicationEffectiveness: val }))}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.medicationEffectiveness === val ? 'bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.medicationEffectiveness === val ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
                     {label}
                   </button>
                 ))}
@@ -213,7 +213,7 @@ const ENTFollowUpFormView: React.FC = () => {
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.sideEffects} onChange={e => setForm(f => ({ ...f, sideEffects: e.target.checked }))}
-                    className="w-5 h-5 rounded text-indigo-500" />
+                    className="w-5 h-5 rounded text-blue-500" />
                   <span className="text-slate-700 dark:text-slate-300">هل يوجد أعراض جانبية؟</span>
                 </label>
               </div>
@@ -280,7 +280,7 @@ const ENTFollowUpFormView: React.FC = () => {
 
           <div className="flex justify-center pb-8">
             <button onClick={handleSubmit} disabled={saving}
-              className="px-12 py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
+              className="px-12 py-4 bg-gradient-to-r from-emerald-600 to-blue-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
               {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> جاري الحفظ...</>
                 : saved ? <><i className="fa-solid fa-check ml-2"></i> تم الحفظ بنجاح</>
                 : <><i className="fa-solid fa-save ml-2"></i> حفظ استبيان المراجعة</>}

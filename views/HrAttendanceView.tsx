@@ -236,7 +236,7 @@ const HrAttendanceView: React.FC = () => {
                         {r.lateMinutes > 0 ? <span className="text-amber-600 font-bold">{r.lateMinutes}m</span> : '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        {r.overtimeMinutes > 0 ? <span className="text-indigo-600 font-bold">{r.overtimeMinutes}m</span> : '—'}
+                        {r.overtimeMinutes > 0 ? <span className="text-blue-600 font-bold">{r.overtimeMinutes}m</span> : '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[r.status] || 'bg-slate-100 text-slate-500'}`}>

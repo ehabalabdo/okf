@@ -50,7 +50,7 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
       case 'ecg': return { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-200' };
       case 'glucose': return { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-200' };
       case 'chemistry': return { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-200' };
-      case 'xray': return { bg: 'bg-cyan-100', text: 'text-cyan-600', border: 'border-cyan-200' };
+      case 'xray': return { bg: 'bg-sky-100', text: 'text-sky-600', border: 'border-sky-200' };
       default: return { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' };
     }
   };
