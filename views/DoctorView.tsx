@@ -1326,6 +1326,7 @@ const DoctorView: React.FC = () => {
           )}
 
       </div>
+      </div>
 
       <style>{`
         @keyframes pulse-slow {
