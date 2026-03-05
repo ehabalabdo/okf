@@ -179,7 +179,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         
         // Build client-specific login URL
         const clientSlug = client?.slug || localStorage.getItem('currentClientSlug') || '';
-        const loginUrl = clientSlug ? `https://okf.vercel.app/${clientSlug}` : 'https://okf.vercel.app';
+        const loginUrl = clientSlug ? `https://okf-nine.vercel.app/${clientSlug}` : 'https://okf-nine.vercel.app';
         const clinicName = client?.name || 'العيادة';
         
         // Prepare message in Arabic
