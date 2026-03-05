@@ -1165,9 +1165,22 @@ const DoctorView: React.FC = () => {
                     {/* ============ TAB 8: ENT FORMS ============ */}
                     {activeTab === 'ent-forms' && (
                       <div className="space-y-5 animate-fadeIn" dir="rtl">
-                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-stethoscope text-amber-500"></i> نماذج الأنف والأذن والحنجرة
-                        </h3>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i className="fa-solid fa-stethoscope text-amber-500"></i> نماذج الأنف والأذن والحنجرة
+                          </h3>
+                          {/* Doctor can create tests directly */}
+                          <div className="flex gap-2">
+                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/audiogram`, '_blank'); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200 transition">
+                              <i className="fa-solid fa-ear-listen"></i> فحص سمع جديد
+                            </button>
+                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/balance`, '_blank'); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200 transition">
+                              <i className="fa-solid fa-compass"></i> فحص توازن جديد
+                            </button>
+                          </div>
+                        </div>
                         {entLoading ? (
                           <div className="flex items-center justify-center py-16">
                             <i className="fa-solid fa-spinner fa-spin text-3xl text-amber-500"></i>

@@ -38,7 +38,8 @@ export interface SuperAdmin {
 export enum UserRole {
   ADMIN = 'admin',
   SECRETARY = 'secretary',
-  DOCTOR = 'doctor'
+  DOCTOR = 'doctor',
+  TECHNICIAN = 'technician'
 }
 
 // Base Entity for Audit Trails

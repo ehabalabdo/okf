@@ -34,6 +34,7 @@ import ENTFollowUpFormView from './views/ENTFollowUpFormView';
 import AudiogramFormView from './views/AudiogramFormView';
 import BalanceAssessmentFormView from './views/BalanceAssessmentFormView';
 import ReferralFormView from './views/ReferralFormView';
+import TechnicianView from './views/TechnicianView';
 // HrLoginView removed — HR login integrated into main LoginView
 import DevModeSwitcher from './components/DevModeSwitcher';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -118,7 +119,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   const { user, loading } = useAuth();
   // Detect slug from current URL for proper redirect
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments', 
+  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments', 
     'clinic-history', 'device-results', 'device-management', 
     'queue-display', 'patient', 'super-admin', 'hr', 'ent'];
   const currentSlug = pathParts[0] && !knownTopRoutes.includes(pathParts[0]) ? pathParts[0] : null;
@@ -141,6 +142,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     if (user.role === UserRole.ADMIN) return <RedirectHandler to={`${prefix}/admin`} />;
     if (user.role === UserRole.SECRETARY) return <RedirectHandler to={`${prefix}/reception`} />;
     if (user.role === UserRole.DOCTOR) return <RedirectHandler to={`${prefix}/doctor`} />;
+    if (user.role === UserRole.TECHNICIAN) return <RedirectHandler to={`${prefix}/technician`} />;
     return <RedirectHandler to={loginPath} />;
   }
 
@@ -249,7 +251,7 @@ const ClientSlugRoutes: React.FC = () => {
   const { user, patientUser } = useAuth();
 
   // Don't treat known routes as slugs
-  const knownRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments', 
+  const knownRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments', 
     'clinic-history', 'device-results', 'device-management', 'queue-display', 
     'patient', 'super-admin', 'hr', 'ent'];
   if (slug && knownRoutes.includes(slug)) {
@@ -265,6 +267,7 @@ const ClientSlugRoutes: React.FC = () => {
           <Route path="/admin" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminView /></ProtectedRoute>} />
           <Route path="/reception" element={<ProtectedRoute allowedRoles={[UserRole.SECRETARY]}><ReceptionView /></ProtectedRoute>} />
           <Route path="/doctor" element={<ProtectedRoute allowedRoles={[UserRole.DOCTOR]}><DoctorView /></ProtectedRoute>} />
+          <Route path="/technician" element={<ProtectedRoute allowedRoles={[UserRole.TECHNICIAN]}><TechnicianView /></ProtectedRoute>} />
           <Route path="/patients" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientsRegistryView /></ProtectedRoute>} />
           <Route path="/patients/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientProfileView /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AppointmentsView /></ProtectedRoute>} />

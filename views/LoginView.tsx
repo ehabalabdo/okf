@@ -55,6 +55,7 @@ const LoginView: React.FC = () => {
             if (role === 'admin') navigate(`${prefix}/admin`, { replace: true });
             else if (role === 'secretary') navigate(`${prefix}/reception`, { replace: true });
             else if (role === 'doctor') navigate(`${prefix}/doctor`, { replace: true });
+            else if (role === 'technician') navigate(`${prefix}/technician`, { replace: true });
             else navigate(`${prefix}/`, { replace: true });
           } catch {
             navigate(slug ? `/${slug}/` : '/', { replace: true });

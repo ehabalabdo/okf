@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
   const location = useLocation();
 
   // Detect slug from URL to prefix nav links
-  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'patients', 'appointments',
+  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments',
     'clinic-history', 'device-results', 'device-management',
     'queue-display', 'patient', 'super-admin'];
   const pathParts = location.pathname.split('/').filter(Boolean);
@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
       case UserRole.ADMIN: return 'bg-purple-500/20 text-purple-300 border border-purple-500/30';
       case UserRole.DOCTOR: return 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
       case UserRole.SECRETARY: return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+      case UserRole.TECHNICIAN: return 'bg-sky-500/20 text-sky-300 border border-sky-500/30';
 
       default: return 'bg-gray-100';
     }
@@ -93,9 +94,10 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
         <nav className="flex-1 px-4 space-y-1 mt-6 overflow-y-auto custom-scrollbar">
            <div className="px-4 pb-2 text-xs font-bold uppercase text-slate-600 tracking-wider">{t('menu_label')}</div>
            
-           {/* Admin & Secretary Views */}
+           {/* Admin & Secretary & Technician Views */}
            {role === UserRole.ADMIN && <NavItem to="/admin" icon="fa-solid fa-shield-halved" label={t('admin_dashboard')} />}
            {role === UserRole.SECRETARY && <NavItem to="/reception" icon="fa-solid fa-clipboard-user" label={t('reception_desk')} />}
+           {role === UserRole.TECHNICIAN && <NavItem to="/technician" icon="fa-solid fa-ear-listen" label="فني الفحوصات" />}
            
            {/* Clinical Views (Hidden for Dept Staff) */}
            {showClinicalViews && (
@@ -195,6 +197,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center z-40 px-2 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
             {role === UserRole.ADMIN && <NavItem to="/admin" icon="fa-solid fa-shield-halved" label="Admin" mobile />}
             {role === UserRole.SECRETARY && <NavItem to="/reception" icon="fa-solid fa-clipboard-user" label="Clinic" mobile />}
+            {role === UserRole.TECHNICIAN && <NavItem to="/technician" icon="fa-solid fa-ear-listen" label="فحوصات" mobile />}
             
             {showClinicalViews && (
               <>
