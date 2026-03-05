@@ -117,6 +117,7 @@ const translations = {
     entry_id: "Visit ID",
     created: "Check-in",
     start_consult: "Start Consultation",
+    btn_complete_visit: "Complete Visit",
     complete_discharge: "Complete & Discharge",
     select_patient: "Select a patient to begin consultation",
 
@@ -293,6 +294,7 @@ const translations = {
     entry_id: "رقم الزيارة",
     created: "وقت الدخول",
     start_consult: "بدء المعاينة",
+    btn_complete_visit: "إنهاء الزيارة",
     complete_discharge: "إكمال وخروج",
     select_patient: "اختر مريضاً للبدء",
 
