@@ -1179,6 +1179,10 @@ const DoctorView: React.FC = () => {
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200 transition">
                               <i className="fa-solid fa-compass"></i> فحص توازن جديد
                             </button>
+                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/referral`, '_blank'); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200 transition">
+                              <i className="fa-solid fa-share-from-square"></i> تحويل طبي
+                            </button>
                           </div>
                         </div>
                         {entLoading ? (
