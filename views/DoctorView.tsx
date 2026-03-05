@@ -550,6 +550,7 @@ const DoctorView: React.FC = () => {
   );
 
   const tabs: { key: SoapTab; label: string; icon: string; color: string }[] = [
+    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-teal-600' },
     { key: 'chief', label: 'Chief Complaint', icon: 'fa-comment-medical', color: 'bg-slate-800' },
     { key: 'history', label: 'History', icon: 'fa-clock-rotate-left', color: 'bg-indigo-600' },
     { key: 'exam', label: 'Examination', icon: 'fa-stethoscope', color: 'bg-teal-600' },
@@ -557,7 +558,6 @@ const DoctorView: React.FC = () => {
     { key: 'plan', label: 'Plan & Orders', icon: 'fa-clipboard-list', color: 'bg-blue-600' },
     { key: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
     { key: 'devices', label: 'Devices', icon: 'fa-microchip', color: 'bg-violet-600' },
-    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-teal-600' },
   ];
 
   return (
@@ -575,7 +575,7 @@ const DoctorView: React.FC = () => {
       <div className="flex flex-col lg:flex-row h-auto lg:h-full gap-4 overflow-visible lg:overflow-hidden">
         
         {/* --- SIDEBAR --- */}
-        <div className={`w-full lg:w-64 xl:w-72 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
+        <div className={`w-full lg:w-52 xl:w-60 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
             <div className="flex-1 min-h-[300px] lg:min-h-0 bg-white rounded-3xl shadow-soft border border-slate-100 flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
                     <h2 className="font-bold text-slate-800 text-sm">{t('waiting_room')}</h2>
