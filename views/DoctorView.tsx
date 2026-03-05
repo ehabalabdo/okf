@@ -575,7 +575,7 @@ const DoctorView: React.FC = () => {
       <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-160px)] gap-6 overflow-visible lg:overflow-hidden">
         
         {/* --- SIDEBAR --- */}
-        <div className={`w-full lg:w-80 xl:w-96 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
+        <div className={`w-full lg:w-64 xl:w-72 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
             <div className="flex-1 min-h-[300px] lg:min-h-0 bg-white rounded-3xl shadow-soft border border-slate-100 flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
                     <h2 className="font-bold text-slate-800 text-sm">{t('waiting_room')}</h2>
@@ -640,20 +640,7 @@ const DoctorView: React.FC = () => {
                 </div>
             </div>
             
-             {/* Appointments Mini View */}
-            <div className="h-48 bg-white rounded-3xl shadow-soft border border-slate-100 flex flex-col overflow-hidden shrink-0">
-                <div className="p-4 border-b border-slate-50 flex justify-between items-center">
-                    <h2 className="font-bold text-slate-700 text-xs uppercase tracking-wider">Scheduled Today</h2>
-                </div>
-                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
-                     {appointments.map(app => (
-                        <div key={app.id} className="flex gap-2 items-center text-xs p-2 rounded hover:bg-slate-50">
-                            <span className="font-bold text-slate-900 bg-slate-200 px-1.5 rounded">{new Date(app.date).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}</span>
-                            <span className="truncate text-slate-600">{app.patientName}</span>
-                        </div>
-                     ))}
-                </div>
-            </div>
+
         </div>
 
         {/* --- MAIN EMR WORKSPACE --- */}
