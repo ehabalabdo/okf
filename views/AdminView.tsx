@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { ClinicService, AuthService, BillingService } from '../services/services';
+import { ClinicService, AuthService, BillingService, SettingsService } from '../services/services';
 import { pgUsers, pgClientsService } from '../services/apiServices';
 import { api } from '../src/api';
 import { Clinic, User, UserRole, Invoice, SystemSettings, ClinicCategory, ClientFeatures } from '../types';
@@ -189,6 +189,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
         case UserRole.ADMIN: path = '/admin'; break;
         case UserRole.SECRETARY: path = '/reception'; break;
         case UserRole.DOCTOR: path = '/doctor'; break;
+        case UserRole.LAB_TECH: path = '/dental-lab'; break;
+        case UserRole.IMPLANT_MANAGER: path = '/implant-company'; break;
+        case UserRole.COURSE_MANAGER: path = '/academy'; break;
         default: path = '/login';
     }
 
@@ -396,11 +399,13 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm ${
                                       u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
                                       u.role === 'doctor' ? 'bg-blue-100 text-blue-600' :
+                                      u.role === 'lab_tech' ? 'bg-amber-100 text-amber-600' :
                                       'bg-green-100 text-green-600'
                                   }`}>
                                       <i className={`fa-solid ${
                                           u.role === 'admin' ? 'fa-shield-halved' :
                                           u.role === 'doctor' ? 'fa-user-doctor' :
+                                          u.role === 'lab_tech' ? 'fa-tooth' :
                                           'fa-user'
                                       }`}></i>
                                   </div>
@@ -465,9 +470,12 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
               </h2>
               <p className="text-slate-400 text-sm mb-6">فعّل الأقسام اللي بدك تظهر للموظفين والدكتور</p>
               {[
+                { key: 'dental_lab' as keyof ClientFeatures, label: 'مختبر الأسنان', icon: 'fa-solid fa-tooth', desc: 'إدارة طلبات مختبر الأسنان' },
+                { key: 'implant_company' as keyof ClientFeatures, label: 'شركة الزراعات', icon: 'fa-solid fa-box-open', desc: 'إدارة طلبات الزراعات' },
+                { key: 'academy' as keyof ClientFeatures, label: 'الأكاديمية', icon: 'fa-solid fa-graduation-cap', desc: 'إدارة الدورات والتدريب' },
                 { key: 'device_results' as keyof ClientFeatures, label: 'نتائج الأجهزة', icon: 'fa-solid fa-microscope', desc: 'عرض نتائج الأجهزة الطبية للموظفين والمرضى' }
               ].map(feature => {
-                const features = client?.enabledFeatures || { device_results: false };
+                const features = client?.enabledFeatures || { dental_lab: false, implant_company: false, academy: false, device_results: false };
                 const isOn = features[feature.key];
                 return (
                   <div key={feature.key} className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0">
@@ -571,7 +579,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Name</label>
                                 <input 
                                     className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none"
-                                    placeholder={targetCategory === 'clinic' ? 'e.g. ENT Clinic' : 'e.g. Audiology Dept'}
+                                    placeholder={targetCategory === 'clinic' ? 'e.g. Dental Clinic' : 'e.g. Dental Lab'}
                                     value={newEntityName}
                                     onChange={e => setNewEntityName(e.target.value)}
                                     autoFocus
@@ -661,8 +669,11 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">System Role</label>
                                     <select className="w-full px-4 py-2.5 rounded-xl border border-purple-100 bg-white outline-none" value={userFormData.role} onChange={e => setUserFormData({...userFormData, role: e.target.value as UserRole})}>
                                         <option value={UserRole.DOCTOR}>Doctor (Medical Access)</option>
+                                        <option value={UserRole.LAB_TECH}>Lab Technician (Lab Only)</option>
+                                        <option value={UserRole.IMPLANT_MANAGER}>Implant Manager (Logistics Only)</option>
                                         <option value={UserRole.SECRETARY}>Secretary (Front-Desk Access)</option>
                                         <option value={UserRole.ADMIN}>Admin (System Control)</option>
+                                        <option value={UserRole.COURSE_MANAGER}>Academy Manager</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
@@ -711,6 +722,8 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border transition-transform ${
                                         user.role === 'admin' ? 'bg-purple-100 text-purple-600 border-purple-200' :
                                         user.role === 'doctor' ? 'bg-blue-100 text-blue-600 border-blue-200' :
+                                        user.role === 'lab_tech' ? 'bg-amber-100 text-amber-600 border-amber-200' :
+                                        user.role === 'implant_manager' ? 'bg-cyan-100 text-cyan-600 border-cyan-200' :
                                         'bg-emerald-100 text-emerald-600 border-emerald-200'
                                     }`}>
                                         {(user?.name || user?.email || "U").charAt(0)}
@@ -728,6 +741,8 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                     <span className={`w-fit px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase tracking-tighter shadow-sm border ${
                                         user.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-100' :
                                         user.role === 'doctor' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                        user.role === 'lab_tech' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                        user.role === 'implant_manager' ? 'bg-cyan-50 text-cyan-700 border-cyan-100' :
                                         'bg-emerald-50 text-emerald-700 border-emerald-100'
                                     }`}>
                                         {user.role}

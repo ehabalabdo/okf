@@ -1,5 +1,5 @@
 
-import { Clinic, Patient, User, UserRole, AuditMetadata, VisitData, Appointment, Invoice, Notification, PrescriptionItem, Attachment, SystemSettings, ClinicCategory, Device, DeviceResult, DeviceResultStatus, DeviceResultPayload } from '../types';
+import { Clinic, Patient, User, UserRole, AuditMetadata, VisitData, Appointment, Invoice, Notification, PrescriptionItem, Attachment, SystemSettings, ClinicCategory, LabCase, LabCaseStatus, ImplantItem, ImplantOrder, ImplantOrderStatus, Course, CourseStudent, CourseSession, CourseStatus, Device, DeviceResult, DeviceResultStatus, DeviceResultPayload } from '../types';
 import { mockDb } from './mockFirebase';
 import { pgUsers, pgClinics, pgPatients, pgAppointments, pgInvoices, pgDevices, pgDeviceResults } from './apiServices';
 
@@ -715,6 +715,236 @@ export const SettingsService = {
         // Add an id to make it compatible with writeDocument
         const settingsWithId = { ...settings, id: 'settings_default' };
         await mockDb.writeDocument('settings', settingsWithId);
+    }
+};
+
+export const DentalLabService = {
+    getAllCases: async (user: User): Promise<LabCase[]> => {
+        const allCases = mockDb.getCollection<LabCase>('labCases');
+        const isLabAdmin = user.role === UserRole.ADMIN || user.role === UserRole.LAB_TECH;
+        
+        if (isLabAdmin) {
+            return allCases.sort((a,b) => b.createdAt - a.createdAt);
+        } else if (user.role === UserRole.DOCTOR) {
+            return allCases.filter(c => c.doctorId === user.uid).sort((a,b) => b.createdAt - a.createdAt);
+        }
+        return [];
+    },
+
+    getEligibleVisits: async (user: User) => {
+        const allPatients = mockDb.getCollection<Patient>('patients');
+        const eligible: { patientName: string, visitId: string, patientId: string, date: number, doctorId: string }[] = [];
+        
+        allPatients.forEach(p => {
+            if (p.currentVisit.status === 'completed') {
+                eligible.push({ 
+                    patientName: p.name, 
+                    visitId: p.currentVisit.visitId, 
+                    patientId: p.id,
+                    date: p.currentVisit.date,
+                    doctorId: p.currentVisit.doctorId || 'unknown'
+                });
+            }
+            if (p.history) {
+                p.history.forEach(v => {
+                    if (v.status === 'completed') {
+                        eligible.push({ 
+                            patientName: p.name, 
+                            visitId: v.visitId, 
+                            patientId: p.id,
+                            date: v.date,
+                            doctorId: v.doctorId || 'unknown'
+                        });
+                    }
+                });
+            }
+        });
+        return eligible.sort((a,b) => b.date - a.date);
+    },
+
+    createCase: async (user: User, data: Pick<LabCase, 'visitId'|'patientId'|'patientName'|'doctorId'|'doctorName'|'caseType'|'notes'|'dueDate'>) => {
+        const newCase: LabCase = {
+            id: generateId('lc'),
+            ...data,
+            status: 'PENDING',
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('labCases', newCase);
+    },
+
+    updateStatus: async (user: User, caseId: string, status: LabCaseStatus) => {
+        const isLabUser = user.role === UserRole.ADMIN || user.role === UserRole.LAB_TECH;
+        if (!isLabUser) throw new Error("Unauthorized");
+        const allCases = mockDb.getCollection<LabCase>('labCases');
+        const labCase = allCases.find(c => c.id === caseId);
+        if (!labCase) throw new Error("Case not found");
+        const updated = { ...labCase, status, ...createMeta(user, labCase) };
+        await mockDb.writeDocument('labCases', updated);
+    }
+};
+
+export const ImplantService = {
+    getInventory: async (user: User): Promise<ImplantItem[]> => {
+        if (user.role === UserRole.SECRETARY) return [];
+        const items = mockDb.getCollection<ImplantItem>('implant_inventory');
+        return items;
+    },
+
+    addInventoryItem: async (user: User, data: Pick<ImplantItem, 'brand'|'type'|'size'|'quantity'|'minThreshold'>) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.IMPLANT_MANAGER) throw new Error("Unauthorized");
+        const newItem: ImplantItem = {
+            id: generateId('imp'),
+            ...data,
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('implant_inventory', newItem);
+    },
+
+    updateStock: async (user: User, itemId: string, newQuantity: number) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.IMPLANT_MANAGER) throw new Error("Unauthorized");
+        const items = mockDb.getCollection<ImplantItem>('implant_inventory');
+        const item = items.find(i => i.id === itemId);
+        if (!item) throw new Error("Item not found");
+        const updated = { ...item, quantity: newQuantity, ...createMeta(user, item) };
+        await mockDb.writeDocument('implant_inventory', updated);
+    },
+
+    getOrders: async (user: User): Promise<ImplantOrder[]> => {
+        const orders = mockDb.getCollection<ImplantOrder>('implant_orders');
+        if (user.role === UserRole.ADMIN || user.role === UserRole.IMPLANT_MANAGER) {
+            return orders.sort((a,b) => b.createdAt - a.createdAt);
+        }
+        if (user.role === UserRole.DOCTOR) {
+            return orders.filter(o => o.doctorId === user.uid).sort((a,b) => b.createdAt - a.createdAt);
+        }
+        return [];
+    },
+
+    createOrder: async (user: User, data: Pick<ImplantOrder, 'clinicId'|'clinicName'|'doctorId'|'doctorName'|'itemId'|'brand'|'type'|'size'|'quantity'|'requiredDate'|'notes'>) => {
+        const items = mockDb.getCollection<ImplantItem>('implant_inventory');
+        const item = items.find(i => i.id === data.itemId);
+        if (!item) throw new Error("Item not found");
+        if (item.quantity < data.quantity) throw new Error(`Insufficient stock. Available: ${item.quantity}`);
+
+        const newOrder: ImplantOrder = {
+            id: generateId('imp_ord'),
+            ...data,
+            status: 'PENDING',
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('implant_orders', newOrder);
+    },
+
+    updateOrderStatus: async (user: User, orderId: string, status: ImplantOrderStatus) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.IMPLANT_MANAGER) throw new Error("Unauthorized");
+        
+        const orders = mockDb.getCollection<ImplantOrder>('implant_orders');
+        const order = orders.find(o => o.id === orderId);
+        if (!order) throw new Error("Order not found");
+
+        if (status === 'DELIVERED' && order.status !== 'DELIVERED') {
+            const items = mockDb.getCollection<ImplantItem>('implant_inventory');
+            const item = items.find(i => i.id === order.itemId);
+            if (item) {
+                const newQty = Math.max(0, item.quantity - order.quantity);
+                const updatedItem = { ...item, quantity: newQty, ...createMeta(user, item) };
+                await mockDb.writeDocument('implant_inventory', updatedItem);
+            }
+        }
+        const updatedOrder = { ...order, status, ...createMeta(user, order) };
+        await mockDb.writeDocument('implant_orders', updatedOrder);
+    }
+};
+
+// --- NEW: Course Service (Beauty Academy) ---
+export const CourseService = {
+    getAllCourses: async (): Promise<Course[]> => {
+        const courses = mockDb.getCollection<Course>('courses');
+        return courses.filter(c => c.status === 'ACTIVE');
+    },
+
+    createCourse: async (user: User, data: Pick<Course, 'title'|'description'|'duration'|'price'|'instructorName'|'hasCertificate'>) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.COURSE_MANAGER) throw new Error("Unauthorized");
+        const newCourse: Course = {
+            id: generateId('crs'),
+            ...data,
+            status: 'ACTIVE',
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('courses', newCourse);
+    },
+
+    registerStudent: async (user: User, data: Pick<CourseStudent, 'name'|'phone'|'gender'|'courseId'|'courseName'|'totalFees'>) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.COURSE_MANAGER) throw new Error("Unauthorized");
+        const newStudent: CourseStudent = {
+            id: generateId('std'),
+            ...data,
+            enrollmentDate: Date.now(),
+            paidAmount: 0,
+            paymentStatus: 'UNPAID',
+            isCertified: false,
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('course_students', newStudent);
+    },
+
+    getStudents: async (user: User): Promise<CourseStudent[]> => {
+        const students = mockDb.getCollection<CourseStudent>('course_students');
+        if (user.role === UserRole.ADMIN || user.role === UserRole.COURSE_MANAGER) {
+            return students.sort((a,b) => b.createdAt - a.createdAt);
+        }
+        return [];
+    },
+
+    recordPayment: async (user: User, studentId: string, amount: number) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.COURSE_MANAGER) throw new Error("Unauthorized");
+        const students = mockDb.getCollection<CourseStudent>('course_students');
+        const student = students.find(s => s.id === studentId);
+        if (!student) throw new Error("Student not found");
+
+        const newPaid = student.paidAmount + amount;
+        const newStatus = newPaid >= student.totalFees ? 'PAID' : 'PARTIAL';
+        
+        const updated = { ...student, paidAmount: newPaid, paymentStatus: newStatus, ...createMeta(user, student) };
+        await mockDb.writeDocument('course_students', updated);
+
+        // --- NEW: Generate Invoice for Secretary to Collect/Verify ---
+        // This makes the payment appear in the Reception "Billing" modal
+        await BillingService.create(user, {
+            visitId: 'academy_' + student.id + '_' + Date.now(), // Fake ID
+            patientId: student.id, // Student ID
+            patientName: student.name + ' (Student)',
+            items: [{ 
+                id: generateId('item'), 
+                description: `Academy Fee: ${student.courseName}`, 
+                price: amount 
+            }]
+        });
+    },
+
+    issueCertificate: async (user: User, studentId: string) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.COURSE_MANAGER) throw new Error("Unauthorized");
+        const students = mockDb.getCollection<CourseStudent>('course_students');
+        const student = students.find(s => s.id === studentId);
+        if (!student) throw new Error("Student not found");
+        
+        const updated = { ...student, isCertified: true, ...createMeta(user, student) };
+        await mockDb.writeDocument('course_students', updated);
+    },
+
+    getSessions: async (user: User): Promise<CourseSession[]> => {
+        const sessions = mockDb.getCollection<CourseSession>('course_sessions');
+        return sessions.sort((a,b) => b.createdAt - a.createdAt);
+    },
+
+    addSession: async (user: User, data: Pick<CourseSession, 'courseId'|'courseName'|'date'|'topic'|'instructor'>) => {
+        if (user.role !== UserRole.ADMIN && user.role !== UserRole.COURSE_MANAGER) throw new Error("Unauthorized");
+        const session: CourseSession = {
+            id: generateId('sess'),
+            ...data,
+            ...createMeta(user)
+        };
+        await mockDb.writeDocument('course_sessions', session);
     }
 };
 
