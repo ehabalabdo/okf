@@ -670,6 +670,12 @@ const DoctorView: React.FC = () => {
                         <i className="fa-solid fa-triangle-exclamation mr-1"></i> Medical Alert
                     </div>
                 )}
+
+                {selectedPatient?.currentVisit.status === 'in-progress' && (
+                  <button onClick={() => handleSaveVisit('completed')} className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shrink-0">
+                    <i className="fa-solid fa-check-circle text-[10px]"></i> {t('btn_complete_visit')}
+                  </button>
+                )}
               </div>
 
               {/* SOAP Tabs Navigation */}
@@ -1311,48 +1317,14 @@ const DoctorView: React.FC = () => {
 
                  </div>
               </div>
-
-              {/* Footer Actions */}
-              <div className="px-4 py-2 border-t border-slate-100 bg-white flex justify-between items-center z-10">
-                 <div className="flex items-center gap-3">
-                   <div className="text-[10px] font-bold text-slate-400 uppercase hidden md:flex items-center gap-1">
-                     <i className="fa-solid fa-cloud-check text-green-400 mr-1"></i> Auto-saving
-                   </div>
-                   {/* Tab navigation shortcuts */}
-                   <div className="hidden md:flex gap-1">
-                     <button 
-                       onClick={() => { const idx = tabs.findIndex(tb => tb.key === activeTab); if (idx > 0) setActiveTab(tabs[idx - 1].key); }}
-                       disabled={activeTab === tabs[0].key}
-                       className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded disabled:opacity-30"
-                     >
-                       <i className="fa-solid fa-chevron-left"></i> Prev
-                     </button>
-                     <button 
-                       onClick={() => { const idx = tabs.findIndex(tb => tb.key === activeTab); if (idx < tabs.length - 1) setActiveTab(tabs[idx + 1].key); }}
-                       disabled={activeTab === tabs[tabs.length - 1].key}
-                       className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded disabled:opacity-30"
-                     >
-                       Next <i className="fa-solid fa-chevron-right"></i>
-                     </button>
-                   </div>
-                 </div>
-                 <div className="flex gap-2">
-                    {/* Only show 'Complete' if In Progress */}
-                    {selectedPatient?.currentVisit.status === 'in-progress' && (
-                        <button onClick={() => handleSaveVisit('completed')} className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5">
-                            <i className="fa-solid fa-check-circle mr-2"></i>{t('btn_complete_visit')}
-                        </button>
-                    )}
-                 </div>
-              </div>
             </>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-slate-300 p-10 text-center">
-              <i className="fa-solid fa-user-doctor text-6xl opacity-10 mb-6 animate-pulse"></i>
-              <p className="text-xl font-extrabold text-slate-400">{t('select_patient')}</p>
+                <i className="fa-solid fa-user-doctor text-6xl opacity-10 mb-6 animate-pulse"></i>
+                <p className="text-xl font-extrabold text-slate-400">{t('select_patient')}</p>
             </div>
           )}
-        </div>
+
       </div>
 
       <style>{`
