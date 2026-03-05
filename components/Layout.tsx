@@ -10,9 +10,10 @@ import { Link, useLocation } from 'react-router-dom';
 interface LayoutProps {
   children: React.ReactNode;
   title: string;
+  hideTitle?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
   const { user, logout } = useAuth();
   const clientCtx = useClientSafe();
   const features = clientCtx?.client?.enabledFeatures || { device_results: false };
@@ -178,12 +179,14 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         </header>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-auto min-h-0 p-4 md:p-8 relative pb-24 md:pb-8">
-           <div className="max-w-7xl mx-auto mb-6 md:mb-8 animate-fade-in-down px-2">
+        <div className={`flex-1 overflow-auto min-h-0 relative ${hideTitle ? 'p-2 md:p-3 pb-20 md:pb-3' : 'p-4 md:p-8 pb-24 md:pb-8'}`}>
+           {!hideTitle && (
+             <div className="max-w-7xl mx-auto mb-6 md:mb-8 animate-fade-in-down px-2">
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight">{title}</h2>
                 <div className="h-1 w-16 bg-primary rounded-full mt-1.5"></div>
-           </div>
-           <div className="max-w-7xl mx-auto">
+             </div>
+           )}
+           <div className={hideTitle ? 'h-full' : 'max-w-7xl mx-auto'}>
              {children}
            </div>
         </div>

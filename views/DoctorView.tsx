@@ -561,7 +561,7 @@ const DoctorView: React.FC = () => {
   ];
 
   return (
-    <Layout title={t('doctor_console')}>
+    <Layout title={t('doctor_console')} hideTitle>
       {/* Mobile Tab Switcher */}
       <div className="lg:hidden flex mb-4 bg-white rounded-2xl p-1 shadow-sm border border-slate-100">
           <button onClick={() => setMobileTab('queue')} className={`flex-1 py-2 text-sm font-bold rounded-xl ${mobileTab === 'queue' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500'}`}>
@@ -572,7 +572,7 @@ const DoctorView: React.FC = () => {
           </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-160px)] gap-6 overflow-visible lg:overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-80px)] gap-4 overflow-visible lg:overflow-hidden">
         
         {/* --- SIDEBAR --- */}
         <div className={`w-full lg:w-64 xl:w-72 flex-col gap-5 ${mobileTab === 'queue' ? 'flex' : 'hidden lg:flex'}`}>
