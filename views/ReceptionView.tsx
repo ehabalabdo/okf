@@ -203,7 +203,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         const generatedPassword = String(100000 + (arr[0] % 900000));
         
         try {
-            await PatientService.add(user, {
+            const patientId = await PatientService.add(user, {
                 name: formData.name,
                 dateOfBirth: formData.dateOfBirth || undefined,
                 age: 0, // age will be calculated from dateOfBirth in pgServices
@@ -243,8 +243,12 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
             // Send via WhatsApp if enabled
             if (formData.sendWhatsApp && patientPhone) {
                 sendWhatsAppCredentials(patientPhone, patientName, patientPassword);
-            } else {
-                alert('✅ تمت إضافة المريض بنجاح!');
+            }
+
+            // Navigate to ENT New Patient Questionnaire with patient pre-selected
+            const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
+            if (confirm('✅ تمت إضافة المريض بنجاح!\n\nهل تريد تعبئة استبيان المريض الجديد (ENT) الآن؟')) {
+                window.location.href = `/${slug}/ent/new-patient?patientId=${patientId}`;
             }
         } catch (e: any) {
             alert("Error: " + (e.message || 'فشل إضافة المريض'));

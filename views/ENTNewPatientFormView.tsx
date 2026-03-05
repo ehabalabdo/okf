@@ -36,7 +36,18 @@ const ENTNewPatientFormView: React.FC = () => {
   });
 
   useEffect(() => {
-    api.get('/patients').then(setPatients).catch(console.error);
+    api.get('/patients').then((pts: Patient[]) => {
+      setPatients(pts);
+      // Auto-select patient if patientId is in URL query params
+      const params = new URLSearchParams(window.location.search);
+      const preSelectedId = params.get('patientId');
+      if (preSelectedId) {
+        const found = pts.find(p => p.id === preSelectedId);
+        if (found) {
+          setSelectedPatientId(preSelectedId);
+        }
+      }
+    }).catch(console.error);
   }, []);
 
   const filteredPatients = patients.filter(p =>
