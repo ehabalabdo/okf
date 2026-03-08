@@ -29,6 +29,7 @@ import HrEmployeeMeView from './views/HrEmployeeMeView';
 import HrPayrollView from './views/HrPayrollView';
 import HrManagerActionsView from './views/HrManagerActionsView';
 import CatalogView from './views/CatalogView';
+import AccountingView from './views/AccountingView';
 import ENTNewPatientFormView from './views/ENTNewPatientFormView';
 import ENTFollowUpFormView from './views/ENTFollowUpFormView';
 import AudiogramFormView from './views/AudiogramFormView';
@@ -276,6 +277,7 @@ const ClientSlugRoutes: React.FC = () => {
           <Route path="/device-results" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><DeviceResultsView /></ProtectedRoute>} />
           <Route path="/device-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><DeviceManagementView /></ProtectedRoute>} />
           <Route path="/catalog" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><CatalogView /></ProtectedRoute>} />
+          <Route path="/accounting" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AccountingView /></ProtectedRoute>} />
           <Route path="/queue-display" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY]}><QueueDisplayView /></ProtectedRoute>} />
           
           {/* ENT Medical Forms */}

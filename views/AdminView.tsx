@@ -351,6 +351,12 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
             >
                 <i className="fa-solid fa-book-medical mr-2"></i> Catalog
             </button>
+            <button 
+                onClick={() => { const slug = window.location.pathname.split('/')[1]; window.location.href = `/${slug}/accounting`; }} 
+                className="px-6 py-2 rounded-xl font-bold transition-all bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
+            >
+                <i className="fa-solid fa-calculator mr-2"></i> Accounting
+            </button>
         </div>
 
         {/* --- USER SWITCHER PORTAL BUTTON --- */}
