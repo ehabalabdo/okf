@@ -263,11 +263,14 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
     } catch (e: any) { alert(e.message); }
   };
 
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance'>('cash');
+
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
-      await BillingService.processPayment(user, selectedInvoice.id, amount, 'cash');
+      await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
       setShowBillingModal(false);
       setSelectedInvoice(null);
+      setPaymentMethod('cash');
       loadData();
   };
 
@@ -464,8 +467,19 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                     <div className="text-sm text-slate-400 uppercase">Total Due</div>
                                     <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount} د.أ</div>
                                 </div>
+                                <div className="flex gap-2 mb-3">
+                                    {([['cash', 'fa-money-bill-wave', 'كاش'], ['card', 'fa-credit-card', 'بطاقة'], ['insurance', 'fa-shield-heart', 'تأمين']] as const).map(([method, icon, label]) => (
+                                        <button key={method} onClick={() => setPaymentMethod(method)} className={`flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all border-2 ${
+                                            paymentMethod === method
+                                                ? 'bg-primary text-white border-primary shadow-lg scale-105'
+                                                : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-primary/50'
+                                        }`}>
+                                            <i className={`fa-solid ${icon}`}></i> {label}
+                                        </button>
+                                    ))}
+                                </div>
                                 <button onClick={() => handlePayInvoice(selectedInvoice.totalAmount)} className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-lg">
-                                    <i className="fa-solid fa-check-circle mr-2"></i> Mark as Paid (Cash)
+                                    <i className="fa-solid fa-check-circle mr-2"></i> تأكيد الدفع
                                 </button>
                                 <button onClick={() => setSelectedInvoice(null)} className="w-full text-slate-400 text-sm hover:text-slate-600">Back to list</button>
                             </div>
