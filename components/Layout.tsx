@@ -11,9 +11,10 @@ interface LayoutProps {
   children: React.ReactNode;
   title: string;
   hideTitle?: boolean;
+  titleExtra?: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra }) => {
   const { user, logout } = useAuth();
   const clientCtx = useClientSafe();
   const features = clientCtx?.client?.enabledFeatures || { device_results: false };
@@ -185,7 +186,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle }) => {
            {!hideTitle && (
              <div className="max-w-7xl mx-auto mb-6 md:mb-8 animate-fade-in-down px-2">
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight">{title}</h2>
-                <div className="h-1 w-16 bg-primary rounded-full mt-1.5"></div>
+                {titleExtra || <div className="h-1 w-16 bg-primary rounded-full mt-1.5"></div>}
              </div>
            )}
            <div className={hideTitle ? 'h-full' : 'max-w-7xl mx-auto'}>

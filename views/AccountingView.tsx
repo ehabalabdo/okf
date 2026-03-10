@@ -168,13 +168,10 @@ const AccountingView: React.FC = () => {
   }
 
   return (
-    <Layout title={isRTL ? 'المحاسبة والتقارير المالية' : 'Accounting & Financial Reports'}>
+    <Layout title={isRTL ? 'المحاسبة والتقارير المالية' : 'Accounting & Financial Reports'} titleExtra={<div onClick={handleTitleTap} className="h-1 w-16 bg-primary rounded-full mt-1.5 cursor-default select-none"></div>}>
       {/* Header: Tabs + Date Range */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="flex gap-2 flex-wrap">
-          <div onClick={handleTitleTap} className="select-none cursor-default ml-2 flex items-center">
-            <i className="fa-solid fa-calculator text-primary text-lg"></i>
-          </div>
           {tabs.map(tab => (
             <button
               key={tab.key}
