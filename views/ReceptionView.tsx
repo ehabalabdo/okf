@@ -264,14 +264,28 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   };
 
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance'>('cash');
+  const [insurancePatientAmount, setInsurancePatientAmount] = useState('');
+  const [insuranceCompanyAmount, setInsuranceCompanyAmount] = useState('');
 
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
       try {
-          await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
+          if (paymentMethod === 'insurance') {
+              const patientPay = parseFloat(insurancePatientAmount) || 0;
+              const insurancePay = parseFloat(insuranceCompanyAmount) || 0;
+              if (patientPay + insurancePay !== selectedInvoice.totalAmount) {
+                  alert('مجموع حصة المريض وحصة التأمين لازم يساوي المبلغ الكلي');
+                  return;
+              }
+              await BillingService.processPayment(user, selectedInvoice.id, patientPay + insurancePay, paymentMethod);
+          } else {
+              await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
+          }
           setShowBillingModal(false);
           setSelectedInvoice(null);
           setPaymentMethod('cash');
+          setInsurancePatientAmount('');
+          setInsuranceCompanyAmount('');
           await loadData();
       } catch (e: any) {
           alert(e.message || 'خطأ في معالجة الدفع');
@@ -482,6 +496,52 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                         </button>
                                     ))}
                                 </div>
+                                {paymentMethod === 'insurance' && (
+                                    <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 space-y-3 mb-3">
+                                        <div className="text-sm font-bold text-blue-700 text-center mb-2">
+                                            <i className="fa-solid fa-shield-heart ml-1"></i> توزيع المبلغ
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-bold text-slate-600 mb-1">حصة المريض (د.أ)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    value={insurancePatientAmount}
+                                                    onChange={(e) => {
+                                                        setInsurancePatientAmount(e.target.value);
+                                                        const patVal = parseFloat(e.target.value) || 0;
+                                                        setInsuranceCompanyAmount((selectedInvoice.totalAmount - patVal).toFixed(2));
+                                                    }}
+                                                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-center font-bold text-lg focus:border-blue-500 focus:outline-none"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-bold text-slate-600 mb-1">حصة التأمين (د.أ)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    value={insuranceCompanyAmount}
+                                                    onChange={(e) => {
+                                                        setInsuranceCompanyAmount(e.target.value);
+                                                        const insVal = parseFloat(e.target.value) || 0;
+                                                        setInsurancePatientAmount((selectedInvoice.totalAmount - insVal).toFixed(2));
+                                                    }}
+                                                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-center font-bold text-lg focus:border-blue-500 focus:outline-none"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="text-center text-xs text-slate-500">
+                                            المجموع: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === selectedInvoice.totalAmount ? 'text-emerald-600' : 'text-red-500'}`}>
+                                                {((parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0)).toFixed(2)}
+                                            </span> / {selectedInvoice.totalAmount.toFixed(2)} د.أ
+                                        </div>
+                                    </div>
+                                )}
                                 <button onClick={() => handlePayInvoice(selectedInvoice.totalAmount)} className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-lg">
                                     <i className="fa-solid fa-check-circle mr-2"></i> تأكيد الدفع
                                 </button>
