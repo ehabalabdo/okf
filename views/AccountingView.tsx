@@ -57,8 +57,11 @@ const AccountingView: React.FC = () => {
     const validItems = editItems.filter(i => i.description.trim() && i.price > 0);
     if (validItems.length === 0) return alert(isRTL ? 'أضف خدمة واحدة على الأقل' : 'Add at least one item');
     try {
+      const newItems = validItems.map((item, idx) => ({ id: `item-${idx}`, ...item }));
+      const newTotal = validItems.reduce((sum, i) => sum + i.price, 0);
       await BillingService.update(user, editingInvoice.id, {
-        items: validItems.map((item, idx) => ({ id: `item-${idx}`, ...item })),
+        items: newItems,
+        totalAmount: newTotal,
       });
       setEditingInvoice(null);
       loadData();
