@@ -528,7 +528,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                         <div>
                                             <div className="font-bold text-slate-800">{inv.patientName}</div>
                                             <div className="text-xs text-slate-500">{fmtDate(inv.createdAt)} • {inv.items.length} items</div>
-                                            <div className="text-[10px] text-slate-300 mt-1">اضغط مطوّلاً للتعديل</div>
                                         </div>
                                         <div className="font-bold text-lg text-emerald-600">{inv.totalAmount} د.أ</div>
                                     </div>

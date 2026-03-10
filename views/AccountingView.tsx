@@ -360,12 +360,11 @@ const AccountingView: React.FC = () => {
                   <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'طريقة الدفع' : 'Method'}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'الحالة' : 'Status'}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'التاريخ' : 'Date'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100 w-16"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredInvoices.length === 0 ? (
-                  <tr><td colSpan={9} className="px-5 py-12 text-center text-slate-400">{isRTL ? 'لا توجد فواتير' : 'No invoices found'}</td></tr>
+                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{isRTL ? 'لا توجد فواتير' : 'No invoices found'}</td></tr>
                 ) : (
                   filteredInvoices.map(inv => {
                     const balance = inv.totalAmount - inv.paidAmount;
@@ -375,7 +374,7 @@ const AccountingView: React.FC = () => {
                       partial: 'bg-amber-50 text-amber-600 border-amber-100',
                     };
                     return (
-                      <tr key={inv.id} className="hover:bg-slate-50/50 transition">
+                      <tr key={inv.id} className="hover:bg-slate-50/50 transition cursor-pointer" onDoubleClick={() => openEditInvoice(inv)}>
                         <td className="px-5 py-3 font-mono text-xs text-slate-400">{inv.id.substring(0, 12)}</td>
                         <td className="px-5 py-3 font-bold text-slate-800">{inv.patientName || '-'}</td>
                         <td className="px-5 py-3 font-bold">{formatCurrency(inv.totalAmount)}</td>
@@ -394,11 +393,6 @@ const AccountingView: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-5 py-3 text-xs text-slate-500">{formatDate(inv.createdAt)}</td>
-                        <td className="px-5 py-3">
-                          <button onClick={() => openEditInvoice(inv)} className="text-slate-400 hover:text-amber-600 transition-colors" title={isRTL ? '\u062a\u0639\u062f\u064a\u0644' : 'Edit'}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                          </button>
-                        </td>
                       </tr>
                     );
                   })
