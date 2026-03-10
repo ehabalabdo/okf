@@ -223,6 +223,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin" element={<SlugRedirect path="/admin" />} />
       <Route path="/reception" element={<SlugRedirect path="/reception" />} />
       <Route path="/doctor" element={<SlugRedirect path="/doctor" />} />
+      <Route path="/technician" element={<SlugRedirect path="/technician" />} />
       <Route path="/patients/:id" element={<SlugRedirectWithId basePath="/patients" />} />
       <Route path="/patients" element={<SlugRedirect path="/patients" />} />
       <Route path="/appointments" element={<SlugRedirect path="/appointments" />} />
