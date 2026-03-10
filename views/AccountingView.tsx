@@ -55,7 +55,7 @@ const AccountingView: React.FC = () => {
   const handleSaveInvoiceEdit = async () => {
     if (!user || !editingInvoice) return;
     const validItems = editItems.filter(i => i.description.trim() && i.price > 0);
-    if (validItems.length === 0) return alert(isRTL ? '\u0623\u0636\u0641 \u062e\u062f\u0645\u0629 \u0648\u0627\u062d\u062f\u0629 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644' : 'Add at least one item');
+    if (validItems.length === 0) return alert(isRTL ? 'أضف خدمة واحدة على الأقل' : 'Add at least one item');
     try {
       await BillingService.update(user, editingInvoice.id, {
         items: validItems.map((item, idx) => ({ id: `item-${idx}`, ...item })),
@@ -437,7 +437,7 @@ const AccountingView: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4" dir="rtl">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="p-5 bg-amber-600 text-white flex justify-between items-center">
-              <h3 className="font-bold"><i className="fa-solid fa-pen-to-square ml-2"></i>\u062a\u0639\u062f\u064a\u0644 \u0641\u0627\u062a\u0648\u0631\u0629 - {editingInvoice.patientName}</h3>
+              <h3 className="font-bold"><i className="fa-solid fa-pen-to-square ml-2"></i>تعديل فاتورة - {editingInvoice.patientName}</h3>
               <button onClick={() => setEditingInvoice(null)}><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div className="p-5 space-y-3">
@@ -445,14 +445,14 @@ const AccountingView: React.FC = () => {
                 <div key={idx} className="flex gap-2 items-center">
                   <input
                     className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-primary outline-none"
-                    placeholder="\u0627\u0644\u062e\u062f\u0645\u0629"
+                    placeholder="الخدمة"
                     value={item.description}
                     onChange={e => { const arr = [...editItems]; arr[idx].description = e.target.value; setEditItems(arr); }}
                   />
                   <input
                     className="w-24 border border-slate-200 rounded-xl px-3 py-2 text-sm text-left font-mono focus:border-primary outline-none"
                     type="number"
-                    placeholder="\u0627\u0644\u0633\u0639\u0631"
+                    placeholder="السعر"
                     value={item.price || ''}
                     onChange={e => { const arr = [...editItems]; arr[idx].price = parseFloat(e.target.value) || 0; setEditItems(arr); }}
                   />
@@ -460,14 +460,14 @@ const AccountingView: React.FC = () => {
                 </div>
               ))}
               <button onClick={() => setEditItems([...editItems, { description: '', price: 0 }])} className="w-full border-2 border-dashed border-slate-200 rounded-xl py-2 text-sm text-slate-400 hover:border-primary hover:text-primary transition-colors">
-                <i className="fa-solid fa-plus ml-1"></i> \u0625\u0636\u0627\u0641\u0629 \u062e\u062f\u0645\u0629
+                <i className="fa-solid fa-plus ml-1"></i> إضافة خدمة
               </button>
               <div className="flex justify-between items-center pt-3 border-t border-slate-100">
-                <span className="font-bold text-slate-600">\u0627\u0644\u0645\u062c\u0645\u0648\u0639:</span>
-                <span className="text-2xl font-bold text-emerald-600">{editItems.reduce((s, i) => s + i.price, 0).toFixed(2)} \u062f.\u0623</span>
+                <span className="font-bold text-slate-600">المجموع:</span>
+                <span className="text-2xl font-bold text-emerald-600">{editItems.reduce((s, i) => s + i.price, 0).toFixed(2)} د.أ</span>
               </div>
               <button onClick={handleSaveInvoiceEdit} className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-amber-700 shadow-lg mt-2">
-                <i className="fa-solid fa-check ml-2"></i> \u062d\u0641\u0638 \u0627\u0644\u062a\u0639\u062f\u064a\u0644\u0627\u062a
+                <i className="fa-solid fa-check ml-2"></i> حفظ التعديلات
               </button>
             </div>
           </div>
