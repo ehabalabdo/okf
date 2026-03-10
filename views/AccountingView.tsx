@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -149,6 +149,151 @@ const AccountingView: React.FC = () => {
   const formatCurrency = (n: number) => `${parseFloat(String(n || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} JOD`;
   const formatDate = (ts: number) => new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
+  // PDF Export
+  const handleExportPDF = useCallback(() => {
+    const { from, to } = getDateRangeMs(dateRange);
+    const rangedInvoices = invoices.filter(i => i.createdAt >= from && i.createdAt <= to);
+    const rangeLabel = dateRange === '7d' ? '7 أيام' : dateRange === '30d' ? '30 يوم' : dateRange === '90d' ? '3 أشهر' : dateRange === '365d' ? 'سنة' : 'الكل';
+    const fromDate = formatDate(from);
+    const toDate = formatDate(to);
+    const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const nowTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    const cashTotal = rangedInvoices.filter(i => i.paymentMethod === 'cash').reduce((s, i) => s + i.totalAmount, 0);
+    const cardTotal = rangedInvoices.filter(i => i.paymentMethod === 'card').reduce((s, i) => s + i.totalAmount, 0);
+    const insuranceTotal = rangedInvoices.filter(i => i.paymentMethod === 'insurance').reduce((s, i) => s + i.totalAmount, 0);
+
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<title>كشف محاسبي - MED LOOP</title>
+<style>
+@page { size: A4; margin: 15mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; color: #1e293b; font-size: 11px; line-height: 1.5; }
+.header { text-align: center; border-bottom: 3px solid #0ea5e9; padding-bottom: 12px; margin-bottom: 16px; }
+.header h1 { font-size: 22px; color: #0f172a; margin-bottom: 2px; }
+.header .clinic { font-size: 13px; color: #64748b; }
+.header .subtitle { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+.meta { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 10px; color: #64748b; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.summary-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; text-align: center; }
+.summary-card .val { font-size: 16px; font-weight: 800; color: #0f172a; }
+.summary-card .lbl { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+.summary-card.revenue { border-color: #3b82f6; background: #eff6ff; }
+.summary-card.collected { border-color: #10b981; background: #ecfdf5; }
+.summary-card.pending { border-color: #f59e0b; background: #fffbeb; }
+.summary-card.partial { border-color: #8b5cf6; background: #f5f3ff; }
+.section-title { font-size: 13px; font-weight: 700; color: #0f172a; margin: 14px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+th { background: #f1f5f9; font-size: 9px; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; padding: 6px 8px; border-bottom: 2px solid #e2e8f0; text-align: right; }
+td { padding: 5px 8px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
+tr:nth-child(even) { background: #f8fafc; }
+.status-paid { color: #10b981; font-weight: 700; }
+.status-unpaid { color: #ef4444; font-weight: 700; }
+.status-partial { color: #f59e0b; font-weight: 700; }
+.method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.method-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center; }
+.method-card .val { font-size: 14px; font-weight: 800; }
+.method-card .lbl { font-size: 9px; color: #94a3b8; }
+.footer { text-align: center; color: #94a3b8; font-size: 9px; margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+.totals-row { font-weight: 800; background: #f1f5f9 !important; }
+.text-left { text-align: left; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>MED LOOP</h1>
+  <div class="clinic">عيادة الدكتور طارق خريس - أنف وأذن وحنجرة</div>
+  <div class="subtitle">كشف محاسبي - ${rangeLabel} (${fromDate} إلى ${toDate})</div>
+</div>
+
+<div class="meta">
+  <span>تاريخ الطباعة: ${now} - ${nowTime}</span>
+  <span>عدد الفواتير: ${rangedInvoices.length}</span>
+</div>
+
+<div class="summary-grid">
+  <div class="summary-card revenue">
+    <div class="val">${formatCurrency(localSummary.total_revenue)}</div>
+    <div class="lbl">إجمالي الإيرادات</div>
+  </div>
+  <div class="summary-card collected">
+    <div class="val">${formatCurrency(localSummary.total_collected)}</div>
+    <div class="lbl">المحصّل</div>
+  </div>
+  <div class="summary-card pending">
+    <div class="val">${formatCurrency(localSummary.total_pending)}</div>
+    <div class="lbl">المعلّق</div>
+  </div>
+  <div class="summary-card partial">
+    <div class="val">${formatCurrency(rangedInvoices.filter(i => i.status === 'partial').reduce((s, i) => s + i.totalAmount, 0))}</div>
+    <div class="lbl">دفع جزئي</div>
+  </div>
+</div>
+
+<div class="section-title">طرق الدفع</div>
+<div class="method-grid">
+  <div class="method-card"><div class="val" style="color:#10b981">${formatCurrency(cashTotal)}</div><div class="lbl">نقدي (${rangedInvoices.filter(i => i.paymentMethod === 'cash').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#3b82f6">${formatCurrency(cardTotal)}</div><div class="lbl">بطاقة (${rangedInvoices.filter(i => i.paymentMethod === 'card').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#8b5cf6">${formatCurrency(insuranceTotal)}</div><div class="lbl">تأمين (${rangedInvoices.filter(i => i.paymentMethod === 'insurance').length})</div></div>
+</div>
+
+<div class="section-title">تفاصيل الفواتير</div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>المريض</th>
+      <th>المبلغ</th>
+      <th>المدفوع</th>
+      <th>الباقي</th>
+      <th>طريقة الدفع</th>
+      <th>الحالة</th>
+      <th>التاريخ</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${rangedInvoices.sort((a, b) => b.createdAt - a.createdAt).map((inv, idx) => {
+      const balance = inv.totalAmount - inv.paidAmount;
+      const methodMap: Record<string, string> = { cash: 'نقدي', card: 'بطاقة', insurance: 'تأمين' };
+      const statusMap: Record<string, string> = { paid: 'مدفوعة', unpaid: 'غير مدفوعة', partial: 'جزئية' };
+      return `<tr>
+        <td>${idx + 1}</td>
+        <td style="font-weight:600">${inv.patientName || '-'}</td>
+        <td>${formatCurrency(inv.totalAmount)}</td>
+        <td style="color:#10b981;font-weight:600">${formatCurrency(inv.paidAmount)}</td>
+        <td style="color:${balance > 0 ? '#ef4444' : '#94a3b8'}">${formatCurrency(balance)}</td>
+        <td>${methodMap[inv.paymentMethod] || inv.paymentMethod}</td>
+        <td class="status-${inv.status}">${statusMap[inv.status] || inv.status}</td>
+        <td class="text-left">${formatDate(inv.createdAt)}</td>
+      </tr>`;
+    }).join('')}
+    <tr class="totals-row">
+      <td colspan="2">المجموع</td>
+      <td>${formatCurrency(rangedInvoices.reduce((s, i) => s + i.totalAmount, 0))}</td>
+      <td style="color:#10b981">${formatCurrency(rangedInvoices.reduce((s, i) => s + i.paidAmount, 0))}</td>
+      <td style="color:#ef4444">${formatCurrency(rangedInvoices.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0))}</td>
+      <td colspan="3"></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  تم إنشاء هذا التقرير بواسطة نظام MED LOOP &bull; ${now}
+</div>
+</body>
+</html>`;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+      setTimeout(() => { printWindow.print(); }, 500);
+    }
+  }, [invoices, dateRange, localSummary]);
+
   const paymentMethodLabel = (m: string) => {
     const map: Record<string, string> = { cash: 'نقدي', card: 'بطاقة', insurance: 'تأمين' };
     return isRTL ? (map[m] || m) : m;
@@ -200,18 +345,27 @@ const AccountingView: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-200">
-          {dateRanges.map(r => (
-            <button
-              key={r.key}
-              onClick={() => setDateRange(r.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                dateRange === r.key ? 'bg-primary text-white' : 'text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+        <div className="flex gap-2 items-center">
+          <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-200">
+            {dateRanges.map(r => (
+              <button
+                key={r.key}
+                onClick={() => setDateRange(r.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  dateRange === r.key ? 'bg-primary text-white' : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleExportPDF}
+            className="px-4 py-2.5 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-lg"
+          >
+            <i className="fa-solid fa-file-pdf"></i>
+            {isRTL ? 'طباعة كشف' : 'Print Report'}
+          </button>
         </div>
       </div>
 
