@@ -65,6 +65,16 @@ const AccountingView: React.FC = () => {
     } catch (e: any) { alert(e.message); }
   };
 
+  const handleDeleteInvoice = async (inv: Invoice) => {
+    if (!user) return;
+    if (!confirm(isRTL ? `حذف فاتورة ${inv.patientName} نهائياً؟` : `Delete invoice for ${inv.patientName}?`)) return;
+    try {
+      await api.del(`/invoices/${inv.id}`);
+      setEditingInvoice(null);
+      loadData();
+    } catch (e: any) { alert(e.message); }
+  };
+
   const getDateRangeMs = (range: DateRange): { from: number; to: number } => {
     const to = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
@@ -468,6 +478,9 @@ const AccountingView: React.FC = () => {
               </div>
               <button onClick={handleSaveInvoiceEdit} className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-amber-700 shadow-lg mt-2">
                 <i className="fa-solid fa-check ml-2"></i> حفظ التعديلات
+              </button>
+              <button onClick={() => handleDeleteInvoice(editingInvoice)} className="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-red-700 mt-1 opacity-60 hover:opacity-100 transition-opacity">
+                <i className="fa-solid fa-trash ml-2"></i> حذف الفاتورة نهائياً
               </button>
             </div>
           </div>
