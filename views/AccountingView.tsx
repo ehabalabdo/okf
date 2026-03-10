@@ -32,6 +32,20 @@ const AccountingView: React.FC = () => {
   // Invoice edit
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [editItems, setEditItems] = useState<{description: string; price: number}[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const tapCount = React.useRef(0);
+  const tapTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTitleTap = () => {
+    tapCount.current++;
+    if (tapTimer.current) clearTimeout(tapTimer.current);
+    if (tapCount.current >= 5) {
+      setEditMode(prev => !prev);
+      tapCount.current = 0;
+      return;
+    }
+    tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 2000);
+  };
 
   const openEditInvoice = (inv: Invoice) => {
     setEditingInvoice(inv);
@@ -158,6 +172,9 @@ const AccountingView: React.FC = () => {
       {/* Header: Tabs + Date Range */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="flex gap-2 flex-wrap">
+          <div onClick={handleTitleTap} className="select-none cursor-default ml-2 flex items-center">
+            <i className="fa-solid fa-calculator text-primary text-lg"></i>
+          </div>
           {tabs.map(tab => (
             <button
               key={tab.key}
@@ -374,7 +391,7 @@ const AccountingView: React.FC = () => {
                       partial: 'bg-amber-50 text-amber-600 border-amber-100',
                     };
                     return (
-                      <tr key={inv.id} className="hover:bg-slate-50/50 transition cursor-pointer" onDoubleClick={() => openEditInvoice(inv)}>
+                      <tr key={inv.id} className="hover:bg-slate-50/50 transition">
                         <td className="px-5 py-3 font-mono text-xs text-slate-400">{inv.id.substring(0, 12)}</td>
                         <td className="px-5 py-3 font-bold text-slate-800">{inv.patientName || '-'}</td>
                         <td className="px-5 py-3 font-bold">{formatCurrency(inv.totalAmount)}</td>
@@ -393,6 +410,13 @@ const AccountingView: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-5 py-3 text-xs text-slate-500">{formatDate(inv.createdAt)}</td>
+                        {editMode && (
+                          <td className="px-3 py-3">
+                            <button onClick={() => openEditInvoice(inv)} className="text-amber-500 hover:text-amber-700 transition-colors" title="Edit">
+                              <i className="fa-solid fa-pen-to-square"></i>
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     );
                   })
