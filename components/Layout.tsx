@@ -100,12 +100,12 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
            {role === UserRole.SECRETARY && <NavItem to="/reception" icon="fa-solid fa-clipboard-user" label={t('reception_desk')} />}
            {role === UserRole.TECHNICIAN && <NavItem to="/technician" icon="fa-solid fa-ear-listen" label="فني الفحوصات" />}
            
-           {/* Clinical Views (Hidden for Dept Staff) */}
+           {/* Clinical Views (Hidden for Dept Staff & Technician) */}
            {showClinicalViews && (
              <>
                {role === UserRole.DOCTOR && <NavItem to="/doctor" icon="fa-solid fa-user-doctor" label={t('doctor_console')} />}
-               <NavItem to="/appointments" icon="fa-regular fa-calendar-check" label={t('appointments_nav')} />
-               <NavItem to="/patients" icon="fa-solid fa-users-viewfinder" label={t('patients_registry')} />
+               {role !== UserRole.TECHNICIAN && <NavItem to="/appointments" icon="fa-regular fa-calendar-check" label={t('appointments_nav')} />}
+               {role !== UserRole.TECHNICIAN && <NavItem to="/patients" icon="fa-solid fa-users-viewfinder" label={t('patients_registry')} />}
                {showDeviceResults && <NavItem to="/device-results" icon="fa-solid fa-microscope" label={t('device_results_nav')} />}
                {role === UserRole.ADMIN && <NavItem to="/device-management" icon="fa-solid fa-microchip" label={t('device_mgmt_nav')} />}
                {(role === UserRole.ADMIN || role === UserRole.DOCTOR) && <NavItem to="/clinic-history" icon="fa-solid fa-chart-line" label={t('clinic_history_nav')} />}
@@ -203,8 +203,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
             {showClinicalViews && (
               <>
                 {role === UserRole.DOCTOR && <NavItem to="/doctor" icon="fa-solid fa-user-doctor" label="Console" mobile />}
-                <NavItem to="/appointments" icon="fa-regular fa-calendar-check" label="Dates" mobile />
-                <NavItem to="/patients" icon="fa-solid fa-users-viewfinder" label="Registry" mobile />
+                {role !== UserRole.TECHNICIAN && <NavItem to="/appointments" icon="fa-regular fa-calendar-check" label="Dates" mobile />}
+                {role !== UserRole.TECHNICIAN && <NavItem to="/patients" icon="fa-solid fa-users-viewfinder" label="Registry" mobile />}
                 {(role === UserRole.ADMIN || role === UserRole.DOCTOR) && <NavItem to="/clinic-history" icon="fa-solid fa-chart-line" label="History" mobile />}
               </>
             )}

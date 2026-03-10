@@ -210,68 +210,21 @@ const TechnicianView: React.FC = () => {
     <Layout title="فني الفحوصات" hideTitle>
       <div className="flex h-full overflow-hidden" dir="rtl">
 
-        {/* ====== RIGHT SIDEBAR — Patient Selection ====== */}
-        <div className="w-72 flex-shrink-0 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col h-full">
-          {/* Header */}
-          <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-l from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-900">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <i className="fa-solid fa-ear-listen text-white text-lg"></i>
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-800 dark:text-white">فني الفحوصات</h2>
-                <p className="text-[10px] text-slate-500">{currentTime.toLocaleTimeString('ar-JO')}</p>
-              </div>
-            </div>
-            <input
-              type="text" placeholder="بحث بالاسم أو الهاتف..."
-              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-800 dark:text-white placeholder-slate-400"
-            />
-          </div>
-
-          {/* Patient List */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {filteredPatients.length === 0 ? (
-              <div className="text-center text-slate-400 py-12 text-sm">
-                <i className="fa-solid fa-users-slash text-3xl mb-2 opacity-30"></i>
-                <p>لا يوجد مرضى</p>
-              </div>
-            ) : (
-              filteredPatients.map(p => (
-                <button key={p.id} onClick={() => handleSelectPatient(p)}
-                  className={`w-full text-right px-4 py-3 border-b border-slate-100 dark:border-slate-700 transition-all flex items-center gap-3 ${
-                    selectedPatient?.id === p.id
-                      ? 'bg-amber-50 dark:bg-amber-900/20 border-r-4 border-r-amber-500'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                  }`}>
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-sm">{p.name.charAt(0)}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-slate-800 dark:text-white truncate">{p.name}</p>
-                    <p className="text-[10px] text-slate-500">{p.phone} {p.age ? `• ${p.age} سنة` : ''}</p>
-                  </div>
-                  {p.currentVisit?.status === 'in_progress' && (
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-
         {/* ====== MAIN CONTENT ====== */}
         <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900">
-          {!selectedPatient ? (
-            /* No patient selected — show ENT form cards + prompt */
             <div className="h-full flex flex-col items-center justify-center p-10 text-center">
-              <i className="fa-solid fa-ear-listen text-7xl opacity-10 mb-6 text-slate-300"></i>
-              <p className="text-xl font-bold text-slate-400 mb-2">اختر مريض لبدء الفحص</p>
-              <p className="text-sm text-slate-400 mb-8">ابحث عن المريض من القائمة على اليمين</p>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i className="fa-solid fa-ear-listen text-white text-xl"></i>
+                </div>
+                <div className="text-right">
+                  <h1 className="text-xl font-bold text-slate-800 dark:text-white">فني الفحوصات</h1>
+                  <p className="text-[10px] text-slate-500">{currentTime.toLocaleTimeString('ar-JO')}</p>
+                </div>
+              </div>
 
               {/* ENT Medical Forms Quick Access */}
-              <div className="w-full max-w-2xl">
+              <div className="w-full max-w-2xl mt-8">
                 <div className="flex items-center gap-3 mb-4 justify-center">
                   <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
                   <div className="text-right"><h2 className="font-bold text-slate-800 dark:text-white leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
@@ -296,13 +249,21 @@ const TechnicianView: React.FC = () => {
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto">
-              {/* Patient Info Bar */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg">{selectedPatient.name.charAt(0)}</span>
+        </div>
+
+      </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+      `}</style>
+    </Layout>
+  );
+};
+
+export default TechnicianView;
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-slate-800 dark:text-white">{selectedPatient.name}</h2>
