@@ -264,11 +264,37 @@ const TechnicianView: React.FC = () => {
         {/* ====== MAIN CONTENT ====== */}
         <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900">
           {!selectedPatient ? (
-            /* No patient selected */
-            <div className="h-full flex flex-col items-center justify-center text-slate-300 p-10 text-center">
-              <i className="fa-solid fa-ear-listen text-7xl opacity-10 mb-6"></i>
-              <p className="text-xl font-bold text-slate-400">اختر مريض لبدء الفحص</p>
-              <p className="text-sm text-slate-400 mt-2">ابحث عن المريض من القائمة على اليمين</p>
+            /* No patient selected — show ENT form cards + prompt */
+            <div className="h-full flex flex-col items-center justify-center p-10 text-center">
+              <i className="fa-solid fa-ear-listen text-7xl opacity-10 mb-6 text-slate-300"></i>
+              <p className="text-xl font-bold text-slate-400 mb-2">اختر مريض لبدء الفحص</p>
+              <p className="text-sm text-slate-400 mb-8">ابحث عن المريض من القائمة على اليمين</p>
+
+              {/* ENT Medical Forms Quick Access */}
+              <div className="w-full max-w-2xl">
+                <div className="flex items-center gap-3 mb-4 justify-center">
+                  <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
+                  <div className="text-right"><h2 className="font-bold text-slate-800 dark:text-white leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                    { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
+                    { path: 'ent/audiogram', icon: 'fa-ear-listen', label: 'فحص السمع', color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
+                    { path: 'ent/balance', icon: 'fa-person-walking', label: 'فحص التوازن', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                    { path: 'ent/referral', icon: 'fa-share-from-square', label: 'تحويل طبي', color: 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' },
+                  ].map(item => {
+                    const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
+                    return (
+                      <a key={item.path} href={`/${slug}/${item.path}`}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all text-center ${item.color}`}>
+                        <i className={`fa-solid ${item.icon} text-2xl`}></i>
+                        <span className="text-xs font-bold">{item.label}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto">

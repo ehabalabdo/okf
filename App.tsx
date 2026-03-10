@@ -281,11 +281,11 @@ const ClientSlugRoutes: React.FC = () => {
           <Route path="/queue-display" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY]}><QueueDisplayView /></ProtectedRoute>} />
           
           {/* ENT Medical Forms */}
-          <Route path="/ent/new-patient" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><ENTNewPatientFormView /></ProtectedRoute>} />
-          <Route path="/ent/follow-up" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><ENTFollowUpFormView /></ProtectedRoute>} />
-          <Route path="/ent/audiogram" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AudiogramFormView /></ProtectedRoute>} />
-          <Route path="/ent/balance" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><BalanceAssessmentFormView /></ProtectedRoute>} />
-          <Route path="/ent/referral" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><ReferralFormView /></ProtectedRoute>} />
+          <Route path="/ent/new-patient" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ENTNewPatientFormView /></ProtectedRoute>} />
+          <Route path="/ent/follow-up" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ENTFollowUpFormView /></ProtectedRoute>} />
+          <Route path="/ent/audiogram" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><AudiogramFormView /></ProtectedRoute>} />
+          <Route path="/ent/balance" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><BalanceAssessmentFormView /></ProtectedRoute>} />
+          <Route path="/ent/referral" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ReferralFormView /></ProtectedRoute>} />
           
           {/* HR Admin Routes (admin only) */}
           <Route path="/hr/employees" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrEmployeesView /></ProtectedRoute>} />
