@@ -64,7 +64,8 @@ const AccountingView: React.FC = () => {
         totalAmount: newTotal,
       });
       setEditingInvoice(null);
-      loadData();
+      setEditItems([]);
+      await loadData();
     } catch (e: any) { alert(e.message); }
   };
 

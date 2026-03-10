@@ -267,11 +267,15 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
 
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
-      await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
-      setShowBillingModal(false);
-      setSelectedInvoice(null);
-      setPaymentMethod('cash');
-      loadData();
+      try {
+          await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
+          setShowBillingModal(false);
+          setSelectedInvoice(null);
+          setPaymentMethod('cash');
+          await loadData();
+      } catch (e: any) {
+          alert(e.message || 'خطأ في معالجة الدفع');
+      }
   };
 
   // --- PDF GENERATOR ---
