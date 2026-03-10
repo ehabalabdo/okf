@@ -11,14 +11,6 @@ import Layout from '../components/Layout';
 const emptyFreq = (): AudiogramFrequencyData => ({ hz250: undefined, hz500: undefined, hz1000: undefined, hz2000: undefined, hz4000: undefined, hz8000: undefined });
 const frequencies = ['hz250', 'hz500', 'hz1000', 'hz2000', 'hz4000', 'hz8000'] as const;
 const freqLabels: Record<string, string> = { hz250: '250', hz500: '500', hz1000: '1000', hz2000: '2000', hz4000: '4000', hz8000: '8000' };
-const hearingLevels = [
-  { value: 'normal', label: 'طبيعي', color: 'bg-green-100 text-green-700' },
-  { value: 'mild', label: 'خفيف', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'moderate', label: 'متوسط', color: 'bg-orange-100 text-orange-700' },
-  { value: 'moderately_severe', label: 'متوسط لشديد', color: 'bg-red-100 text-red-700' },
-  { value: 'severe', label: 'شديد', color: 'bg-red-200 text-red-800' },
-  { value: 'profound', label: 'عميق', color: 'bg-red-300 text-red-900' },
-];
 const tympTypes = ['A', 'As', 'Ad', 'B', 'C'] as const;
 
 type TestMode = 'audiogram' | 'balance';
@@ -27,6 +19,16 @@ const TechnicianView: React.FC = () => {
   const { user } = useAuth();
   const { client } = useClient();
   const { t } = useLanguage();
+
+  // The hearingLevels array needs t() so must be inside the component
+  const hearingLevels = [
+    { value: 'normal', label: t('hearing_normal'), color: 'bg-green-100 text-green-700' },
+    { value: 'mild', label: t('hearing_mild'), color: 'bg-yellow-100 text-yellow-700' },
+    { value: 'moderate', label: t('hearing_moderate'), color: 'bg-orange-100 text-orange-700' },
+    { value: 'moderately_severe', label: t('hearing_moderately_severe'), color: 'bg-red-100 text-red-700' },
+    { value: 'severe', label: t('hearing_severe'), color: 'bg-red-200 text-red-800' },
+    { value: 'profound', label: t('hearing_profound'), color: 'bg-red-300 text-red-900' },
+  ];
 
   // ========= State =========
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -123,7 +125,7 @@ const TechnicianView: React.FC = () => {
 
   // ========= Submit Handlers =========
   const handleSubmitAudiogram = async () => {
-    if (!selectedPatient) return alert('يرجى اختيار المريض');
+    if (!selectedPatient) return alert(t('select_patient_alert'));
     setSaving(true);
     try {
       await api.post('/ent-forms/audiogram', {
@@ -133,13 +135,13 @@ const TechnicianView: React.FC = () => {
       setSaved(true);
       loadPatientHistory(selectedPatient.id);
       setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) { alert(err.message || 'حدث خطأ'); }
+    } catch (err: any) { alert(err.message || t('error_occurred')); }
     finally { setSaving(false); }
   };
 
   const handleSubmitBalance = async () => {
-    if (!selectedPatient) return alert('يرجى اختيار المريض');
-    if (!balanceForm.diagnosis) return alert('يرجى إدخال التشخيص');
+    if (!selectedPatient) return alert(t('select_patient_alert'));
+    if (!balanceForm.diagnosis) return alert(t('enter_diagnosis_alert'));
     setSaving(true);
     try {
       await api.post('/ent-forms/balance-assessment', {
@@ -149,7 +151,7 @@ const TechnicianView: React.FC = () => {
       setSaved(true);
       loadPatientHistory(selectedPatient.id);
       setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) { alert(err.message || 'حدث خطأ'); }
+    } catch (err: any) { alert(err.message || t('error_occurred')); }
     finally { setSaving(false); }
   };
 
@@ -166,8 +168,8 @@ const TechnicianView: React.FC = () => {
   };
 
   const associatedLabels: Record<string, string> = {
-    nausea: 'غثيان', vomiting: 'تقيؤ', hearingLoss: 'ضعف سمع',
-    tinnitus: 'طنين', headache: 'صداع', visualDisturbance: 'اضطراب بصري', fallHistory: 'تاريخ سقوط',
+    nausea: t('assoc_nausea'), vomiting: t('assoc_vomiting'), hearingLoss: t('assoc_hearing_loss'),
+    tinnitus: t('assoc_tinnitus'), headache: t('assoc_headache'), visualDisturbance: t('assoc_visual_disturbance'), fallHistory: t('assoc_fall_history'),
   };
 
   // ========= Frequency Table Component =========
@@ -177,13 +179,13 @@ const TechnicianView: React.FC = () => {
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-slate-100 dark:bg-slate-700">
-            <th className="p-2 text-right">التردد (Hz)</th>
+            <th className="p-2 text-right">{t('frequency_hz')}</th>
             {frequencies.map(f => <th key={f} className="p-2 text-center">{freqLabels[f]}</th>)}
           </tr>
         </thead>
         <tbody>
           <tr className="border-b dark:border-slate-600">
-            <td className="p-2 font-medium text-red-600">يمنى <span className="text-xs">(O)</span></td>
+            <td className="p-2 font-medium text-red-600">{t('right_ear')} <span className="text-xs">(O)</span></td>
             {frequencies.map(f => (
               <td key={f} className="p-1">
                 <input type="number" value={audioForm[rightKey][f] ?? ''} onChange={e => updateFreq(rightKey, f, e.target.value)}
@@ -192,7 +194,7 @@ const TechnicianView: React.FC = () => {
             ))}
           </tr>
           <tr>
-            <td className="p-2 font-medium text-amber-600">يسرى <span className="text-xs">(X)</span></td>
+            <td className="p-2 font-medium text-amber-600">{t('left_ear')} <span className="text-xs">(X)</span></td>
             {frequencies.map(f => (
               <td key={f} className="p-1">
                 <input type="number" value={audioForm[leftKey][f] ?? ''} onChange={e => updateFreq(leftKey, f, e.target.value)}
@@ -207,7 +209,7 @@ const TechnicianView: React.FC = () => {
 
   // ==================== RENDER ====================
   return (
-    <Layout title="فني الفحوصات" hideTitle>
+    <Layout title={t('technician_title')} hideTitle>
       <div className="flex h-full overflow-hidden" dir="rtl">
         <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900">
           <div className="h-full flex flex-col items-center justify-center p-10 text-center">
@@ -216,7 +218,7 @@ const TechnicianView: React.FC = () => {
                 <i className="fa-solid fa-ear-listen text-white text-xl"></i>
               </div>
               <div className="text-right">
-                <h1 className="text-xl font-bold text-slate-800 dark:text-white">فني الفحوصات</h1>
+                <h1 className="text-xl font-bold text-slate-800 dark:text-white">{t('technician_title')}</h1>
                 <p className="text-[10px] text-slate-500">{currentTime.toLocaleTimeString('ar-JO')}</p>
               </div>
             </div>
@@ -225,15 +227,15 @@ const TechnicianView: React.FC = () => {
             <div className="w-full max-w-2xl mt-8">
               <div className="flex items-center gap-3 mb-4 justify-center">
                 <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
-                <div className="text-right"><h2 className="font-bold text-slate-800 dark:text-white leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
+                <div className="text-right"><h2 className="font-bold text-slate-800 dark:text-white leading-tight">{t('ent_forms_heading')}</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('ent_forms_subtitle')}</p></div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
-                  { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
-                  { path: 'ent/audiogram', icon: 'fa-ear-listen', label: 'فحص السمع', color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
-                  { path: 'ent/balance', icon: 'fa-person-walking', label: 'فحص التوازن', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
-                  { path: 'ent/referral', icon: 'fa-share-from-square', label: 'تحويل طبي', color: 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' },
+                  { path: 'ent/new-patient', icon: 'fa-file-medical', label: t('ent_new_patient_form'), color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                  { path: 'ent/follow-up', icon: 'fa-file-lines', label: t('ent_follow_up_form'), color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
+                  { path: 'ent/audiogram', icon: 'fa-ear-listen', label: t('ent_audiogram_form'), color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
+                  { path: 'ent/balance', icon: 'fa-person-walking', label: t('ent_balance_form'), color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                  { path: 'ent/referral', icon: 'fa-share-from-square', label: t('ent_referral_form'), color: 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' },
                 ].map(item => {
                   const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
                   return (

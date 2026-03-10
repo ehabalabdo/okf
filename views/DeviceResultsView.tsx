@@ -59,7 +59,7 @@ const DeviceResultsView: React.FC = () => {
       setSearchQuery('');
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل ربط النتيجة');
+      alert(err.message || t('link_result_failed'));
     } finally {
       setMatchLoading(false);
     }
@@ -67,7 +67,7 @@ const DeviceResultsView: React.FC = () => {
 
   const handleReject = async (resultId: string) => {
     if (!user) return;
-    if (!confirm('هل أنت متأكد من رفض هذه النتيجة؟')) return;
+    if (!confirm(t('confirm_reject_result'))) return;
     try {
       await DeviceService.rejectResult(user, resultId);
       await loadData();
@@ -100,13 +100,13 @@ const DeviceResultsView: React.FC = () => {
   const getStatusBadge = (status: DeviceResultStatus) => {
     switch (status) {
       case 'pending':
-        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">معلّقة</span>;
+        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">{t('status_pending')}</span>;
       case 'matched':
-        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">مربوطة</span>;
+        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700">{t('status_linked')}</span>;
       case 'error':
-        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700">خطأ</span>;
+        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700">{t('status_error')}</span>;
       case 'rejected':
-        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">مرفوضة</span>;
+        return <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">{t('status_rejected')}</span>;
     }
   };
 
@@ -116,7 +116,7 @@ const DeviceResultsView: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout title="نتائج الأجهزة">
+      <Layout title={t('device_results_title')}>
         <div className="flex items-center justify-center h-64">
           <i className="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i>
         </div>
@@ -125,7 +125,7 @@ const DeviceResultsView: React.FC = () => {
   }
 
   return (
-    <Layout title="نتائج الأجهزة الطبية">
+    <Layout title={t('medical_device_results')}>
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -134,7 +134,7 @@ const DeviceResultsView: React.FC = () => {
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-800">{pendingCount}</div>
-            <div className="text-xs text-slate-400 font-medium">نتائج معلّقة</div>
+            <div className="text-xs text-slate-400 font-medium">{t('pending_results')}</div>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -145,7 +145,7 @@ const DeviceResultsView: React.FC = () => {
             <div className="text-2xl font-bold text-slate-800">
               {results.filter(r => r.status === 'matched').length}
             </div>
-            <div className="text-xs text-slate-400 font-medium">تم ربطها</div>
+            <div className="text-xs text-slate-400 font-medium">{t('linked_results')}</div>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
@@ -154,7 +154,7 @@ const DeviceResultsView: React.FC = () => {
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-800">{results.length}</div>
-            <div className="text-xs text-slate-400 font-medium">إجمالي النتائج</div>
+            <div className="text-xs text-slate-400 font-medium">{t('total_results')}</div>
           </div>
         </div>
       </div>
@@ -162,9 +162,9 @@ const DeviceResultsView: React.FC = () => {
       {/* Tabs */}
       <div className="bg-white rounded-t-xl shadow-sm border border-gray-100 flex overflow-hidden">
         {([
-          { id: 'pending' as TabFilter, label: 'معلّقة', icon: 'fa-solid fa-clock', count: pendingCount },
-          { id: 'matched' as TabFilter, label: 'مربوطة', icon: 'fa-solid fa-check', count: 0 },
-          { id: 'all' as TabFilter, label: 'الكل', icon: 'fa-solid fa-list', count: 0 }
+          { id: 'pending' as TabFilter, label: t('status_pending'), icon: 'fa-solid fa-clock', count: pendingCount },
+          { id: 'matched' as TabFilter, label: t('status_linked'), icon: 'fa-solid fa-check', count: 0 },
+          { id: 'all' as TabFilter, label: t('all_filter'), icon: 'fa-solid fa-list', count: 0 }
         ]).map(tab => (
           <button
             key={tab.id}
@@ -191,21 +191,21 @@ const DeviceResultsView: React.FC = () => {
         {results.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400">
             <i className="fa-solid fa-inbox text-5xl mb-4 text-slate-200"></i>
-            <p className="text-lg font-semibold">لا توجد نتائج {activeTab === 'pending' ? 'معلّقة' : ''}</p>
-            <p className="text-sm mt-1">ستظهر النتائج هنا عند وصولها من الأجهزة</p>
+            <p className="text-lg font-semibold">{activeTab === 'pending' ? t('no_results_pending') : t('no_results_any')}</p>
+            <p className="text-sm mt-1">{t('results_appear_hint')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
                 <tr>
-                  <th className="text-right px-4 py-3">الجهاز</th>
-                  <th className="text-right px-4 py-3">الفحص</th>
-                  <th className="text-right px-4 py-3">النتيجة</th>
-                  <th className="text-right px-4 py-3">معرّف المريض</th>
-                  <th className="text-right px-4 py-3">الحالة</th>
-                  <th className="text-right px-4 py-3">التاريخ</th>
-                  <th className="text-right px-4 py-3">إجراء</th>
+                  <th className="text-right px-4 py-3">{t('device_label')}</th>
+                  <th className="text-right px-4 py-3">{t('test_label')}</th>
+                  <th className="text-right px-4 py-3">{t('result_label')}</th>
+                  <th className="text-right px-4 py-3">{t('patient_id_label')}</th>
+                  <th className="text-right px-4 py-3">{t('status_label')}</th>
+                  <th className="text-right px-4 py-3">{t('date_label_col')}</th>
+                  <th className="text-right px-4 py-3">{t('action_label')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -223,7 +223,7 @@ const DeviceResultsView: React.FC = () => {
                           <i className={getDeviceIcon(result.deviceType)}></i>
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-700">{result.deviceName || 'جهاز'}</div>
+                          <div className="font-semibold text-slate-700">{result.deviceName || t('device_label')}</div>
                           <div className="text-[10px] text-slate-400 uppercase">{result.deviceType}</div>
                         </div>
                       </div>
@@ -237,9 +237,9 @@ const DeviceResultsView: React.FC = () => {
                         {result.value} {result.unit && <span className="text-xs font-normal text-slate-400">{result.unit}</span>}
                       </div>
                       {result.referenceRange && (
-                        <div className="text-[10px] text-slate-400">المرجع: {result.referenceRange}</div>
+                        <div className="text-[10px] text-slate-400">{t('reference_label')}: {result.referenceRange}</div>
                       )}
-                      {result.isAbnormal && <span className="text-[10px] text-red-500 font-bold">⚠ غير طبيعي</span>}
+                      {result.isAbnormal && <span className="text-[10px] text-red-500 font-bold">⚠ {t('abnormal_label')}</span>}
                     </td>
                     <td className="px-4 py-3">
                       <span className="font-mono text-sm text-slate-600">{result.patientIdentifier}</span>
@@ -258,12 +258,12 @@ const DeviceResultsView: React.FC = () => {
                             onClick={() => { setMatchingResult(result); setSearchQuery(''); }}
                             className="bg-primary hover:bg-primary/90 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm"
                           >
-                            <i className="fa-solid fa-link"></i> ربط
+                            <i className="fa-solid fa-link"></i> {t('link_btn')}
                           </button>
                           <button
                             onClick={() => handleReject(result.id)}
                             className="bg-gray-200 hover:bg-gray-300 text-slate-600 px-2 py-1.5 rounded-lg text-xs"
-                            title="رفض"
+                            title={t('reject_btn')}
                           >
                             <i className="fa-solid fa-times"></i>
                           </button>
@@ -271,7 +271,7 @@ const DeviceResultsView: React.FC = () => {
                       )}
                       {result.status === 'matched' && result.matchedBy && (
                         <span className="text-[10px] text-slate-400">
-                          بواسطة: {result.matchedBy === 'auto' ? 'تلقائي' : result.matchedBy}
+                          {t('matched_by_label')}: {result.matchedBy === 'auto' ? t('auto_matched') : result.matchedBy}
                         </span>
                       )}
                     </td>
@@ -290,7 +290,7 @@ const DeviceResultsView: React.FC = () => {
             {/* Modal Header */}
             <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-primary/5 to-transparent">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-slate-800">ربط النتيجة بمريض</h3>
+                <h3 className="text-lg font-bold text-slate-800">{t('link_result_to_patient')}</h3>
                 <button onClick={() => setMatchingResult(null)} className="text-slate-400 hover:text-slate-600">
                   <i className="fa-solid fa-times text-lg"></i>
                 </button>
@@ -304,7 +304,7 @@ const DeviceResultsView: React.FC = () => {
                     {matchingResult.testCode}: <span className="font-mono">{matchingResult.value} {matchingResult.unit}</span>
                   </div>
                   <div className="text-xs text-slate-400">
-                    معرّف المريض على الجهاز: <span className="font-mono font-bold">{matchingResult.patientIdentifier}</span>
+                    {t('device_patient_id')}: <span className="font-mono font-bold">{matchingResult.patientIdentifier}</span>
                   </div>
                 </div>
               </div>
@@ -318,7 +318,7 @@ const DeviceResultsView: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="ابحث بالاسم أو رقم الهاتف أو رقم المريض..."
+                  placeholder={t('search_name_phone_id')}
                   className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                   autoFocus
                 />
@@ -330,12 +330,12 @@ const DeviceResultsView: React.FC = () => {
               {searchQuery.length < 2 ? (
                 <div className="text-center text-slate-400 text-sm py-6">
                   <i className="fa-solid fa-keyboard mb-2 text-2xl text-slate-200"></i>
-                  <p>اكتب حرفين على الأقل للبحث</p>
+                  <p>{t('type_min_chars')}</p>
                 </div>
               ) : filteredPatients.length === 0 ? (
                 <div className="text-center text-slate-400 text-sm py-6">
                   <i className="fa-solid fa-user-slash mb-2 text-2xl text-slate-200"></i>
-                  <p>لا يوجد مريض مطابق</p>
+                  <p>{t('no_matching_patient')}</p>
                 </div>
               ) : (
                 filteredPatients.map(patient => (

@@ -149,21 +149,21 @@ const AppointmentsView: React.FC = () => {
       
       const clientSlug = client?.slug || localStorage.getItem('currentClientSlug') || '';
       const loginUrl = clientSlug ? `https://med.loopjo.com/${clientSlug}` : 'https://med.loopjo.com';
-      const clinicName = client?.name || 'العيادة';
+      const clinicName = client?.name || t('the_clinic');
       
       const message = [
-        `مرحبا ${name}`,
+        `${t('wa_hello')} ${name}`,
         '',
-        `تم تسجيلك في نظام ${clinicName}`,
+        `${t('wa_registered')} ${clinicName}`,
         '',
-        'بيانات الدخول:',
-        `اسم المستخدم: ${phone}`,
-        `كلمة المرور: ${password}`,
+        `${t('wa_login_info')}`,
+        `${t('wa_username')}: ${phone}`,
+        `${t('wa_password')}: ${password}`,
         '',
-        'رابط الدخول:',
+        `${t('wa_login_link')}`,
         loginUrl,
         '',
-        'احتفظ بهذه المعلومات بشكل آمن'
+        t('wa_keep_safe')
       ].join('\n');
       
       const encodedMessage = encodeURIComponent(message);
@@ -431,7 +431,7 @@ const AppointmentsView: React.FC = () => {
                                             <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                                             <input 
                                                 type="text"
-                                                placeholder={language === 'ar' ? 'ابحث بالاسم أو رقم الهاتف...' : 'Search by name or phone...'}
+                                                placeholder={t('search_name_phone')}
                                                 className="w-full p-2.5 pl-9 border rounded-lg bg-white text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all"
                                                 value={patientSearch}
                                                 onChange={e => { setPatientSearch(e.target.value); setIsPatientDropdownOpen(true); }}
@@ -473,7 +473,7 @@ const AppointmentsView: React.FC = () => {
                                                             return (
                                                                 <div className="p-4 text-center text-slate-400 text-sm">
                                                                     <i className="fa-solid fa-user-slash mb-1 block"></i>
-                                                                    {language === 'ar' ? 'لا يوجد نتائج' : 'No patients found'}
+                                                                    {t('no_results')}
                                                                 </div>
                                                             );
                                                         }
@@ -495,7 +495,7 @@ const AppointmentsView: React.FC = () => {
                                                                     </div>
                                                                     <div>
                                                                         <span className="text-sm font-semibold text-slate-700 block">{p.name}</span>
-                                                                        <span className="text-[11px] text-slate-400">{p.phone} {p.age ? `• ${p.age} ${language === 'ar' ? 'سنة' : 'y'}` : ''}</span>
+                                                                        <span className="text-[11px] text-slate-400">{p.phone} {p.age ? `• ${p.age} ${t('year_short')}` : ''}</span>
                                                                     </div>
                                                                 </div>
                                                                 {formData.patientId === p.id && (
@@ -525,7 +525,7 @@ const AppointmentsView: React.FC = () => {
                                         <input type="tel" placeholder={t('phone')} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" value={formData.newPhone} onChange={e => setFormData({...formData, newPhone: e.target.value})} required={patientMode === 'new'} />
                                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">
                                            <i className="fa-solid fa-info-circle mr-2"></i>
-                                           <strong>ملاحظة:</strong> رقم الهاتف سيكون اسم المستخدم، وكلمة المرور ستُولّد تلقائياً
+                                           <strong>{t('note_label')}</strong> {t('phone_username_note')}
                                         </div>
                                     </div>
 

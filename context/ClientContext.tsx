@@ -74,10 +74,10 @@ export const ClientProvider: React.FC<{ children: React.ReactNode; slug?: string
         localStorage.setItem('currentClientSlug', slug);
         localStorage.setItem('currentClientId', String(c.id));
       } else {
-        setError('هذا المركز غير موجود');
+        setError('Center not found');
       }
     } catch (err: any) {
-      setError(err.message || 'خطأ في تحميل بيانات المركز');
+      setError(err.message || 'Error loading center data');
     } finally {
       setLoading(false);
     }

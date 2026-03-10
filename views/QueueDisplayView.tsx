@@ -18,7 +18,7 @@ const QueueDisplayView: React.FC = () => {
   const [clinics, setClinics] = useState<Record<string, string>>({});
   const [currentTime, setCurrentTime] = useState(new Date());
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [ttsStatus, setTtsStatus] = useState('اضغط لتفعيل الصوت');
+  const [ttsStatus, setTtsStatus] = useState('');
   const [currentCalling, setCurrentCalling] = useState<{name: string, clinic: string, patientId?: string} | null>(null);
   
   const prevPatientsRef = useRef<Patient[]>([]);
@@ -26,6 +26,11 @@ const QueueDisplayView: React.FC = () => {
   const callingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const soundEnabledRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Set initial TTS status with translated text
+  useEffect(() => {
+    if (!ttsStatus) setTtsStatus(t('tts_tap_enable'));
+  }, [t]);
 
   // Clock
   useEffect(() => {
@@ -52,10 +57,10 @@ const QueueDisplayView: React.FC = () => {
       const url = `/api/tts?lang=${encodeURIComponent(lang)}&text=${encodeURIComponent(text)}`;
       
       console.log('[TTS] Server TTS URL:', url);
-      setTtsStatus('جاري النطق...');
+      setTtsStatus(t('tts_speaking'));
       
       audio.src = url;
-      audio.onended = () => { setTtsStatus('جاهز ✅'); resolve(); };
+      audio.onended = () => { setTtsStatus(t('tts_ready')); resolve(); };
       audio.onerror = (e) => { 
         console.warn('[TTS] Server audio error:', e);
         reject('Server TTS audio error');
@@ -90,7 +95,7 @@ const QueueDisplayView: React.FC = () => {
       }
       
       let done = false;
-      u.onend = () => { if (!done) { done = true; setTtsStatus('جاهز ✅'); resolve(); } };
+      u.onend = () => { if (!done) { done = true; setTtsStatus(t('tts_ready')); resolve(); } };
       u.onerror = (e) => { if (!done) { done = true; reject('Browser TTS error: ' + e.error); } };
       setTimeout(() => { if (!done) { done = true; reject('Browser TTS timeout'); } }, 10000);
       
@@ -106,7 +111,7 @@ const QueueDisplayView: React.FC = () => {
     }
     
     console.log('[TTS] === SPEAK CALLED ===', { text, isArabic });
-    setTtsStatus('🔔 تنبيه...');
+    setTtsStatus(t('tts_alert'));
 
     // 1. Play chime
     try {
@@ -126,7 +131,7 @@ const QueueDisplayView: React.FC = () => {
 
     // 2. Try our server-side TTS proxy FIRST (most reliable, bypasses CORS)
     try {
-      setTtsStatus('جاري النطق...');
+      setTtsStatus(t('tts_speaking'));
       await speakServer(text, isArabic);
       console.log('[TTS] ✅ Server TTS worked!');
       return;
@@ -136,7 +141,7 @@ const QueueDisplayView: React.FC = () => {
 
     // 3. Fallback to browser SpeechSynthesis
     try {
-      setTtsStatus('محاولة بالمتصفح...');
+      setTtsStatus(t('tts_browser_fallback'));
       await speakBrowser(text, isArabic);
       console.log('[TTS] ✅ Browser TTS worked!');
       return;
@@ -144,7 +149,7 @@ const QueueDisplayView: React.FC = () => {
       console.log('[TTS] ❌ Browser TTS failed:', e);
     }
 
-    setTtsStatus('❌ فشل النطق');
+    setTtsStatus(t('tts_failed'));
     console.error('[TTS] ALL methods failed!');
   };
 
@@ -153,7 +158,7 @@ const QueueDisplayView: React.FC = () => {
     const newState = !soundEnabled;
     
     if (newState) {
-      setTtsStatus('🔓 جاري تفعيل الصوت...');
+      setTtsStatus(t('tts_enabling'));
       
       // Unlock AudioContext
       try {
@@ -177,11 +182,11 @@ const QueueDisplayView: React.FC = () => {
 
       soundEnabledRef.current = true;
       setSoundEnabled(true);
-      setTtsStatus('✅ الصوت مفعّل - جاهز');
+      setTtsStatus(t('tts_enabled'));
     } else {
       soundEnabledRef.current = false;
       setSoundEnabled(false);
-      setTtsStatus('🔇 الصوت مطفي');
+      setTtsStatus(t('tts_disabled'));
     }
   };
 
@@ -192,7 +197,7 @@ const QueueDisplayView: React.FC = () => {
       await new Promise(r => setTimeout(r, 500));
     }
     soundEnabledRef.current = true;
-    speak("المريض أحمد محمد، يرجى التوجه إلى العيادة الأولى", true);
+    speak(t('tts_patient_announce_ar').replace('{name}', 'أحمد محمد').replace('{clinic}', 'العيادة الأولى'), true);
   };
 
   // Load clinic names once (separate from subscription to avoid infinite loop)
@@ -241,9 +246,8 @@ const QueueDisplayView: React.FC = () => {
                
                // Announce patient name
                const isArabicName = /[\u0600-\u06FF]/.test(p.name);
-               const text = isArabicName 
-                 ? `الرجاء من المريض ${p.name}, التوجه إلى ${clinicName}`
-                 : `Patient ${p.name}, please proceed to ${clinicName}`;
+               const announceKey = isArabicName ? 'tts_patient_announce_ar' : 'tts_patient_announce';
+               const text = t(announceKey).replace('{name}', p.name).replace('{clinic}', clinicName);
                speak(text, isArabicName);
            }
        });
@@ -292,14 +296,14 @@ const QueueDisplayView: React.FC = () => {
                 className="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-3 bg-amber-500/10 text-amber-400 border border-amber-500/50 hover:bg-amber-500/20"
             >
                 <i className="fa-solid fa-play"></i>
-                تجربة الصوت
+                {t('test_audio')}
             </button>
             <button 
                 onClick={enableSound}
                 className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all duration-300 flex items-center gap-3 ${soundEnabled ? 'bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-500/30 animate-pulse'}`}
             >
                 <i className={`fa-solid ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`}></i>
-                {soundEnabled ? '🔊 الصوت مفعّل' : '🔇 اضغط لتفعيل الصوت'}
+                {soundEnabled ? t('sound_on_label') : t('sound_off_label')}
             </button>
         </div>
 
@@ -330,12 +334,12 @@ const QueueDisplayView: React.FC = () => {
                 </div>
               </div>
               <h2 className="text-6xl font-bold text-white tracking-wide drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
-                {language === 'ar' ? 'حان دورك!' : 'Your Turn!'}
+                {t('calling_your_turn')}
               </h2>
               
               <div className="bg-sky-950/40 border border-sky-800/50 rounded-3xl p-10 backdrop-blur-md transform transition-all hover:scale-105">
                 <p className="text-3xl font-medium text-sky-100/70 mb-4 uppercase tracking-widest">
-                  {language === 'ar' ? 'المريض' : 'Patient'}
+                  {t('calling_patient_label')}
                 </p>
                 <p className="text-6xl font-bold text-white mb-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
                   {currentCalling.name}
@@ -344,7 +348,7 @@ const QueueDisplayView: React.FC = () => {
                 <div className="w-24 h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent mx-auto mb-10 opacity-50"></div>
 
                 <p className="text-2xl text-sky-100/70 mb-4 uppercase tracking-widest">
-                  {language === 'ar' ? 'يرجى التوجه إلى' : 'Please proceed to'}
+                  {t('calling_proceed_to')}
                 </p>
                 <p className="text-5xl font-bold text-sky-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] flex items-center justify-center gap-6">
                   <i className="fa-solid fa-door-open"></i>

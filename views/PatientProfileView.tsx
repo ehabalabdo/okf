@@ -14,7 +14,7 @@ const PatientProfileView: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
@@ -72,8 +72,8 @@ const PatientProfileView: React.FC = () => {
       
       // Show alert notification
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('جاء دورك!', {
-          body: 'الرجاء التوجه إلى غرفة الفحص',
+        new Notification(t('pp_your_turn'), {
+          body: t('pp_go_to_exam_room'),
           icon: '/logo.png'
         });
       }
@@ -299,8 +299,8 @@ const PatientProfileView: React.FC = () => {
            <TabButton id="basic" label={t('tab_basic')} icon="fa-solid fa-address-card" />
            <TabButton id="timeline" label={t('tab_timeline')} icon="fa-solid fa-clock-rotate-left" />
            <TabButton id="clinical" label={t('tab_clinical')} icon="fa-solid fa-file-medical" />
-           <TabButton id="devices" label="نتائج الأجهزة" icon="fa-solid fa-microscope" />
-           <TabButton id="ent-forms" label="نماذج ENT" icon="fa-solid fa-stethoscope" />
+           <TabButton id="devices" label={t('pp_tab_devices')} icon="fa-solid fa-microscope" />
+           <TabButton id="ent-forms" label={t('pp_tab_ent_forms')} icon="fa-solid fa-stethoscope" />
        </div>
 
        {/* Tab Content */}
@@ -317,7 +317,7 @@ const PatientProfileView: React.FC = () => {
                                    onClick={handleEditBasic}
                                    className="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
                                >
-                                   <i className="fa-solid fa-pen"></i> تعديل
+                                   <i className="fa-solid fa-pen"></i> {t('pp_edit')}
                                </button>
                            )}
                        </div>
@@ -345,17 +345,17 @@ const PatientProfileView: React.FC = () => {
                                    <span className="font-medium font-mono">{patient.phone}</span>
                                </div>
                                <div className="flex justify-between border-b border-gray-50 pb-2">
-                                   <span className="text-slate-500">اسم المستخدم</span>
+                                   <span className="text-slate-500">{t('pp_username')}</span>
                                    <span className="font-medium">{patient.username || '—'}</span>
                                </div>
                                <div className="flex justify-between border-b border-gray-50 pb-2">
-                                   <span className="text-slate-500">البريد الإلكتروني</span>
+                                   <span className="text-slate-500">{t('pp_email_label')}</span>
                                    <span className="font-medium">{patient.email || '—'}</span>
                                </div>
                                <div className="flex justify-between border-b border-gray-50 pb-2">
-                                   <span className="text-slate-500">الدخول للبوابة</span>
+                                   <span className="text-slate-500">{t('pp_portal_access')}</span>
                                    <span className={`font-bold ${patient.hasAccess ? 'text-green-600' : 'text-red-600'}`}>
-                                       {patient.hasAccess ? '✓ مفعل' : '✗ معطل'}
+                                       {patient.hasAccess ? t('pp_access_enabled') : t('pp_access_disabled')}
                                    </span>
                                </div>
                            </div>
@@ -389,7 +389,7 @@ const PatientProfileView: React.FC = () => {
                                    />
                                </div>
                                <div>
-                                   <label className="block text-xs font-bold text-slate-600 mb-1">اسم المستخدم (للبوابة)</label>
+                                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('pp_username_portal')}</label>
                                    <input
                                        type="text"
                                        value={editUsername}
@@ -399,7 +399,7 @@ const PatientProfileView: React.FC = () => {
                                    />
                                </div>
                                <div>
-                                   <label className="block text-xs font-bold text-slate-600 mb-1">البريد الإلكتروني</label>
+                                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('pp_email_label')}</label>
                                    <input
                                        type="email"
                                        value={editEmail}
@@ -409,7 +409,7 @@ const PatientProfileView: React.FC = () => {
                                    />
                                </div>
                                <div>
-                                   <label className="block text-xs font-bold text-slate-600 mb-1">كلمة المرور (اتركها فارغة للإبقاء على القديمة)</label>
+                                   <label className="block text-xs font-bold text-slate-600 mb-1">{t('pp_password_keep_empty')}</label>
                                    <input
                                        type="password"
                                        value={editPassword}
@@ -426,20 +426,20 @@ const PatientProfileView: React.FC = () => {
                                        onChange={e => setEditHasAccess(e.target.checked)}
                                        className="w-4 h-4"
                                    />
-                                   <label htmlFor="hasAccess" className="text-sm font-medium text-slate-700">تفعيل الدخول لبوابة المريض</label>
+                                   <label htmlFor="hasAccess" className="text-sm font-medium text-slate-700">{t('pp_enable_portal_access')}</label>
                                </div>
                                <div className="flex gap-2 pt-2">
                                    <button
                                        onClick={handleSaveBasic}
                                        className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm"
                                    >
-                                       <i className="fa-solid fa-check"></i> حفظ
+                                       <i className="fa-solid fa-check"></i> {t('pp_save')}
                                    </button>
                                    <button
                                        onClick={handleCancelBasicEdit}
                                        className="flex-1 bg-gray-300 hover:bg-gray-400 text-slate-700 px-4 py-2 rounded-lg font-bold text-sm"
                                    >
-                                       <i className="fa-solid fa-times"></i> إلغاء
+                                       <i className="fa-solid fa-times"></i> {t('pp_cancel')}
                                    </button>
                                </div>
                            </div>
@@ -488,7 +488,7 @@ const PatientProfileView: React.FC = () => {
                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 w-full space-y-3">
                                        {visit.reasonForVisit && (
                                          <div className="text-sm font-medium text-slate-800">
-                                           <i className="fa-solid fa-comment-medical text-primary ml-1"></i> سبب الزيارة: {visit.reasonForVisit}
+                                           <i className="fa-solid fa-comment-medical text-primary ml-1"></i> {t('pp_visit_reason')}: {visit.reasonForVisit}
                                          </div>
                                        )}
                                        
@@ -502,7 +502,7 @@ const PatientProfileView: React.FC = () => {
                                                {visit.chiefComplaint && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
                                                    <div className="text-[11px] font-bold text-primary uppercase mb-1 flex items-center gap-1">
-                                                     <i className="fa-solid fa-bullhorn text-[10px]"></i> الشكوى الرئيسية
+                                                     <i className="fa-solid fa-bullhorn text-[10px]"></i> {t('pp_chief_complaint')}
                                                    </div>
                                                    <div className="text-sm text-slate-700">{visit.chiefComplaint}</div>
                                                  </div>
@@ -512,29 +512,29 @@ const PatientProfileView: React.FC = () => {
                                                {(visit.presentIllness || visit.pastMedicalHistory || visit.surgicalHistory || visit.currentMedications || visit.allergies || visit.familyHistory || visit.socialHistory) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
                                                    <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-book-medical text-[10px]"></i> التاريخ المرضي
+                                                     <i className="fa-solid fa-book-medical text-[10px]"></i> {t('pp_medical_history')}
                                                    </div>
                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                      {visit.presentIllness && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">المرض الحالي:</span> <span className="text-slate-700">{visit.presentIllness}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_present_illness')}</span> <span className="text-slate-700">{visit.presentIllness}</span></div>
                                                      )}
                                                      {visit.pastMedicalHistory && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">التاريخ الطبي:</span> <span className="text-slate-700">{visit.pastMedicalHistory}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_past_medical')}</span> <span className="text-slate-700">{visit.pastMedicalHistory}</span></div>
                                                      )}
                                                      {visit.surgicalHistory && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">التاريخ الجراحي:</span> <span className="text-slate-700">{visit.surgicalHistory}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_surgical_history')}</span> <span className="text-slate-700">{visit.surgicalHistory}</span></div>
                                                      )}
                                                      {visit.currentMedications && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">الأدوية الحالية:</span> <span className="text-slate-700">{visit.currentMedications}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_current_medications')}</span> <span className="text-slate-700">{visit.currentMedications}</span></div>
                                                      )}
                                                      {visit.allergies && (
-                                                       <div className="text-xs"><span className="font-bold text-red-500">الحساسية:</span> <span className="text-red-700">{visit.allergies}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-red-500">{t('pp_allergies')}</span> <span className="text-red-700">{visit.allergies}</span></div>
                                                      )}
                                                      {visit.familyHistory && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">تاريخ العائلة:</span> <span className="text-slate-700">{visit.familyHistory}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_family_history')}</span> <span className="text-slate-700">{visit.familyHistory}</span></div>
                                                      )}
                                                      {visit.socialHistory && (
-                                                       <div className="text-xs"><span className="font-bold text-slate-500">التاريخ الاجتماعي:</span> <span className="text-slate-700">{visit.socialHistory}</span></div>
+                                                       <div className="text-xs"><span className="font-bold text-slate-500">{t('pp_social_history')}</span> <span className="text-slate-700">{visit.socialHistory}</span></div>
                                                      )}
                                                    </div>
                                                  </div>
@@ -544,17 +544,17 @@ const PatientProfileView: React.FC = () => {
                                                {(visit.generalExamination || visit.systemicExamination || hasVitals) && (
                                                  <div className="bg-white p-3 rounded-lg border border-slate-100">
                                                    <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-stethoscope text-[10px]"></i> الفحص السريري
+                                                     <i className="fa-solid fa-stethoscope text-[10px]"></i> {t('pp_clinical_exam')}
                                                    </div>
                                                    {visit.generalExamination && (
-                                                     <div className="text-xs mb-2"><span className="font-bold text-slate-500">الفحص العام:</span> <span className="text-slate-700">{visit.generalExamination}</span></div>
+                                                     <div className="text-xs mb-2"><span className="font-bold text-slate-500">{t('pp_general_exam')}</span> <span className="text-slate-700">{visit.generalExamination}</span></div>
                                                    )}
                                                    {visit.systemicExamination && (
-                                                     <div className="text-xs mb-2"><span className="font-bold text-slate-500">فحص الأجهزة:</span> <span className="text-slate-700">{visit.systemicExamination}</span></div>
+                                                     <div className="text-xs mb-2"><span className="font-bold text-slate-500">{t('pp_systemic_exam')}</span> <span className="text-slate-700">{visit.systemicExamination}</span></div>
                                                    )}
                                                    {hasVitals && (
                                                      <div className="mt-2">
-                                                       <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">العلامات الحيوية</div>
+                                                       <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">{t('pp_vital_signs')}</div>
                                                        <div className="flex flex-wrap gap-2">
                                                          {visit.vitalSigns?.bloodPressure && (
                                                            <span className="bg-red-50 text-red-700 px-2 py-1 rounded text-[11px] font-medium flex items-center gap-1">
@@ -591,7 +591,7 @@ const PatientProfileView: React.FC = () => {
                                                {(visit.preliminaryDiagnosis || visit.differentialDiagnosis || visit.diagnosis) && (
                                                  <div className="bg-white p-3 rounded-lg border border-emerald-100">
                                                    <div className="text-[11px] font-bold text-emerald-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-clipboard-check text-[10px]"></i> التشخيص
+                                                     <i className="fa-solid fa-clipboard-check text-[10px]"></i> {t('pp_diagnosis_section')}
                                                    </div>
                                                    {(visit.preliminaryDiagnosis || visit.diagnosis) && (
                                                      <div className="text-sm font-medium text-slate-800 mb-1">
@@ -600,7 +600,7 @@ const PatientProfileView: React.FC = () => {
                                                    )}
                                                    {visit.differentialDiagnosis && (
                                                      <div className="text-xs text-slate-500">
-                                                       <span className="font-bold">تشخيص تفريقي:</span> {visit.differentialDiagnosis}
+                                                       <span className="font-bold">{t('pp_differential_diagnosis')}</span> {visit.differentialDiagnosis}
                                                      </div>
                                                    )}
                                                  </div>
@@ -610,7 +610,7 @@ const PatientProfileView: React.FC = () => {
                                                {visit.prescriptions && visit.prescriptions.length > 0 && (
                                                  <div className="bg-white p-3 rounded-lg border border-amber-100">
                                                    <div className="text-[11px] font-bold text-amber-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-prescription text-[10px]"></i> الوصفة الطبية
+                                                     <i className="fa-solid fa-prescription text-[10px]"></i> {t('pp_prescription')}
                                                    </div>
                                                    <div className="flex flex-wrap gap-1.5">
                                                      {visit.prescriptions.map((rx, i) => (
@@ -626,14 +626,14 @@ const PatientProfileView: React.FC = () => {
                                                {hasLabs && (
                                                  <div className="bg-white p-3 rounded-lg border border-purple-100">
                                                    <div className="text-[11px] font-bold text-purple-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-flask text-[10px]"></i> طلبات المختبر
+                                                     <i className="fa-solid fa-flask text-[10px]"></i> {t('pp_lab_orders')}
                                                    </div>
                                                    <div className="space-y-1.5">
                                                      {visit.labOrders!.map((lab, i) => (
                                                        <div key={i} className="flex items-center justify-between bg-purple-50 px-3 py-1.5 rounded-lg text-xs">
                                                          <span className="font-medium text-purple-800">🧪 {lab.testName}</span>
                                                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${lab.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                           {lab.status === 'Completed' ? '✓ مكتمل' : '⏳ معلق'}
+                                                           {lab.status === 'Completed' ? t('pp_completed') : t('pp_pending')}
                                                          </span>
                                                        </div>
                                                      ))}
@@ -645,14 +645,14 @@ const PatientProfileView: React.FC = () => {
                                                {hasImaging && (
                                                  <div className="bg-white p-3 rounded-lg border border-sky-100">
                                                    <div className="text-[11px] font-bold text-sky-600 uppercase mb-2 flex items-center gap-1">
-                                                     <i className="fa-solid fa-x-ray text-[10px]"></i> طلبات الأشعة
+                                                     <i className="fa-solid fa-x-ray text-[10px]"></i> {t('pp_imaging_orders')}
                                                    </div>
                                                    <div className="space-y-1.5">
                                                      {visit.imagingOrders!.map((img, i) => (
                                                        <div key={i} className="flex items-center justify-between bg-sky-50 px-3 py-1.5 rounded-lg text-xs">
                                                          <span className="font-medium text-sky-800">📷 {img.imagingType} - {img.bodyPart}</span>
                                                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${img.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                           {img.status === 'Completed' ? '✓ مكتمل' : '⏳ معلق'}
+                                                           {img.status === 'Completed' ? t('pp_completed') : t('pp_pending')}
                                                          </span>
                                                        </div>
                                                      ))}
@@ -664,7 +664,7 @@ const PatientProfileView: React.FC = () => {
                                                {visit.doctorNotes && (
                                                  <div className="bg-white p-3 rounded-lg border border-amber-100">
                                                    <div className="text-[11px] font-bold text-amber-600 uppercase mb-1 flex items-center gap-1">
-                                                     <i className="fa-solid fa-note-sticky text-[10px]"></i> ملاحظات الطبيب
+                                                     <i className="fa-solid fa-note-sticky text-[10px]"></i> {t('pp_doctor_notes')}
                                                    </div>
                                                    <div className="text-sm text-slate-700 italic">"{visit.doctorNotes}"</div>
                                                  </div>
@@ -674,7 +674,7 @@ const PatientProfileView: React.FC = () => {
                                                {visit.attachments && visit.attachments.length > 0 && (
                                                    <div className="bg-white p-3 rounded-lg border border-slate-100">
                                                        <div className="text-[11px] font-bold text-slate-500 uppercase mb-2 flex items-center gap-1">
-                                                         <i className="fa-solid fa-paperclip text-[10px]"></i> المرفقات
+                                                         <i className="fa-solid fa-paperclip text-[10px]"></i> {t('pp_attachments')}
                                                        </div>
                                                        <div className="flex flex-wrap gap-2">
                                                            {visit.attachments.map((att, i) => (
@@ -707,7 +707,7 @@ const PatientProfileView: React.FC = () => {
                                                {!hasSOAP && !visit.diagnosis && (!visit.prescriptions || visit.prescriptions.length === 0) && !hasLabs && !hasImaging && !visit.doctorNotes && (!visit.attachments || visit.attachments.length === 0) && (
                                                  <div className="text-center py-4 text-slate-400 text-xs">
                                                    <i className="fa-solid fa-inbox text-lg mb-1"></i>
-                                                   <p>لا توجد بيانات سريرية مسجلة لهذه الزيارة</p>
+                                                   <p>{t('pp_no_clinical_data')}</p>
                                                  </div>
                                                )}
 
@@ -816,18 +816,18 @@ const PatientProfileView: React.FC = () => {
                    ) : !entForms ? (
                      <div className="text-center text-slate-400 py-20">
                        <i className="fa-solid fa-folder-open text-4xl mb-3"></i>
-                       <p>لا توجد نماذج محفوظة</p>
+                       <p>{t('pp_no_saved_forms')}</p>
                      </div>
                    ) : (
                      <div className="space-y-6">
                        {/* Summary Cards */}
                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                          {[
-                           { key: 'newPatientForms', label: 'استبيان مريض جديد', icon: 'fa-file-medical', color: 'blue', endpoint: 'new-patient' },
-                           { key: 'followUpForms', label: 'متابعة', icon: 'fa-file-lines', color: 'green', endpoint: 'follow-up' },
-                           { key: 'audiograms', label: 'فحص السمع', icon: 'fa-ear-listen', color: 'purple', endpoint: 'audiogram' },
-                           { key: 'balanceAssessments', label: 'فحص التوازن', icon: 'fa-person-walking', color: 'amber', endpoint: 'balance-assessment' },
-                           { key: 'referrals', label: 'تحويل طبي', icon: 'fa-share-from-square', color: 'rose', endpoint: 'referral' },
+                           { key: 'newPatientForms', label: t('pp_new_patient_form'), icon: 'fa-file-medical', color: 'blue', endpoint: 'new-patient' },
+                           { key: 'followUpForms', label: t('pp_follow_up_form'), icon: 'fa-file-lines', color: 'green', endpoint: 'follow-up' },
+                           { key: 'audiograms', label: t('pp_audiogram_form'), icon: 'fa-ear-listen', color: 'purple', endpoint: 'audiogram' },
+                           { key: 'balanceAssessments', label: t('pp_balance_form'), icon: 'fa-person-walking', color: 'amber', endpoint: 'balance-assessment' },
+                           { key: 'referrals', label: t('pp_referral_form'), icon: 'fa-share-from-square', color: 'rose', endpoint: 'referral' },
                          ].map(cat => {
                            const count = entForms[cat.key]?.length || 0;
                            return (
@@ -850,7 +850,7 @@ const PatientProfileView: React.FC = () => {
                          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
                            <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
                              <i className="fa-solid fa-list"></i>
-                             السجلات ({entForms[entExpanded].length})
+                             {t('pp_records_count')} ({entForms[entExpanded].length})
                            </h3>
                            <div className="space-y-2">
                              {entForms[entExpanded].map((form: any, idx: number) => {
@@ -888,7 +888,7 @@ const PatientProfileView: React.FC = () => {
                        {entExpanded && entForms[entExpanded]?.length === 0 && (
                          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 text-center text-slate-400">
                            <i className="fa-solid fa-inbox text-3xl mb-2"></i>
-                           <p>لا توجد سجلات من هذا النوع</p>
+                           <p>{t('pp_no_records')}</p>
                          </div>
                        )}
 
@@ -902,75 +902,75 @@ const PatientProfileView: React.FC = () => {
                          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" dir="rtl">
                            <div className="flex items-center justify-between mb-4">
                              <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                               <i className="fa-solid fa-file-medical text-primary"></i> تفاصيل النموذج
+                               <i className="fa-solid fa-file-medical text-primary"></i> {t('pp_form_details')}
                              </h3>
-                             <span className="text-xs text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                             <span className="text-xs text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString(language === 'ar' ? 'ar-JO' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                            </div>
                            
                            {entDetail.type === 'new-patient' && (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <DetailField label="الشكوى الرئيسية" value={entDetail.data.chief_complaint} />
-                               <DetailField label="مدة الأعراض" value={entDetail.data.symptom_duration} />
-                               <DetailField label="جهة الأعراض" value={{right:'يمين',left:'يسار',both:'كلاهما',none:'غير محدد'}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
-                               <DetailField label="علاج ENT سابق" value={entDetail.data.previous_ent_treatment ? `نعم — ${entDetail.data.previous_ent_details}` : 'لا'} />
-                               <DetailField label="عمليات ENT سابقة" value={entDetail.data.previous_ent_surgery ? `نعم — ${entDetail.data.previous_ent_surgery_details}` : 'لا'} />
+                               <DetailField label={t('pp_chief_complaint')} value={entDetail.data.chief_complaint} />
+                               <DetailField label={t('pp_symptom_duration')} value={entDetail.data.symptom_duration} />
+                               <DetailField label={t('pp_symptom_side')} value={{right:t('pp_side_right'),left:t('pp_side_left'),both:t('pp_side_both'),none:t('pp_side_none')}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
+                               <DetailField label={t('pp_previous_ent')} value={entDetail.data.previous_ent_treatment ? `${t('pp_yes')} — ${entDetail.data.previous_ent_details}` : t('pp_no')} />
+                               <DetailField label={t('pp_previous_ent_surgery')} value={entDetail.data.previous_ent_surgery ? `${t('pp_yes')} — ${entDetail.data.previous_ent_surgery_details}` : t('pp_no')} />
                                {entDetail.data.symptoms && typeof entDetail.data.symptoms === 'object' && (
                                  <div className="md:col-span-2">
-                                   <div className="text-xs font-bold uppercase text-slate-400 mb-2">الأعراض</div>
+                                   <div className="text-xs font-bold uppercase text-slate-400 mb-2">{t('pp_symptoms')}</div>
                                    <div className="flex flex-wrap gap-2">
                                      {Object.entries(entDetail.data.symptoms).filter(([k, v]) => v === true).map(([k]) => (
                                        <span key={k} className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">
-                                         {{earPain:'ألم أذن',hearingLoss:'ضعف سمع',tinnitus:'طنين',earDischarge:'إفرازات أذن',vertigo:'دوخة',nasalObstruction:'انسداد أنف',nasalDischarge:'إفرازات أنف',sneezing:'عطاس',soreThroat:'ألم حلق',voiceChange:'تغير صوت',dysphagia:'صعوبة بلع',snoring:'شخير',sleepApnea:'انقطاع نفس',facialPain:'ألم وجه',headache:'صداع',nosebleeds:'رعاف',lossOfSmell:'فقدان شم',neckMass:'كتلة رقبة'}[k] || k}
+                                         {{earPain:t('pp_ear_pain'),hearingLoss:t('pp_hearing_loss'),tinnitus:t('pp_tinnitus'),earDischarge:t('pp_ear_discharge'),vertigo:t('pp_vertigo'),nasalObstruction:t('pp_nasal_obstruction'),nasalDischarge:t('pp_nasal_discharge'),sneezing:t('pp_sneezing'),soreThroat:t('pp_sore_throat'),voiceChange:t('pp_voice_change'),dysphagia:t('pp_dysphagia'),snoring:t('pp_snoring'),sleepApnea:t('pp_sleep_apnea'),facialPain:t('pp_facial_pain'),headache:t('pp_headache'),nosebleeds:t('pp_nosebleeds'),lossOfSmell:t('pp_loss_of_smell'),neckMass:t('pp_neck_mass')}[k] || k}
                                        </span>
                                      ))}
                                      {entDetail.data.symptoms.other && <span className="bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-xs font-bold border border-amber-200">{entDetail.data.symptoms.other}</span>}
                                    </div>
                                  </div>
                                )}
-                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                               {entDetail.data.notes && <DetailField label={t('pp_notes')} value={entDetail.data.notes} span2 />}
                              </div>
                            )}
 
                            {entDetail.type === 'follow-up' && (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <DetailField label="سبب المتابعة" value={entDetail.data.follow_up_reason} />
-                               <DetailField label="التشخيص السابق" value={entDetail.data.previous_diagnosis} />
-                               <DetailField label="الالتزام بالعلاج" value={{full:'كامل',partial:'جزئي',none:'لا يوجد'}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
-                               <DetailField label="تقييم الأعراض" value={{improved:'تحسن',same:'كما هي',worsened:'تفاقمت'}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
-                               <DetailField label="أعراض جديدة" value={entDetail.data.new_symptoms} />
-                               <DetailField label="فعالية الأدوية" value={entDetail.data.medication_effectiveness} />
-                               {entDetail.data.is_surgical_follow_up && <DetailField label="العملية الجراحية" value={entDetail.data.surgical_procedure} />}
-                               {entDetail.data.is_surgical_follow_up && <DetailField label="التئام الجرح" value={entDetail.data.wound_healing} />}
-                               <DetailField label="الخطوات القادمة" value={entDetail.data.next_steps} />
-                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                               <DetailField label={t('pp_follow_up_reason')} value={entDetail.data.follow_up_reason} />
+                               <DetailField label={t('pp_previous_diagnosis')} value={entDetail.data.previous_diagnosis} />
+                               <DetailField label={t('pp_treatment_compliance')} value={{full:t('pp_compliance_full'),partial:t('pp_compliance_partial'),none:t('pp_compliance_none')}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
+                               <DetailField label={t('pp_symptom_assessment')} value={{improved:t('pp_assessment_improved'),same:t('pp_assessment_same'),worsened:t('pp_assessment_worsened')}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
+                               <DetailField label={t('pp_new_symptoms')} value={entDetail.data.new_symptoms} />
+                               <DetailField label={t('pp_medication_effectiveness')} value={entDetail.data.medication_effectiveness} />
+                               {entDetail.data.is_surgical_follow_up && <DetailField label={t('pp_surgical_procedure')} value={entDetail.data.surgical_procedure} />}
+                               {entDetail.data.is_surgical_follow_up && <DetailField label={t('pp_wound_healing')} value={entDetail.data.wound_healing} />}
+                               <DetailField label={t('pp_next_steps')} value={entDetail.data.next_steps} />
+                               {entDetail.data.notes && <DetailField label={t('pp_notes')} value={entDetail.data.notes} span2 />}
                              </div>
                            )}
 
                            {entDetail.type === 'audiogram' && (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <DetailField label="مستوى السمع" value={entDetail.data.hearing_level} />
-                               <DetailField label="نوع ضعف السمع" value={entDetail.data.hearing_loss_type} />
-                               <DetailField label="توصية بسماعة" value={entDetail.data.recommend_hearing_aid ? 'نعم' : 'لا'} />
+                               <DetailField label={t('pp_hearing_level')} value={entDetail.data.hearing_level} />
+                               <DetailField label={t('pp_hearing_loss_type')} value={entDetail.data.hearing_loss_type} />
+                               <DetailField label={t('pp_hearing_aid_recommendation')} value={entDetail.data.recommend_hearing_aid ? t('pp_yes') : t('pp_no')} />
                                <DetailField label="OAE" value={entDetail.data.oae} />
-                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                               {entDetail.data.notes && <DetailField label={t('pp_notes')} value={entDetail.data.notes} span2 />}
                              </div>
                            )}
 
                            {entDetail.type === 'balance-assessment' && (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <DetailField label="وظيفة الدهليز" value={entDetail.data.vestibular_function} />
-                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                               <DetailField label={t('pp_vestibular_function')} value={entDetail.data.vestibular_function} />
+                               {entDetail.data.notes && <DetailField label={t('pp_notes')} value={entDetail.data.notes} span2 />}
                              </div>
                            )}
 
                            {entDetail.type === 'referral' && (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <DetailField label="الطبيب المحوّل" value={entDetail.data.referring_doctor} />
-                               <DetailField label="التخصص" value={entDetail.data.referred_to_specialty} />
-                               <DetailField label="الطبيب المحال إليه" value={entDetail.data.referred_to_doctor} />
-                               <DetailField label="المستشفى" value={entDetail.data.referred_to_hospital} />
-                               <DetailField label="الاستعجال" value={{routine:'عادي',urgent:'مستعجل',emergency:'طوارئ'}[entDetail.data.urgency as string] || entDetail.data.urgency} />
-                               {entDetail.data.notes && <DetailField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                               <DetailField label={t('pp_referring_doctor')} value={entDetail.data.referring_doctor} />
+                               <DetailField label={t('pp_referred_specialty')} value={entDetail.data.referred_to_specialty} />
+                               <DetailField label={t('pp_referred_doctor')} value={entDetail.data.referred_to_doctor} />
+                               <DetailField label={t('pp_referred_hospital')} value={entDetail.data.referred_to_hospital} />
+                               <DetailField label={t('pp_urgency')} value={{routine:t('pp_urgency_routine'),urgent:t('pp_urgency_urgent'),emergency:t('pp_urgency_emergency')}[entDetail.data.urgency as string] || entDetail.data.urgency} />
+                               {entDetail.data.notes && <DetailField label={t('pp_notes')} value={entDetail.data.notes} span2 />}
                              </div>
                            )}
                          </div>

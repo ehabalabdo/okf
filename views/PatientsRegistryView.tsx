@@ -112,7 +112,7 @@ const PatientsRegistryView: React.FC = () => {
         {/* Table */}
         <div className="flex-1 overflow-auto">
            {loading ? (
-             <div className="flex justify-center items-center h-40 text-slate-400">Loading...</div>
+             <div className="flex justify-center items-center h-40 text-slate-400">{t('loading')}</div>
            ) : (
              <table className="w-full text-left text-sm text-slate-600">
                 <thead className="bg-gray-50 text-xs uppercase font-semibold text-slate-500 sticky top-0">
@@ -129,7 +129,7 @@ const PatientsRegistryView: React.FC = () => {
                 <tbody className="divide-y divide-gray-100">
                   {filteredPatients.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-10 text-slate-400">No patients found.</td>
+                      <td colSpan={7} className="text-center py-10 text-slate-400">{t('no_patients_found')}</td>
                     </tr>
                   ) : filteredPatients.map(p => (
                     <tr 
@@ -155,7 +155,7 @@ const PatientsRegistryView: React.FC = () => {
                           {p.currentVisit?.visitId ? (
                             <StatusBadge status={p.currentVisit.status} />
                           ) : (
-                            <span className="px-2 py-1 rounded-full text-xs font-bold uppercase bg-slate-100 text-slate-400">لا زيارة</span>
+                            <span className="px-2 py-1 rounded-full text-xs font-bold uppercase bg-slate-100 text-slate-400">{t('no_visit')}</span>
                           )}
                        </td>
                        <td className="px-6 py-4 text-xs text-slate-500">

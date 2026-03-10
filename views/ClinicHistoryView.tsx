@@ -246,7 +246,7 @@ const ClinicHistoryView: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} ${isAr ? 'د.أ' : 'JOD'}`;
+    return `${amount.toFixed(2)} ${t('currency_jod')}`;
   };
 
   const getStatusBadge = (status: string) => {
@@ -263,33 +263,25 @@ const ClinicHistoryView: React.FC = () => {
   };
 
   const getStatusLabel = (status: string) => {
-    if (isAr) {
-      switch (status) {
-        case 'completed': return 'مكتمل';
-        case 'in-progress': return 'جاري المعاينة';
-        case 'waiting': return 'انتظار';
-        default: return status;
-      }
-    }
     switch (status) {
-      case 'completed': return 'Completed';
-      case 'in-progress': return 'In Progress';
-      case 'waiting': return 'Waiting';
+      case 'completed': return t('completed_status_label');
+      case 'in-progress': return t('in_progress_status_label');
+      case 'waiting': return t('waiting_status_label');
       default: return status;
     }
   };
 
-  const dateFilterLabels: Record<DateFilter, { en: string; ar: string }> = {
-    today: { en: 'Today', ar: 'اليوم' },
-    week: { en: 'This Week', ar: 'هذا الأسبوع' },
-    month: { en: 'This Month', ar: 'هذا الشهر' },
-    year: { en: 'This Year', ar: 'هذه السنة' },
-    all: { en: 'All Time', ar: 'الكل' },
+  const dateFilterLabels: Record<DateFilter, string> = {
+    today: t('today_filter'),
+    week: t('this_week'),
+    month: t('this_month'),
+    year: t('this_year'),
+    all: t('all_time'),
   };
 
   if (loading) {
     return (
-      <Layout title={isAr ? 'سجل العيادات' : 'Clinic History'}>
+      <Layout title={t('clinic_history')}>
         <div className="flex items-center justify-center h-64">
           <i className="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i>
         </div>
@@ -298,7 +290,7 @@ const ClinicHistoryView: React.FC = () => {
   }
 
   return (
-    <Layout title={isAr ? 'سجل العيادات' : 'Clinic History'}>
+    <Layout title={t('clinic_history')}>
       <div className="space-y-6 animate-fade-in-up">
         {/* Filters Bar */}
         <div className="flex flex-wrap gap-3 items-center">
@@ -314,7 +306,7 @@ const ClinicHistoryView: React.FC = () => {
                     : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
-                {isAr ? dateFilterLabels[key].ar : dateFilterLabels[key].en}
+                {dateFilterLabels[key]}
               </button>
             ))}
           </div>
@@ -325,7 +317,7 @@ const ClinicHistoryView: React.FC = () => {
             onChange={e => setSelectedClinicId(e.target.value)}
             className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-200 shadow-sm"
           >
-            <option value="all">{isAr ? 'كل العيادات' : 'All Clinics'}</option>
+            <option value="all">{t('all_clinics')}</option>
             {clinicStats.map(s => (
               <option key={s.clinicId} value={s.clinicId}>
                 {s.clinicName}
@@ -338,27 +330,27 @@ const ClinicHistoryView: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             icon="fa-solid fa-users"
-            label={isAr ? 'إجمالي المرضى' : 'Total Patients'}
+            label={t('total_patients')}
             value={totals.patients}
             color="from-amber-500 to-sky-400"
           />
           <StatCard
             icon="fa-solid fa-stethoscope"
-            label={isAr ? 'إجمالي الزيارات' : 'Total Visits'}
+            label={t('total_visits')}
             value={totals.visits}
-            subValue={`${totals.completed} ${isAr ? 'مكتمل' : 'completed'}`}
+            subValue={`${totals.completed} ${t('completed_visits')}`}
             color="from-emerald-500 to-amber-400"
           />
           <StatCard
             icon="fa-solid fa-money-bill-wave"
-            label={isAr ? 'إجمالي الإيرادات' : 'Total Revenue'}
+            label={t('total_revenue_label')}
             value={formatCurrency(totals.revenue)}
-            subValue={`${formatCurrency(totals.paid)} ${isAr ? 'مقبوض' : 'paid'}`}
+            subValue={`${formatCurrency(totals.paid)} ${t('paid_amount')}`}
             color="from-amber-500 to-yellow-400"
           />
           <StatCard
             icon="fa-regular fa-calendar-check"
-            label={isAr ? 'المواعيد' : 'Appointments'}
+            label={t('appointments_label')}
             value={totals.appointments}
             color="from-purple-500 to-pink-400"
           />
@@ -368,7 +360,7 @@ const ClinicHistoryView: React.FC = () => {
         {filteredStats.length === 0 ? (
           <div className="text-center py-16 text-slate-400 dark:text-slate-500">
             <i className="fa-solid fa-chart-bar text-5xl mb-4 block"></i>
-            <p className="font-semibold">{isAr ? 'لا توجد بيانات للفترة المحددة' : 'No data for the selected period'}</p>
+            <p className="font-semibold">{t('no_data_period')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -386,7 +378,7 @@ const ClinicHistoryView: React.FC = () => {
                     <div className={`text-${isAr ? 'right' : 'left'}`}>
                       <h3 className="font-bold text-lg text-slate-800 dark:text-white">{stats.clinicName}</h3>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {stats.totalPatients} {isAr ? 'مريض' : 'patients'} • {stats.totalVisits} {isAr ? 'زيارة' : 'visits'} • {formatCurrency(stats.totalRevenue)}
+                        {stats.totalPatients} {t('patients_label')} • {stats.totalVisits} {t('visits_count')} • {formatCurrency(stats.totalRevenue)}
                       </p>
                     </div>
                   </div>
@@ -396,13 +388,13 @@ const ClinicHistoryView: React.FC = () => {
                     {stats.waitingNow > 0 && (
                       <span className="hidden md:flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full text-xs font-bold">
                         <i className="fa-solid fa-clock"></i>
-                        {stats.waitingNow} {isAr ? 'منتظر' : 'waiting'}
+                        {stats.waitingNow} {t('waiting_status')}
                       </span>
                     )}
                     {stats.inProgressNow > 0 && (
                       <span className="hidden md:flex items-center gap-1 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
                         <i className="fa-solid fa-user-doctor"></i>
-                        {stats.inProgressNow} {isAr ? 'جاري' : 'in progress'}
+                        {stats.inProgressNow} {t('in_progress_status')}
                       </span>
                     )}
                     <i className={`fa-solid fa-chevron-${expandedClinic === stats.clinicId ? 'up' : 'down'} text-slate-400 transition-transform`}></i>
@@ -414,38 +406,38 @@ const ClinicHistoryView: React.FC = () => {
                   <div className="border-t border-slate-100 dark:border-slate-700">
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-100 dark:bg-slate-700">
-                      <MiniStat icon="fa-solid fa-user-group" label={isAr ? 'مرضى' : 'Patients'} value={stats.totalPatients} />
-                      <MiniStat icon="fa-solid fa-clipboard-check" label={isAr ? 'زيارات مكتملة' : 'Completed'} value={stats.completedVisits} />
-                      <MiniStat icon="fa-solid fa-coins" label={isAr ? 'مقبوض' : 'Paid'} value={formatCurrency(stats.paidRevenue)} />
-                      <MiniStat icon="fa-solid fa-hand-holding-dollar" label={isAr ? 'غير مقبوض' : 'Unpaid'} value={formatCurrency(stats.unpaidRevenue)} />
-                      <MiniStat icon="fa-regular fa-calendar" label={isAr ? 'مواعيد' : 'Appointments'} value={stats.totalAppointments} />
-                      <MiniStat icon="fa-solid fa-calendar-xmark" label={isAr ? 'ملغي' : 'Cancelled'} value={stats.cancelledAppointments} />
-                      <MiniStat icon="fa-solid fa-user-slash" label={isAr ? 'لم يحضر' : 'No-Show'} value={stats.noShowAppointments} />
-                      <MiniStat icon="fa-solid fa-money-bill-trend-up" label={isAr ? 'إجمالي الإيرادات' : 'Revenue'} value={formatCurrency(stats.totalRevenue)} highlight />
+                      <MiniStat icon="fa-solid fa-user-group" label={t('patients_stat')} value={stats.totalPatients} />
+                      <MiniStat icon="fa-solid fa-clipboard-check" label={t('completed_stat')} value={stats.completedVisits} />
+                      <MiniStat icon="fa-solid fa-coins" label={t('paid_stat')} value={formatCurrency(stats.paidRevenue)} />
+                      <MiniStat icon="fa-solid fa-hand-holding-dollar" label={t('unpaid_stat')} value={formatCurrency(stats.unpaidRevenue)} />
+                      <MiniStat icon="fa-regular fa-calendar" label={t('appointments_stat')} value={stats.totalAppointments} />
+                      <MiniStat icon="fa-solid fa-calendar-xmark" label={t('cancelled_stat')} value={stats.cancelledAppointments} />
+                      <MiniStat icon="fa-solid fa-user-slash" label={t('no_show_stat')} value={stats.noShowAppointments} />
+                      <MiniStat icon="fa-solid fa-money-bill-trend-up" label={t('revenue_stat')} value={formatCurrency(stats.totalRevenue)} highlight />
                     </div>
 
                     {/* Visits Table */}
                     <div className="p-4">
                       <h4 className="font-bold text-sm text-slate-600 dark:text-slate-300 mb-3 flex items-center gap-2">
                         <i className="fa-solid fa-list-ul text-primary"></i>
-                        {isAr ? 'سجل الزيارات' : 'Visit Log'}
+                        {t('visit_log')}
                         <span className="text-xs text-slate-400 font-normal">({stats.visits.length})</span>
                       </h4>
 
                       {stats.visits.length === 0 ? (
-                        <p className="text-center py-8 text-slate-400 text-sm">{isAr ? 'لا توجد زيارات' : 'No visits found'}</p>
+                        <p className="text-center py-8 text-slate-400 text-sm">{t('no_visits')}</p>
                       ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="text-xs uppercase text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700">
-                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{isAr ? 'المريض' : 'Patient'}</th>
-                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{isAr ? 'الهاتف' : 'Phone'}</th>
-                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{isAr ? 'التاريخ' : 'Date'}</th>
-                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{isAr ? 'السبب' : 'Reason'}</th>
-                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{isAr ? 'التشخيص' : 'Diagnosis'}</th>
-                                <th className={`py-2 px-3 text-center font-bold`}>{isAr ? 'الحالة' : 'Status'}</th>
-                                <th className={`py-2 px-3 text-${isAr ? 'left' : 'right'} font-bold`}>{isAr ? 'المبلغ' : 'Amount'}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{t('patient_col')}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{t('phone_col')}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{t('date_col')}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{t('reason_col')}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'right' : 'left'} font-bold`}>{t('diagnosis_col')}</th>
+                                <th className={`py-2 px-3 text-center font-bold`}>{t('status_col')}</th>
+                                <th className={`py-2 px-3 text-${isAr ? 'left' : 'right'} font-bold`}>{t('amount_col')}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -476,7 +468,7 @@ const ClinicHistoryView: React.FC = () => {
                           </table>
                           {stats.visits.length > 50 && (
                             <p className="text-center py-3 text-xs text-slate-400">
-                              {isAr ? `يتم عرض أول 50 من ${stats.visits.length} زيارة` : `Showing first 50 of ${stats.visits.length} visits`}
+                              {t('showing_first_50_visits').replace('{count}', String(stats.visits.length))}
                             </p>
                           )}
                         </div>

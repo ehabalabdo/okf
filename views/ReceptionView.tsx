@@ -168,22 +168,21 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         // Build client-specific login URL
         const clientSlug = client?.slug || localStorage.getItem('currentClientSlug') || '';
         const loginUrl = clientSlug ? `https://okf-nine.vercel.app/${clientSlug}` : 'https://okf-nine.vercel.app';
-        const clinicName = client?.name || 'العيادة';
+        const clinicName = client?.name || t('rcpt_clinic_fallback');
         
-        // Prepare message in Arabic
         const message = [
-          `مرحبا ${name}`,
+          `${t('rcpt_whatsapp_greeting')} ${name}`,
           '',
-          `تم تسجيلك في نظام ${clinicName}`,
+          `${t('rcpt_whatsapp_registered')} ${clinicName}`,
           '',
-          'بيانات الدخول:',
-          `اسم المستخدم: ${phone}`,
-          `كلمة المرور: ${password}`,
+          t('rcpt_whatsapp_login_data'),
+          `${t('rcpt_whatsapp_username')}: ${phone}`,
+          `${t('rcpt_whatsapp_password')}: ${password}`,
           '',
-          'رابط الدخول:',
+          t('rcpt_whatsapp_login_link'),
           loginUrl,
           '',
-          'احتفظ بهذه المعلومات بشكل آمن'
+          t('rcpt_whatsapp_keep_safe')
         ].join('\n');
         
         const encodedMessage = encodeURIComponent(message);
@@ -247,11 +246,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
 
             // Navigate to ENT New Patient Questionnaire with patient pre-selected
             const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
-            if (confirm('✅ تمت إضافة المريض بنجاح!\n\nهل تريد تعبئة استبيان المريض الجديد (ENT) الآن؟')) {
+            if (confirm('✅ ' + t('patient_added_success') + '\n\n' + t('fill_ent_questionnaire'))) {
                 window.location.href = `/${slug}/ent/new-patient?patientId=${patientId}`;
             }
         } catch (e: any) {
-            alert("Error: " + (e.message || 'فشل إضافة المريض'));
+            alert(t('error_prefix') + (e.message || t('add_patient_failed')));
         }
     };
 
@@ -274,7 +273,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
               const patientPay = parseFloat(insurancePatientAmount) || 0;
               const insurancePay = parseFloat(insuranceCompanyAmount) || 0;
               if (patientPay + insurancePay !== selectedInvoice.totalAmount) {
-                  alert('مجموع حصة المريض وحصة التأمين لازم يساوي المبلغ الكلي');
+                  alert(t('payment_split_error'));
                   return;
               }
               await BillingService.processPayment(user, selectedInvoice.id, patientPay + insurancePay, paymentMethod);
@@ -288,7 +287,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
           setInsuranceCompanyAmount('');
           await loadData();
       } catch (e: any) {
-          alert(e.message || 'خطأ في معالجة الدفع');
+          alert(e.message || t('payment_error'));
       }
   };
 
@@ -297,7 +296,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
       if (!selectedInvoice) return;
       
       // Use client (clinic) data — each clinic gets their own name/logo/address
-      const clinicName = client?.name || 'العيادة';
+      const clinicName = client?.name || t('rcpt_clinic_fallback');
       const clinicLogo = client?.logoUrl || '';
       const clinicAddress = client?.address || '';
       const invoiceDate = fmtDate(selectedInvoice.createdAt);
@@ -305,15 +304,15 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
       const itemsHtml = selectedInvoice.items.map(item => `
         <tr>
           <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155">${item.description}</td>
-          <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#334155;text-align:left;white-space:nowrap">${item.price.toFixed(2)} د.أ</td>
+          <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#334155;text-align:left;white-space:nowrap">${item.price.toFixed(2)} ${t('rcpt_currency')}</td>
         </tr>
       `).join('');
 
       const printHtml = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="${language}" dir="${language === 'ar' ? 'rtl' : 'ltr'}">
 <head>
   <meta charset="UTF-8"/>
-  <title>فاتورة - ${selectedInvoice.id.slice(-8)}</title>
+  <title>${t('rcpt_invoice_title')} - ${selectedInvoice.id.slice(-8)}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -349,33 +348,33 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
       ${clinicAddress ? `<div class="clinic-addr">${clinicAddress}</div>` : ''}
     </div>
     <div>
-      <div class="invoice-title">فاتورة</div>
+      <div class="invoice-title">${t('rcpt_invoice_title')}</div>
       <div class="invoice-id">#${selectedInvoice.id.slice(-8)}</div>
     </div>
   </div>
 
   <div class="info-row">
     <div>
-      <div class="info-label">اسم المريض</div>
+      <div class="info-label">${t('rcpt_patient_name')}</div>
       <div class="info-value">${selectedInvoice.patientName}</div>
     </div>
     <div class="info-right">
-      <div class="info-label">التاريخ</div>
+      <div class="info-label">${t('rcpt_date')}</div>
       <div class="info-value">${invoiceDate}</div>
     </div>
   </div>
 
   <table>
-    <thead><tr><th>الوصف</th><th>المبلغ</th></tr></thead>
+    <thead><tr><th>${t('rcpt_description')}</th><th>${t('rcpt_amount')}</th></tr></thead>
     <tbody>${itemsHtml}</tbody>
   </table>
 
   <div class="total-bar">
-    <div class="total-label">الإجمالي</div>
-    <div class="total-amount">${selectedInvoice.totalAmount.toFixed(2)} د.أ</div>
+    <div class="total-label">${t('rcpt_total')}</div>
+    <div class="total-amount">${selectedInvoice.totalAmount.toFixed(2)} ${t('rcpt_currency')}</div>
   </div>
 
-  <div class="footer">شكراً لاختياركم ${clinicName}</div>
+  <div class="footer">${t('rcpt_thank_you')} ${clinicName}</div>
 
   <script>
     window.onload = function() {
@@ -390,7 +389,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
           printWindow.document.write(printHtml);
           printWindow.document.close();
       } else {
-          alert('يرجى السماح بالنوافذ المنبثقة لطباعة الفاتورة');
+          alert(t('allow_popups'));
       }
   };
 
@@ -427,11 +426,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         {/* NOTIFICATIONS & BILLING BAR */}
         <div className="flex justify-end gap-4 mb-2">
             <button onClick={() => setShowBillingModal(true)} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 relative">
-                <i className="fa-solid fa-cash-register"></i> Billing
+                <i className="fa-solid fa-cash-register"></i> {t('billing')}
                 {invoices.length > 0 && <span className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] absolute -top-2 -right-2">{invoices.length}</span>}
             </button>
             <button onClick={() => setShowNotifPanel(!showNotifPanel)} className="bg-white text-slate-600 border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 flex items-center gap-2 relative">
-                <i className="fa-solid fa-bell"></i> Alerts
+                <i className="fa-solid fa-bell"></i> {t('alerts')}
                 {notifications.length > 0 && <span className="w-2 h-2 bg-red-500 rounded-full absolute top-2 right-3 animate-ping"></span>}
             </button>
         </div>
@@ -439,9 +438,9 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         {/* NOTIFICATION PANEL */}
         {showNotifPanel && (
             <div className="absolute top-12 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden animate-fade-in-down">
-                <div className="p-4 bg-slate-50 border-b border-slate-100 font-bold text-sm text-slate-700">Pending Reminders</div>
+                <div className="p-4 bg-slate-50 border-b border-slate-100 font-bold text-sm text-slate-700">{t('pending_reminders')}</div>
                 <div className="max-h-64 overflow-y-auto">
-                    {notifications.length === 0 ? <div className="p-6 text-center text-xs text-slate-400">No new alerts</div> : (
+                    {notifications.length === 0 ? <div className="p-6 text-center text-xs text-slate-400">{t('no_new_alerts')}</div> : (
                         notifications.map(n => (
                             <div key={n.id} className="p-4 border-b border-slate-50 hover:bg-amber-50 transition-colors cursor-pointer" onClick={() => { NotificationService.markAsRead(user!, n.id); loadData(); }}>
                                 <div className="flex justify-between mb-1">
@@ -461,7 +460,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-fade-in-up">
                     <div className="p-6 bg-slate-800 text-white flex justify-between items-center">
-                        <h3 className="font-bold">Pending Invoices</h3>
+                        <h3 className="font-bold">{t('pending_invoices')}</h3>
                         <button onClick={() => { setShowBillingModal(false); setSelectedInvoice(null); }}><i className="fa-solid fa-xmark"></i></button>
                     </div>
                     <div className="p-6">
@@ -478,15 +477,15 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                         {selectedInvoice.items.map((item, idx) => (
                                             <div key={idx} className="flex justify-between text-sm text-slate-600 border-b border-slate-200 pb-1 last:border-0 last:pb-0">
                                                 <span>{item.description}</span>
-                                                <span className="font-mono font-bold">{item.price} د.أ</span>
+                                                <span className="font-mono font-bold">{item.price} {t('rcpt_currency')}</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="text-sm text-slate-400 uppercase">Total Due</div>
-                                    <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount} د.أ</div>
+                                    <div className="text-sm text-slate-400 uppercase">{t('total_due')}</div>
+                                    <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount} {t('rcpt_currency')}</div>
                                 </div>
                                 <div className="flex gap-2 mb-3">
-                                    {([['cash', 'fa-money-bill-wave', 'كاش'], ['card', 'fa-credit-card', 'بطاقة'], ['insurance', 'fa-shield-heart', 'تأمين']] as const).map(([method, icon, label]) => (
+                                    {([['cash', 'fa-money-bill-wave', t('cash')], ['card', 'fa-credit-card', t('card')], ['insurance', 'fa-shield-heart', t('insurance')]] as const).map(([method, icon, label]) => (
                                         <button key={method} onClick={() => setPaymentMethod(method)} className={`flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all border-2 ${
                                             paymentMethod === method
                                                 ? 'bg-primary text-white border-primary shadow-lg scale-105'
@@ -499,11 +498,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                 {paymentMethod === 'insurance' && (
                                     <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 space-y-3 mb-3">
                                         <div className="text-sm font-bold text-blue-700 text-center mb-2">
-                                            <i className="fa-solid fa-shield-heart ml-1"></i> توزيع المبلغ
+                                            <i className="fa-solid fa-shield-heart ml-1"></i> {t('amount_distribution')}
                                         </div>
                                         <div className="flex gap-3">
                                             <div className="flex-1">
-                                                <label className="block text-xs font-bold text-slate-600 mb-1">حصة المريض (د.أ)</label>
+                                                <label className="block text-xs font-bold text-slate-600 mb-1">{t('patient_share')}</label>
                                                 <input
                                                     type="number"
                                                     min="0"
@@ -519,7 +518,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <label className="block text-xs font-bold text-slate-600 mb-1">حصة التأمين (د.أ)</label>
+                                                <label className="block text-xs font-bold text-slate-600 mb-1">{t('insurance_share')}</label>
                                                 <input
                                                     type="number"
                                                     min="0"
@@ -536,20 +535,20 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                             </div>
                                         </div>
                                         <div className="text-center text-xs text-slate-500">
-                                            المجموع: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === selectedInvoice.totalAmount ? 'text-emerald-600' : 'text-red-500'}`}>
+                                            {t('total_label')}: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === selectedInvoice.totalAmount ? 'text-emerald-600' : 'text-red-500'}`}>
                                                 {((parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0)).toFixed(2)}
-                                            </span> / {selectedInvoice.totalAmount.toFixed(2)} د.أ
+                                            </span> / {selectedInvoice.totalAmount.toFixed(2)} {t('rcpt_currency')}
                                         </div>
                                     </div>
                                 )}
                                 <button onClick={() => handlePayInvoice(selectedInvoice.totalAmount)} className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-lg">
-                                    <i className="fa-solid fa-check-circle mr-2"></i> تأكيد الدفع
+                                    <i className="fa-solid fa-check-circle mr-2"></i> {t('confirm_payment')}
                                 </button>
-                                <button onClick={() => setSelectedInvoice(null)} className="w-full text-slate-400 text-sm hover:text-slate-600">Back to list</button>
+                                <button onClick={() => setSelectedInvoice(null)} className="w-full text-slate-400 text-sm hover:text-slate-600">{t('back_to_list')}</button>
                             </div>
                         ) : (
                             <div className="space-y-2 max-h-80 overflow-y-auto">
-                                {invoices.length === 0 ? <div className="text-center py-10 text-slate-400">No pending invoices.</div> : invoices.map(inv => (
+                                {invoices.length === 0 ? <div className="text-center py-10 text-slate-400">{t('no_pending_invoices')}</div> : invoices.map(inv => (
                                     <div key={inv.id}
                                         className="flex justify-between items-center p-4 border border-slate-100 rounded-xl hover:border-primary cursor-pointer transition-colors select-none"
                                         onClick={() => setSelectedInvoice(inv)}
@@ -558,7 +557,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                             <div className="font-bold text-slate-800">{inv.patientName}</div>
                                             <div className="text-xs text-slate-500">{fmtDate(inv.createdAt)} • {inv.items.length} items</div>
                                         </div>
-                                        <div className="font-bold text-lg text-emerald-600">{inv.totalAmount} د.أ</div>
+                                        <div className="font-bold text-lg text-emerald-600">{inv.totalAmount} {t('rcpt_currency')}</div>
                                     </div>
                                 ))}
                             </div>
@@ -675,7 +674,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                             <div className="text-amber-400 text-2xl"><i className="fa-solid fa-users-viewfinder"></i></div>
                             <div className="flex flex-col items-start leading-none">
                                 <span className="font-mono text-white text-2xl font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">{String(activeQueue.length).padStart(2, '0')}</span>
-                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">Waiting</span>
+                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">{t('waiting_label')}</span>
                             </div>
                          </div>
                          
@@ -686,7 +685,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                             <div className="text-amber-400 text-2xl"><i className="fa-solid fa-network-wired"></i></div>
                             <div className="flex flex-col items-start leading-none">
                                 <span className="font-mono text-white text-2xl font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">{String(clinics.length).padStart(2, '0')}</span>
-                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">Clinics</span>
+                                <span className="text-[10px] font-mono text-amber-500/70 uppercase tracking-widest mt-1">{t('clinics_label')}</span>
                             </div>
                          </div>
                      </div>
@@ -706,7 +705,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center transition-all shadow-lg ${isFormOpen ? 'bg-primary text-white scale-105' : 'bg-primary/10 text-primary'}`}><i className="fa-solid fa-file-pen text-base md:text-xl"></i></div>
                    <div className="text-left rtl:text-right">
                        <h2 className="font-bold text-slate-800 text-lg md:text-xl">{t('new_patient')}</h2>
-                       <p className="text-[10px] md:text-sm text-slate-400">{isFormOpen ? 'Fill intake' : 'Click to register arrival'}</p>
+                       <p className="text-[10px] md:text-sm text-slate-400">{isFormOpen ? t('fill_intake') : t('click_register')}</p>
                    </div>
                 </div>
                 <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full border border-gray-100 flex items-center justify-center text-slate-400 transition-transform duration-300 ${isFormOpen ? 'rotate-180 bg-slate-200' : ''}`}><i className="fa-solid fa-chevron-down"></i></div>
@@ -726,7 +725,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                             <input type="tel" placeholder={t('phone')} className="input-modern" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
                             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
                                <i className="fa-solid fa-info-circle mr-2"></i>
-                               <strong>ملاحظة:</strong> رقم الهاتف سيكون اسم المستخدم، وكلمة المرور ستُولّد تلقائياً
+                               <strong>{t('phone_note').split(':')[0]}:</strong> {t('phone_note').split(':').slice(1).join(':')}
                             </div>
                          </div>
                          <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
@@ -789,12 +788,12 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
             <div className="p-5 md:p-6 border-b border-gray-100 bg-amber-50/30">
                 <div className="flex items-center gap-3 mb-4">
                     <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-stethoscope"></i></div>
-                    <div><h2 className="font-bold text-slate-800 leading-tight">نماذج الأنف والأذن والحنجرة</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">ENT Medical Forms</p></div>
+                    <div><h2 className="font-bold text-slate-800 leading-tight">{t('ent_forms_title')}</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('ent_forms_subtitle')}</p></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     {[
-                        { path: 'ent/new-patient', icon: 'fa-file-medical', label: 'استبيان مريض جديد', color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
-                        { path: 'ent/follow-up', icon: 'fa-file-lines', label: 'متابعة مريض', color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
+                        { path: 'ent/new-patient', icon: 'fa-file-medical', label: t('new_patient_questionnaire'), color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
+                        { path: 'ent/follow-up', icon: 'fa-file-lines', label: t('follow_up_patient'), color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
                     ].map(item => {
                         const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
                         return (
@@ -817,7 +816,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                 <div className="p-5 md:p-6 border-b border-gray-100 flex justify-between items-center bg-emerald-50/20">
                     <div className="flex items-center gap-3">
                         <div className="bg-emerald-100 text-emerald-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-solid fa-people-group"></i></div>
-                        <div><h2 className="font-bold text-slate-800 leading-tight">{t('todays_queue')}</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">Currently Waiting in Clinics</p></div>
+                        <div><h2 className="font-bold text-slate-800 leading-tight">{t('todays_queue')}</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('currently_waiting')}</p></div>
                     </div>
                     <div className="flex items-center gap-4">
                         <button onClick={openQueueWindow} className="hidden sm:block text-[11px] font-bold text-emerald-600 bg-emerald-100/50 px-4 py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all uppercase"><i className="fa-solid fa-desktop mr-1"></i> {t('open_queue_screen')}</button>
@@ -858,13 +857,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                 <div className="p-5 md:p-6 border-b border-gray-100 flex justify-between items-center bg-amber-50/20">
                     <div className="flex items-center gap-3">
                         <div className="bg-amber-100 text-amber-600 w-10 h-10 rounded-xl flex items-center justify-center"><i className="fa-regular fa-calendar-check"></i></div>
-                        <div><h2 className="font-bold text-slate-800 leading-tight">Scheduled Today</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">Appointments & Classes</p></div>
+                        <div><h2 className="font-bold text-slate-800 leading-tight">{t('scheduled_today')}</h2><p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('appointments_classes')}</p></div>
                     </div>
                     <span className="bg-amber-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">{todaysAppointments.length}</span>
                 </div>
                 <div className="p-4 md:p-6 overflow-auto max-h-[500px]">
                     {todaysAppointments.length === 0 ? (
-                        <div className="text-center py-20 text-slate-300 flex flex-col items-center opacity-40"><i className="fa-solid fa-calendar-day text-5xl mb-4"></i><span className="font-bold uppercase text-[12px] tracking-widest">No remaining schedule for today</span></div>
+                        <div className="text-center py-20 text-slate-300 flex flex-col items-center opacity-40"><i className="fa-solid fa-calendar-day text-5xl mb-4"></i><span className="font-bold uppercase text-[12px] tracking-widest">{t('no_schedule_today')}</span></div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             {todaysAppointments.map(app => (

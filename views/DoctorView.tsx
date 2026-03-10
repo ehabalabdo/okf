@@ -161,8 +161,8 @@ const DoctorView: React.FC = () => {
         
         // Visual notification
         if (Notification.permission === 'granted') {
-          new Notification('مريض جديد في الانتظار', {
-            body: `عدد المرضى المنتظرين: ${waitingCount}`,
+          new Notification(t('new_patient_waiting'), {
+            body: `${t('waiting_patients_count')}: ${waitingCount}`,
             icon: '/favicon.ico'
           });
         }
@@ -550,14 +550,14 @@ const DoctorView: React.FC = () => {
   );
 
   const tabs: { key: SoapTab; label: string; icon: string; color: string }[] = [
-    { key: 'ent-forms', label: 'ENT Forms', icon: 'fa-stethoscope', color: 'bg-amber-600' },
-    { key: 'chief', label: 'Chief Complaint', icon: 'fa-comment-medical', color: 'bg-slate-800' },
-    { key: 'history', label: 'History', icon: 'fa-clock-rotate-left', color: 'bg-amber-600' },
-    { key: 'exam', label: 'Examination', icon: 'fa-stethoscope', color: 'bg-amber-600' },
-    { key: 'assessment', label: 'Assessment', icon: 'fa-diagnoses', color: 'bg-purple-600' },
-    { key: 'plan', label: 'Plan & Orders', icon: 'fa-clipboard-list', color: 'bg-amber-600' },
-    { key: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
-    { key: 'devices', label: 'Devices', icon: 'fa-microchip', color: 'bg-violet-600' },
+    { key: 'ent-forms', label: t('ent_forms_tab'), icon: 'fa-stethoscope', color: 'bg-amber-600' },
+    { key: 'chief', label: t('chief_complaint'), icon: 'fa-comment-medical', color: 'bg-slate-800' },
+    { key: 'history', label: t('history'), icon: 'fa-clock-rotate-left', color: 'bg-amber-600' },
+    { key: 'exam', label: t('examination'), icon: 'fa-stethoscope', color: 'bg-amber-600' },
+    { key: 'assessment', label: t('assessment'), icon: 'fa-diagnoses', color: 'bg-purple-600' },
+    { key: 'plan', label: t('plan_orders'), icon: 'fa-clipboard-list', color: 'bg-amber-600' },
+    { key: 'billing', label: t('billing_tab'), icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
+    { key: 'devices', label: t('devices_tab'), icon: 'fa-microchip', color: 'bg-violet-600' },
   ];
 
   return (
@@ -587,7 +587,7 @@ const DoctorView: React.FC = () => {
                             {waitingList.filter(p => p.currentVisit.status === 'waiting').length}
                           </span>
                           <span className="text-amber-600 text-[10px]">
-                            {language === 'ar' ? 'بالانتظار' : 'waiting'}
+                            {t('waiting_label')}
                           </span>
                         </div>
                       )}
@@ -708,8 +708,8 @@ const DoctorView: React.FC = () => {
                          <div className="w-24 h-24 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-5xl mb-6 shadow-xl animate-bounce">
                              <i className="fa-solid fa-user-clock"></i>
                          </div>
-                         <h2 className="text-3xl font-extrabold text-slate-800 mb-2">Patient is Waiting</h2>
-                         <p className="text-slate-500 max-w-md mb-8">Review the profile if needed. Click the button below to start the session and unlock the medical record forms.</p>
+                         <h2 className="text-3xl font-extrabold text-slate-800 mb-2">{t('patient_is_waiting')}</h2>
+                         <p className="text-slate-500 max-w-md mb-8">{t('review_profile_msg')}</p>
                          <button 
                              onClick={() => handleSaveVisit('in-progress')}
                              className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-primary shadow-2xl hover:scale-105 transition-all flex items-center gap-3"
@@ -725,13 +725,13 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'chief' && (
                       <div className="space-y-4 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-comment-medical text-slate-500"></i> Chief Complaint
+                          <i className="fa-solid fa-comment-medical text-slate-500"></i> {t('chief_complaint')}
                         </h3>
                         <input
                           type="text"
                           maxLength={255}
                           className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-primary transition-all font-medium text-slate-800 text-lg"
-                          placeholder="What brings the patient in today? (e.g. Chest pain for 3 days)"
+                          placeholder={t('chief_complaint_placeholder')}
                           value={chiefComplaint}
                           onChange={e => setChiefComplaint(e.target.value)}
                         />
@@ -739,30 +739,30 @@ const DoctorView: React.FC = () => {
 
                         {/* Quick medical profile preview */}
                         <div className="mt-6 bg-amber-50 rounded-xl border border-amber-100 p-4">
-                          <h4 className="text-xs font-bold text-amber-800 mb-3 uppercase"><i className="fa-solid fa-notes-medical mr-1"></i> Patient Medical Profile (from Registration)</h4>
+                          <h4 className="text-xs font-bold text-amber-800 mb-3 uppercase"><i className="fa-solid fa-notes-medical mr-1"></i> {t('patient_medical_profile')}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                             <div className="bg-white p-2 rounded-lg">
-                              <span className="font-bold text-slate-600">Allergies: </span>
+                              <span className="font-bold text-slate-600">{t('allergies_profile')}: </span>
                               <span className={selectedPatient.medicalProfile.allergies.exists ? 'text-red-600 font-bold' : 'text-slate-400'}>
-                                {selectedPatient.medicalProfile.allergies.exists ? selectedPatient.medicalProfile.allergies.details : 'NKDA'}
+                                {selectedPatient.medicalProfile.allergies.exists ? selectedPatient.medicalProfile.allergies.details : t('nkda')}
                               </span>
                             </div>
                             <div className="bg-white p-2 rounded-lg">
-                              <span className="font-bold text-slate-600">Chronic: </span>
+                              <span className="font-bold text-slate-600">{t('chronic_profile')}: </span>
                               <span className={selectedPatient.medicalProfile.chronicConditions.exists ? 'text-orange-600 font-bold' : 'text-slate-400'}>
-                                {selectedPatient.medicalProfile.chronicConditions.exists ? selectedPatient.medicalProfile.chronicConditions.details : 'None'}
+                                {selectedPatient.medicalProfile.chronicConditions.exists ? selectedPatient.medicalProfile.chronicConditions.details : t('none_label')}
                               </span>
                             </div>
                             <div className="bg-white p-2 rounded-lg">
-                              <span className="font-bold text-slate-600">Medications: </span>
+                              <span className="font-bold text-slate-600">{t('medications_profile')}: </span>
                               <span className={selectedPatient.medicalProfile.currentMedications.exists ? 'text-amber-600' : 'text-slate-400'}>
-                                {selectedPatient.medicalProfile.currentMedications.exists ? selectedPatient.medicalProfile.currentMedications.details : 'None'}
+                                {selectedPatient.medicalProfile.currentMedications.exists ? selectedPatient.medicalProfile.currentMedications.details : t('none_label')}
                               </span>
                             </div>
                             <div className="bg-white p-2 rounded-lg">
-                              <span className="font-bold text-slate-600">Surgeries: </span>
+                              <span className="font-bold text-slate-600">{t('surgeries_profile')}: </span>
                               <span className="text-slate-400">
-                                {selectedPatient.medicalProfile.previousSurgeries?.exists ? selectedPatient.medicalProfile.previousSurgeries.details : 'None'}
+                                {selectedPatient.medicalProfile.previousSurgeries?.exists ? selectedPatient.medicalProfile.previousSurgeries.details : t('none_label')}
                               </span>
                             </div>
                           </div>
@@ -774,17 +774,17 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'history' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-clock-rotate-left text-amber-500"></i> Medical History
+                          <i className="fa-solid fa-clock-rotate-left text-amber-500"></i> {t('medical_history_heading')}
                         </h3>
                         
                         {[
-                          { label: 'History of Present Illness (HPI)', value: presentIllness, setter: setPresentIllness, placeholder: 'Describe onset, duration, severity, associated symptoms...' },
-                          { label: 'Past Medical History', value: pastMedicalHistory, setter: setPastMedicalHistory, placeholder: 'Previous medical conditions, hospitalizations...' },
-                          { label: 'Surgical History', value: surgicalHistory, setter: setSurgicalHistory, placeholder: 'Previous surgeries with dates...' },
-                          { label: 'Current Medications', value: currentMedications, setter: setCurrentMedications, placeholder: 'List current medications with doses...' },
-                          { label: 'Allergies', value: allergiesText, setter: setAllergiesText, placeholder: 'Drug allergies, food allergies, environmental...' },
-                          { label: 'Family History', value: familyHistory, setter: setFamilyHistory, placeholder: 'Relevant family medical history...' },
-                          { label: 'Social History', value: socialHistory, setter: setSocialHistory, placeholder: 'Smoking, alcohol, occupation, living situation...' },
+                          { label: t('history_hpi'), value: presentIllness, setter: setPresentIllness, placeholder: t('history_hpi_placeholder') },
+                          { label: t('past_medical_history'), value: pastMedicalHistory, setter: setPastMedicalHistory, placeholder: t('past_medical_placeholder') },
+                          { label: t('surgical_history'), value: surgicalHistory, setter: setSurgicalHistory, placeholder: t('surgical_placeholder') },
+                          { label: t('current_medications_label'), value: currentMedications, setter: setCurrentMedications, placeholder: t('medications_placeholder') },
+                          { label: t('allergies_label'), value: allergiesText, setter: setAllergiesText, placeholder: t('allergies_placeholder') },
+                          { label: t('family_history'), value: familyHistory, setter: setFamilyHistory, placeholder: t('family_placeholder') },
+                          { label: t('social_history'), value: socialHistory, setter: setSocialHistory, placeholder: t('social_placeholder') },
                         ].map(field => (
                           <div key={field.label}>
                             <label className="text-xs font-bold text-slate-600 mb-1 block">{field.label}</label>
@@ -803,44 +803,44 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'exam' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-stethoscope text-amber-500"></i> Examination
+                          <i className="fa-solid fa-stethoscope text-amber-500"></i> {t('examination')}
                         </h3>
 
                         <div>
-                          <label className="text-xs font-bold text-slate-600 mb-1 block">General Examination</label>
-                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-amber-400 transition-all text-sm resize-none" placeholder="General appearance, consciousness, orientation..." value={generalExamination} onChange={e => setGeneralExamination(e.target.value)} />
+                          <label className="text-xs font-bold text-slate-600 mb-1 block">{t('general_examination')}</label>
+                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-amber-400 transition-all text-sm resize-none" placeholder={t('general_exam_placeholder')} value={generalExamination} onChange={e => setGeneralExamination(e.target.value)} />
                         </div>
 
                         {/* Vital Signs */}
                         <div className="bg-amber-50 rounded-xl border border-amber-100 p-4">
-                          <h4 className="text-xs font-bold text-amber-800 mb-3 uppercase"><i className="fa-solid fa-heart-pulse mr-1"></i> Vital Signs</h4>
+                          <h4 className="text-xs font-bold text-amber-800 mb-3 uppercase"><i className="fa-solid fa-heart-pulse mr-1"></i> {t('vital_signs_heading')}</h4>
                           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 block mb-1">Blood Pressure</label>
+                              <label className="text-[10px] font-bold text-slate-500 block mb-1">{t('blood_pressure')}</label>
                               <input type="text" className="w-full p-2 rounded-lg border text-sm bg-white text-center font-bold" placeholder="120/80" value={vitalSigns.bloodPressure || ''} onChange={e => setVitalSigns({...vitalSigns, bloodPressure: e.target.value})} />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 block mb-1">Pulse (bpm)</label>
+                              <label className="text-[10px] font-bold text-slate-500 block mb-1">{t('pulse_bpm')}</label>
                               <input type="number" className="w-full p-2 rounded-lg border text-sm bg-white text-center font-bold" placeholder="72" value={vitalSigns.pulse || ''} onChange={e => setVitalSigns({...vitalSigns, pulse: parseInt(e.target.value) || undefined})} />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 block mb-1">Temp (°C)</label>
+                              <label className="text-[10px] font-bold text-slate-500 block mb-1">{t('temp_c')}</label>
                               <input type="number" step="0.1" className="w-full p-2 rounded-lg border text-sm bg-white text-center font-bold" placeholder="37.0" value={vitalSigns.temperature || ''} onChange={e => setVitalSigns({...vitalSigns, temperature: parseFloat(e.target.value) || undefined})} />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 block mb-1">RR (/min)</label>
+                              <label className="text-[10px] font-bold text-slate-500 block mb-1">{t('rr_min')}</label>
                               <input type="number" className="w-full p-2 rounded-lg border text-sm bg-white text-center font-bold" placeholder="16" value={vitalSigns.respiratoryRate || ''} onChange={e => setVitalSigns({...vitalSigns, respiratoryRate: parseInt(e.target.value) || undefined})} />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-500 block mb-1">SpO2 (%)</label>
+                              <label className="text-[10px] font-bold text-slate-500 block mb-1">{t('spo2_pct')}</label>
                               <input type="number" className="w-full p-2 rounded-lg border text-sm bg-white text-center font-bold" placeholder="98" value={vitalSigns.oxygenSaturation || ''} onChange={e => setVitalSigns({...vitalSigns, oxygenSaturation: parseInt(e.target.value) || undefined})} />
                             </div>
                           </div>
                         </div>
 
                         <div>
-                          <label className="text-xs font-bold text-slate-600 mb-1 block">Systemic Examination</label>
-                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-amber-400 transition-all text-sm resize-none" placeholder="Cardiovascular, Respiratory, Abdominal, Neurological..." value={systemicExamination} onChange={e => setSystemicExamination(e.target.value)} />
+                          <label className="text-xs font-bold text-slate-600 mb-1 block">{t('systemic_examination')}</label>
+                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-amber-400 transition-all text-sm resize-none" placeholder={t('systemic_exam_placeholder')} value={systemicExamination} onChange={e => setSystemicExamination(e.target.value)} />
                         </div>
                       </div>
                     )}
@@ -849,23 +849,23 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'assessment' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-diagnoses text-purple-500"></i> Assessment
+                          <i className="fa-solid fa-diagnoses text-purple-500"></i> {t('assessment')}
                         </h3>
 
                         <div>
-                          <label className="text-xs font-bold text-slate-600 mb-1 block">Preliminary Diagnosis *</label>
-                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder="Primary diagnosis based on findings..." value={preliminaryDiagnosis} onChange={e => setPreliminaryDiagnosis(e.target.value)} />
+                          <label className="text-xs font-bold text-slate-600 mb-1 block">{t('preliminary_diagnosis')}</label>
+                          <textarea className="w-full h-24 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder={t('preliminary_placeholder')} value={preliminaryDiagnosis} onChange={e => setPreliminaryDiagnosis(e.target.value)} />
                         </div>
 
                         <div>
-                          <label className="text-xs font-bold text-slate-600 mb-1 block">Differential Diagnosis <span className="text-slate-400 font-normal">(optional)</span></label>
-                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder="Other possible diagnoses to consider..." value={differentialDiagnosis} onChange={e => setDifferentialDiagnosis(e.target.value)} />
+                          <label className="text-xs font-bold text-slate-600 mb-1 block">{t('differential_diagnosis')} <span className="text-slate-400 font-normal">({t('differential_optional')})</span></label>
+                          <textarea className="w-full h-20 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder={t('differential_placeholder')} value={differentialDiagnosis} onChange={e => setDifferentialDiagnosis(e.target.value)} />
                         </div>
 
                         {/* Doctor Notes (legacy) */}
                         <div>
-                          <label className="text-xs font-bold text-slate-600 mb-1 block">Additional Notes</label>
-                          <textarea className="w-full h-16 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder="Any additional clinical notes..." value={notes} onChange={e => setNotes(e.target.value)} />
+                          <label className="text-xs font-bold text-slate-600 mb-1 block">{t('additional_notes')}</label>
+                          <textarea className="w-full h-16 p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-purple-400 transition-all text-sm resize-none" placeholder={t('additional_notes_placeholder')} value={notes} onChange={e => setNotes(e.target.value)} />
                         </div>
                       </div>
                     )}
@@ -874,19 +874,19 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'plan' && (
                       <div className="space-y-8 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-clipboard-list text-amber-500"></i> Plan & Orders
+                          <i className="fa-solid fa-clipboard-list text-amber-500"></i> {t('plan_orders')}
                         </h3>
 
                         {/* A) Lab Orders */}
                         <div className="bg-amber-50/50 rounded-xl border border-amber-100 p-4">
                           <h4 className="text-sm font-bold text-amber-800 mb-3 flex items-center gap-2">
-                            <i className="fa-solid fa-flask"></i> Lab Orders
+                            <i className="fa-solid fa-flask"></i> {t('lab_orders')}
                           </h4>
                           <div className="flex gap-2 mb-3">
-                            <input className="flex-1 p-2 rounded-lg border text-sm bg-white" placeholder="Test Name (e.g. CBC, HbA1c)" value={newLab.testName} onChange={e => setNewLab({...newLab, testName: e.target.value})} />
-                            <input className="w-40 p-2 rounded-lg border text-sm bg-white" placeholder="Notes" value={newLab.notes} onChange={e => setNewLab({...newLab, notes: e.target.value})} />
+                            <input className="flex-1 p-2 rounded-lg border text-sm bg-white" placeholder={t('test_name_placeholder')} value={newLab.testName} onChange={e => setNewLab({...newLab, testName: e.target.value})} />
+                            <input className="w-40 p-2 rounded-lg border text-sm bg-white" placeholder={t('notes_placeholder')} value={newLab.notes} onChange={e => setNewLab({...newLab, notes: e.target.value})} />
                             <button onClick={addLabOrder} className="bg-amber-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-amber-700">
-                              <i className="fa-solid fa-plus mr-1"></i> Add
+                              <i className="fa-solid fa-plus mr-1"></i> {t('add_btn')}
                             </button>
                           </div>
                           
@@ -923,7 +923,7 @@ const DoctorView: React.FC = () => {
                         {/* B) Imaging Orders */}
                         <div className="bg-amber-50/50 rounded-xl border border-amber-100 p-4">
                           <h4 className="text-sm font-bold text-amber-800 mb-3 flex items-center gap-2">
-                            <i className="fa-solid fa-x-ray"></i> Imaging Orders
+                            <i className="fa-solid fa-x-ray"></i> {t('imaging_orders')}
                           </h4>
                           <div className="flex gap-2 mb-3 flex-wrap">
                             <select className="p-2 rounded-lg border text-sm bg-white" value={newImaging.imagingType} onChange={e => setNewImaging({...newImaging, imagingType: e.target.value as ImagingOrder['imagingType']})}>
@@ -933,10 +933,10 @@ const DoctorView: React.FC = () => {
                               <option value="Ultrasound">Ultrasound</option>
                               <option value="Other">Other</option>
                             </select>
-                            <input className="flex-1 p-2 rounded-lg border text-sm bg-white" placeholder="Body Part (e.g. Chest, Abdomen)" value={newImaging.bodyPart} onChange={e => setNewImaging({...newImaging, bodyPart: e.target.value})} />
-                            <input className="w-32 p-2 rounded-lg border text-sm bg-white" placeholder="Notes" value={newImaging.notes} onChange={e => setNewImaging({...newImaging, notes: e.target.value})} />
+                            <input className="flex-1 p-2 rounded-lg border text-sm bg-white" placeholder={t('body_part_placeholder')} value={newImaging.bodyPart} onChange={e => setNewImaging({...newImaging, bodyPart: e.target.value})} />
+                            <input className="w-32 p-2 rounded-lg border text-sm bg-white" placeholder={t('notes_placeholder')} value={newImaging.notes} onChange={e => setNewImaging({...newImaging, notes: e.target.value})} />
                             <button onClick={addImagingOrder} className="bg-amber-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-amber-700">
-                              <i className="fa-solid fa-plus mr-1"></i> Add
+                              <i className="fa-solid fa-plus mr-1"></i> {t('add_btn')}
                             </button>
                           </div>
 
@@ -974,11 +974,11 @@ const DoctorView: React.FC = () => {
                         <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
                           <div className="flex justify-between items-center mb-3">
                             <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                              <i className="fa-solid fa-prescription"></i> Prescription (Rx)
+                              <i className="fa-solid fa-prescription"></i> {t('prescription_rx')}
                             </h4>
                             {prescriptions.length > 0 && (
                               <button onClick={handlePrintRx} className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-lg font-bold hover:bg-amber-200 transition-colors">
-                                <i className="fa-solid fa-print mr-1"></i> Print Rx
+                                <i className="fa-solid fa-print mr-1"></i> {t('print_rx')}
                               </button>
                             )}
                           </div>
@@ -986,7 +986,7 @@ const DoctorView: React.FC = () => {
                             <div className="md:col-span-4 relative" ref={rxDropdownRef}>
                               <input 
                                 className="w-full p-2 rounded-lg border text-sm" 
-                                placeholder="Drug Name (type to search)" 
+                                placeholder={t('drug_name_placeholder')} 
                                 value={newRx.name} 
                                 onChange={e => { setNewRx({...newRx, name: e.target.value}); setRxSearch(e.target.value); setRxDropdownOpen(e.target.value.length >= 1); }}
                                 onFocus={() => { if (rxSearch.length >= 1) setRxDropdownOpen(true); }}
@@ -1027,10 +1027,10 @@ const DoctorView: React.FC = () => {
                                 ) : null;
                               })()}
                             </div>
-                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder="Dose (500mg)" value={newRx.dose} onChange={e => setNewRx({...newRx, dose: e.target.value})} /></div>
-                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder="Frequency" value={newRx.freq} onChange={e => setNewRx({...newRx, freq: e.target.value})} /></div>
-                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder="Duration" value={newRx.dur} onChange={e => setNewRx({...newRx, dur: e.target.value})} /></div>
-                            <div className="md:col-span-2"><button onClick={addPrescription} className="w-full bg-slate-800 text-white rounded-lg h-full font-bold text-xs hover:bg-slate-700">ADD</button></div>
+                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder={t('dose_placeholder')} value={newRx.dose} onChange={e => setNewRx({...newRx, dose: e.target.value})} /></div>
+                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder={t('frequency_placeholder')} value={newRx.freq} onChange={e => setNewRx({...newRx, freq: e.target.value})} /></div>
+                            <div className="md:col-span-2"><input className="w-full p-2 rounded-lg border text-sm" placeholder={t('duration_placeholder')} value={newRx.dur} onChange={e => setNewRx({...newRx, dur: e.target.value})} /></div>
+                            <div className="md:col-span-2"><button onClick={addPrescription} className="w-full bg-slate-800 text-white rounded-lg h-full font-bold text-xs hover:bg-slate-700">{t('add_uppercase')}</button></div>
                           </div>
                           {prescriptions.length > 0 && (
                             <div className="space-y-2">
@@ -1053,13 +1053,13 @@ const DoctorView: React.FC = () => {
                         {/* D) Attachments */}
                         <div>
                           <h4 className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                            <i className="fa-solid fa-paperclip"></i> General Attachments
+                            <i className="fa-solid fa-paperclip"></i> {t('general_attachments')}
                           </h4>
                           <div className="flex flex-wrap gap-4">
                             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                             <button onClick={() => fileInputRef.current?.click()} className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-all">
                               <i className="fa-solid fa-cloud-arrow-up text-2xl mb-1"></i>
-                              <span className="text-[10px] font-bold uppercase">Upload</span>
+                              <span className="text-[10px] font-bold uppercase">{t('upload_label')}</span>
                             </button>
                             {attachments.map(att => (
                               <div key={att.id} className="w-24 h-24 rounded-xl border border-slate-200 overflow-hidden relative group">
@@ -1078,7 +1078,7 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'billing' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-file-invoice-dollar text-emerald-500"></i> Services & Billing
+                          <i className="fa-solid fa-file-invoice-dollar text-emerald-500"></i> {t('services_billing')}
                         </h3>
                         <div className="bg-emerald-50/50 rounded-xl border border-emerald-100 p-4">
                           {/* Mode toggle */}
@@ -1087,13 +1087,13 @@ const DoctorView: React.FC = () => {
                               onClick={() => setServiceMode('catalog')} 
                               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${serviceMode === 'catalog' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 border'}`}
                             >
-                              <i className="fa-solid fa-list mr-1"></i> From Catalog
+                              <i className="fa-solid fa-list mr-1"></i> {t('from_catalog')}
                             </button>
                             <button 
                               onClick={() => setServiceMode('custom')} 
                               className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${serviceMode === 'custom' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 border'}`}
                             >
-                              <i className="fa-solid fa-pen mr-1"></i> Custom Entry
+                              <i className="fa-solid fa-pen mr-1"></i> {t('custom_entry')}
                             </button>
                           </div>
 
@@ -1119,8 +1119,8 @@ const DoctorView: React.FC = () => {
                             </div>
                           ) : (
                             <div className="flex gap-2 mb-3">
-                              <input className="flex-1 p-2 rounded-lg border text-sm" placeholder="Service name" value={customServiceName} onChange={e => setCustomServiceName(e.target.value)} />
-                              <input className="w-24 p-2 rounded-lg border text-sm" type="number" placeholder="Price" value={customServicePrice} onChange={e => setCustomServicePrice(e.target.value)} />
+                              <input className="flex-1 p-2 rounded-lg border text-sm" placeholder={t('service_name_placeholder')} value={customServiceName} onChange={e => setCustomServiceName(e.target.value)} />
+                              <input className="w-24 p-2 rounded-lg border text-sm" type="number" placeholder={t('price_placeholder')} value={customServicePrice} onChange={e => setCustomServicePrice(e.target.value)} />
                               <button onClick={() => {
                                 if (!customServiceName || !customServicePrice) return;
                                 setInvoiceItems([...invoiceItems, { id: Date.now().toString(), description: customServiceName, price: Number(customServicePrice) }]);
@@ -1135,17 +1135,17 @@ const DoctorView: React.FC = () => {
                                 <div key={item.id} className="flex justify-between items-center text-sm border-b border-gray-50 last:border-0 pb-1 last:pb-0">
                                   <span className="font-medium text-slate-700">{item.description}</span>
                                   <div className="flex items-center gap-4">
-                                    <span className="font-bold text-emerald-600">{item.price} د.أ</span>
+                                    <span className="font-bold text-emerald-600">{item.price} {t('currency_jod')}</span>
                                     <button onClick={() => removeService(item.id)} className="text-slate-300 hover:text-red-500"><i className="fa-solid fa-xmark"></i></button>
                                   </div>
                                 </div>
                               ))}
                               <div className="flex justify-between items-center pt-2 mt-2 border-t border-gray-100 font-bold text-slate-800">
-                                <span>Total Estimated</span>
-                                <span>{invoiceItems.reduce((acc, i) => acc + i.price, 0)} د.أ</span>
+                                <span>{t('total_estimated')}</span>
+                                <span>{invoiceItems.reduce((acc, i) => acc + i.price, 0)} {t('currency_jod')}</span>
                               </div>
                             </div>
-                          ) : <div className="text-xs text-slate-400 italic text-center py-2">No services added.</div>}
+                          ) : <div className="text-xs text-slate-400 italic text-center py-2">{t('no_services_added')}</div>}
                         </div>
                       </div>
                     )}
@@ -1154,7 +1154,7 @@ const DoctorView: React.FC = () => {
                     {activeTab === 'devices' && (
                       <div className="space-y-5 animate-fadeIn">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-microchip text-violet-500"></i> نتائج الأجهزة (Device Results)
+                          <i className="fa-solid fa-microchip text-violet-500"></i> {t('device_results_heading')}
                         </h3>
                         <div className="bg-violet-50/30 rounded-xl border border-violet-100 p-4">
                             <DeviceResultsTimeline patientId={selectedPatient.id} />
@@ -1167,21 +1167,21 @@ const DoctorView: React.FC = () => {
                       <div className="space-y-5 animate-fadeIn" dir="rtl">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i className="fa-solid fa-stethoscope text-amber-500"></i> نماذج الأنف والأذن والحنجرة
+                            <i className="fa-solid fa-stethoscope text-amber-500"></i> {t('ent_forms_heading_doctor')}
                           </h3>
                           {/* Doctor can create tests directly */}
                           <div className="flex gap-2">
                             <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/audiogram`, '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200 transition">
-                              <i className="fa-solid fa-ear-listen"></i> فحص سمع جديد
+                              <i className="fa-solid fa-ear-listen"></i> {t('new_hearing_test')}
                             </button>
                             <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/balance`, '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200 transition">
-                              <i className="fa-solid fa-compass"></i> فحص توازن جديد
+                              <i className="fa-solid fa-compass"></i> {t('new_balance_test')}
                             </button>
                             <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/referral`, '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200 transition">
-                              <i className="fa-solid fa-share-from-square"></i> تحويل طبي
+                              <i className="fa-solid fa-share-from-square"></i> {t('medical_referral_btn')}
                             </button>
                           </div>
                         </div>
@@ -1192,18 +1192,18 @@ const DoctorView: React.FC = () => {
                         ) : !entForms ? (
                           <div className="text-center text-slate-400 py-16">
                             <i className="fa-solid fa-folder-open text-4xl mb-3"></i>
-                            <p>لا توجد نماذج محفوظة لهذا المريض</p>
+                            <p>{t('no_forms_for_patient')}</p>
                           </div>
                         ) : (
                           <div className="space-y-5">
                             {/* Category Cards */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                               {[
-                                { key: 'newPatientForms', label: 'استبيان جديد', icon: 'fa-file-medical', bg: 'bg-amber-50 border-amber-200 hover:bg-amber-100', txt: 'text-amber-600', activeBg: 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' },
-                                { key: 'followUpForms', label: 'متابعة', icon: 'fa-file-lines', bg: 'bg-green-50 border-green-200 hover:bg-green-100', txt: 'text-green-600', activeBg: 'bg-green-100 border-green-400 ring-2 ring-green-300' },
-                                { key: 'audiograms', label: 'فحص سمع', icon: 'fa-ear-listen', bg: 'bg-purple-50 border-purple-200 hover:bg-purple-100', txt: 'text-purple-600', activeBg: 'bg-purple-100 border-purple-400 ring-2 ring-purple-300' },
-                                { key: 'balanceAssessments', label: 'فحص توازن', icon: 'fa-person-walking', bg: 'bg-amber-50 border-amber-200 hover:bg-amber-100', txt: 'text-amber-600', activeBg: 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' },
-                                { key: 'referrals', label: 'تحويل طبي', icon: 'fa-share-from-square', bg: 'bg-rose-50 border-rose-200 hover:bg-rose-100', txt: 'text-rose-600', activeBg: 'bg-rose-100 border-rose-400 ring-2 ring-rose-300' },
+                                { key: 'newPatientForms', label: t('new_patient_questionnaire_cat'), icon: 'fa-file-medical', bg: 'bg-amber-50 border-amber-200 hover:bg-amber-100', txt: 'text-amber-600', activeBg: 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' },
+                                { key: 'followUpForms', label: t('follow_up_cat'), icon: 'fa-file-lines', bg: 'bg-green-50 border-green-200 hover:bg-green-100', txt: 'text-green-600', activeBg: 'bg-green-100 border-green-400 ring-2 ring-green-300' },
+                                { key: 'audiograms', label: t('hearing_test_cat'), icon: 'fa-ear-listen', bg: 'bg-purple-50 border-purple-200 hover:bg-purple-100', txt: 'text-purple-600', activeBg: 'bg-purple-100 border-purple-400 ring-2 ring-purple-300' },
+                                { key: 'balanceAssessments', label: t('balance_test_cat'), icon: 'fa-person-walking', bg: 'bg-amber-50 border-amber-200 hover:bg-amber-100', txt: 'text-amber-600', activeBg: 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' },
+                                { key: 'referrals', label: t('medical_referral_cat'), icon: 'fa-share-from-square', bg: 'bg-rose-50 border-rose-200 hover:bg-rose-100', txt: 'text-rose-600', activeBg: 'bg-rose-100 border-rose-400 ring-2 ring-rose-300' },
                               ].map(cat => {
                                 const count = entForms[cat.key]?.length || 0;
                                 return (
@@ -1220,7 +1220,7 @@ const DoctorView: React.FC = () => {
                             {/* Records List */}
                             {entExpanded && entForms[entExpanded] && entForms[entExpanded].length > 0 && (
                               <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
-                                <h4 className="font-bold text-slate-700 mb-3 text-sm">السجلات ({entForms[entExpanded].length})</h4>
+                                <h4 className="font-bold text-slate-700 mb-3 text-sm">{t('records_label')} ({entForms[entExpanded].length})</h4>
                                 <div className="space-y-2 max-h-48 overflow-y-auto">
                                   {entForms[entExpanded].map((form: any, idx: number) => {
                                     const formType = entExpanded === 'newPatientForms' ? 'new-patient'
@@ -1256,7 +1256,7 @@ const DoctorView: React.FC = () => {
                             {entExpanded && entForms[entExpanded]?.length === 0 && (
                               <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 text-center text-slate-400 text-sm">
                                 <i className="fa-solid fa-inbox text-2xl mb-2"></i>
-                                <p>لا توجد سجلات</p>
+                                <p>{t('no_records_found')}</p>
                               </div>
                             )}
 
@@ -1270,59 +1270,59 @@ const DoctorView: React.FC = () => {
                               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                                 <div className="flex items-center justify-between mb-4">
                                   <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <i className="fa-solid fa-file-medical text-amber-500"></i> تفاصيل النموذج
+                                    <i className="fa-solid fa-file-medical text-amber-500"></i> {t('form_details')}
                                   </h4>
                                   <span className="text-[10px] text-slate-400">{new Date(entDetail.data.created_at).toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                   {entDetail.type === 'new-patient' && <>
-                                    <EntField label="الشكوى الرئيسية" value={entDetail.data.chief_complaint} />
-                                    <EntField label="مدة الأعراض" value={entDetail.data.symptom_duration} />
-                                    <EntField label="جهة الأعراض" value={{right:'يمين',left:'يسار',both:'كلاهما',none:'غير محدد'}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
-                                    <EntField label="علاج سابق" value={entDetail.data.previous_ent_treatment ? `نعم — ${entDetail.data.previous_ent_details}` : 'لا'} />
-                                    <EntField label="عمليات سابقة" value={entDetail.data.previous_ent_surgery ? `نعم — ${entDetail.data.previous_ent_surgery_details}` : 'لا'} />
+                                    <EntField label={t('ent_chief_complaint')} value={entDetail.data.chief_complaint} />
+                                    <EntField label={t('ent_symptom_duration')} value={entDetail.data.symptom_duration} />
+                                    <EntField label={t('ent_symptom_side')} value={{right:t('ent_side_right'),left:t('ent_side_left'),both:t('ent_side_both'),none:t('ent_side_none')}[entDetail.data.symptom_side as string] || entDetail.data.symptom_side} />
+                                    <EntField label={t('ent_previous_treatment')} value={entDetail.data.previous_ent_treatment ? `${t('ent_yes')} — ${entDetail.data.previous_ent_details}` : t('ent_no')} />
+                                    <EntField label={t('ent_previous_surgery')} value={entDetail.data.previous_ent_surgery ? `${t('ent_yes')} — ${entDetail.data.previous_ent_surgery_details}` : t('ent_no')} />
                                     {entDetail.data.symptoms && typeof entDetail.data.symptoms === 'object' && (
                                       <div className="md:col-span-2">
-                                        <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">الأعراض</div>
+                                        <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">{t('ent_symptoms')}</div>
                                         <div className="flex flex-wrap gap-1">
                                           {Object.entries(entDetail.data.symptoms).filter(([,v]) => v === true).map(([k]) => (
                                             <span key={k} className="bg-red-50 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold border border-red-200">
-                                              {{earPain:'ألم أذن',hearingLoss:'ضعف سمع',tinnitus:'طنين',earDischarge:'إفرازات أذن',vertigo:'دوخة',nasalObstruction:'انسداد أنف',nasalDischarge:'إفرازات أنف',sneezing:'عطاس',soreThroat:'ألم حلق',voiceChange:'تغير صوت',dysphagia:'صعوبة بلع',snoring:'شخير',sleepApnea:'انقطاع نفس',facialPain:'ألم وجه',headache:'صداع',nosebleeds:'رعاف',lossOfSmell:'فقدان شم',neckMass:'كتلة رقبة'}[k] || k}
+                                              {{earPain:t('ent_ear_pain'),hearingLoss:t('ent_hearing_loss'),tinnitus:t('ent_tinnitus'),earDischarge:t('ent_ear_discharge'),vertigo:t('ent_vertigo'),nasalObstruction:t('ent_nasal_obstruction'),nasalDischarge:t('ent_nasal_discharge'),sneezing:t('ent_sneezing'),soreThroat:t('ent_sore_throat'),voiceChange:t('ent_voice_change'),dysphagia:t('ent_dysphagia'),snoring:t('ent_snoring'),sleepApnea:t('ent_sleep_apnea'),facialPain:t('ent_facial_pain'),headache:t('ent_headache'),nosebleeds:t('ent_nosebleeds'),lossOfSmell:t('ent_loss_of_smell'),neckMass:t('ent_neck_mass')}[k] || k}
                                             </span>
                                           ))}
                                         </div>
                                       </div>
                                     )}
-                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                    {entDetail.data.notes && <EntField label={t('ent_notes')} value={entDetail.data.notes} span2 />}
                                   </>}
                                   {entDetail.type === 'follow-up' && <>
-                                    <EntField label="سبب المتابعة" value={entDetail.data.follow_up_reason} />
-                                    <EntField label="التشخيص السابق" value={entDetail.data.previous_diagnosis} />
-                                    <EntField label="الالتزام بالعلاج" value={{full:'كامل',partial:'جزئي',none:'لا'}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
-                                    <EntField label="تقييم الأعراض" value={{improved:'تحسن',same:'كما هي',worsened:'تفاقمت'}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
-                                    <EntField label="أعراض جديدة" value={entDetail.data.new_symptoms} />
-                                    <EntField label="فعالية الأدوية" value={entDetail.data.medication_effectiveness} />
-                                    <EntField label="الخطوات القادمة" value={entDetail.data.next_steps} />
-                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                    <EntField label={t('ent_follow_up_reason')} value={entDetail.data.follow_up_reason} />
+                                    <EntField label={t('ent_previous_diagnosis')} value={entDetail.data.previous_diagnosis} />
+                                    <EntField label={t('ent_treatment_compliance')} value={{full:t('ent_compliance_full'),partial:t('ent_compliance_partial'),none:t('ent_no')}[entDetail.data.treatment_compliance as string] || entDetail.data.treatment_compliance} />
+                                    <EntField label={t('ent_symptom_assessment')} value={{improved:t('ent_improved'),same:t('ent_same'),worsened:t('ent_worsened')}[entDetail.data.symptom_assessment as string] || entDetail.data.symptom_assessment} />
+                                    <EntField label={t('ent_new_symptoms')} value={entDetail.data.new_symptoms} />
+                                    <EntField label={t('ent_medication_effectiveness')} value={entDetail.data.medication_effectiveness} />
+                                    <EntField label={t('ent_next_steps')} value={entDetail.data.next_steps} />
+                                    {entDetail.data.notes && <EntField label={t('ent_notes')} value={entDetail.data.notes} span2 />}
                                   </>}
                                   {entDetail.type === 'audiogram' && <>
-                                    <EntField label="مستوى السمع" value={entDetail.data.hearing_level} />
-                                    <EntField label="نوع ضعف السمع" value={entDetail.data.hearing_loss_type} />
-                                    <EntField label="توصية بسماعة" value={entDetail.data.recommend_hearing_aid ? 'نعم' : 'لا'} />
+                                    <EntField label={t('ent_hearing_level')} value={entDetail.data.hearing_level} />
+                                    <EntField label={t('ent_hearing_loss_type')} value={entDetail.data.hearing_loss_type} />
+                                    <EntField label={t('ent_recommend_hearing_aid')} value={entDetail.data.recommend_hearing_aid ? t('ent_yes') : t('ent_no')} />
                                     <EntField label="OAE" value={entDetail.data.oae} />
-                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                    {entDetail.data.notes && <EntField label={t('ent_notes')} value={entDetail.data.notes} span2 />}
                                   </>}
                                   {entDetail.type === 'balance-assessment' && <>
-                                    <EntField label="وظيفة الدهليز" value={entDetail.data.vestibular_function} />
-                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                    <EntField label={t('ent_vestibular_function')} value={entDetail.data.vestibular_function} />
+                                    {entDetail.data.notes && <EntField label={t('ent_notes')} value={entDetail.data.notes} span2 />}
                                   </>}
                                   {entDetail.type === 'referral' && <>
-                                    <EntField label="الطبيب المحوّل" value={entDetail.data.referring_doctor} />
-                                    <EntField label="التخصص" value={entDetail.data.referred_to_specialty} />
-                                    <EntField label="الطبيب المحال إليه" value={entDetail.data.referred_to_doctor} />
-                                    <EntField label="المستشفى" value={entDetail.data.referred_to_hospital} />
-                                    <EntField label="الاستعجال" value={{routine:'عادي',urgent:'مستعجل',emergency:'طوارئ'}[entDetail.data.urgency as string] || entDetail.data.urgency} />
-                                    {entDetail.data.notes && <EntField label="ملاحظات" value={entDetail.data.notes} span2 />}
+                                    <EntField label={t('ent_referring_doctor')} value={entDetail.data.referring_doctor} />
+                                    <EntField label={t('ent_specialty')} value={entDetail.data.referred_to_specialty} />
+                                    <EntField label={t('ent_referred_doctor')} value={entDetail.data.referred_to_doctor} />
+                                    <EntField label={t('ent_hospital')} value={entDetail.data.referred_to_hospital} />
+                                    <EntField label={t('ent_urgency')} value={{routine:t('ent_urgency_routine'),urgent:t('ent_urgency_urgent'),emergency:t('ent_urgency_emergency')}[entDetail.data.urgency as string] || entDetail.data.urgency} />
+                                    {entDetail.data.notes && <EntField label={t('ent_notes')} value={entDetail.data.notes} span2 />}
                                   </>}
                                 </div>
                               </div>

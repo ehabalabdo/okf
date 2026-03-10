@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { DeviceService } from '../services/services';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { DeviceResult } from '../types';
 import { fmtDate, fmtTime } from '../utils/formatters';
 
@@ -11,6 +12,7 @@ interface DeviceResultsTimelineProps {
 
 const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [results, setResults] = useState<DeviceResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedResult, setExpandedResult] = useState<string | null>(null);
@@ -84,8 +86,8 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
         <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
           <i className="fa-solid fa-microscope text-3xl text-slate-300"></i>
         </div>
-        <p className="text-lg font-semibold text-slate-500">لا توجد نتائج أجهزة</p>
-        <p className="text-sm mt-1">ستظهر النتائج هنا عند وصولها من الأجهزة الطبية</p>
+        <p className="text-lg font-semibold text-slate-500">{t('dev_no_results')}</p>
+        <p className="text-sm mt-1">{t('dev_results_appear')}</p>
       </div>
     );
   }
@@ -97,13 +99,13 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
         <div className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">
           <i className="fa-solid fa-vials text-amber-500"></i>
           <span className="text-amber-700 font-bold">{results.length}</span>
-          <span className="text-amber-500 text-xs">إجمالي النتائج</span>
+          <span className="text-amber-500 text-xs">{t('dev_total_results')}</span>
         </div>
         {results.some(r => r.isAbnormal) && (
           <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">
             <i className="fa-solid fa-triangle-exclamation text-red-500"></i>
             <span className="text-red-700 font-bold">{results.filter(r => r.isAbnormal).length}</span>
-            <span className="text-red-500 text-xs">غير طبيعية</span>
+            <span className="text-red-500 text-xs">{t('dev_abnormal')}</span>
           </div>
         )}
       </div>
@@ -147,11 +149,11 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
                           <span className="font-bold text-slate-800">{result.testCode}</span>
                           {result.testName && <span className="text-xs text-slate-400 truncate">({result.testName})</span>}
                           {result.isAbnormal && (
-                            <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded">⚠ غير طبيعي</span>
+                            <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded">⚠ {t('dev_abnormal_badge')}</span>
                           )}
                         </div>
                         <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                          <span>{result.deviceName || 'جهاز'}</span>
+                          <span>{result.deviceName || t('dev_device')}</span>
                           <span>•</span>
                           <span>{formatTime(result.createdAt)}</span>
                         </div>
@@ -173,27 +175,27 @@ const DeviceResultsTimeline: React.FC<DeviceResultsTimelineProps> = ({ patientId
                       <div className="border-t border-gray-100 px-4 py-3 bg-slate-50 text-sm space-y-2">
                         {result.referenceRange && (
                           <div className="flex justify-between">
-                            <span className="text-slate-500">المدى المرجعي</span>
+                            <span className="text-slate-500">{t('dev_reference_range')}</span>
                             <span className="font-mono text-slate-700">{result.referenceRange}</span>
                           </div>
                         )}
                         <div className="flex justify-between">
-                          <span className="text-slate-500">معرّف الجهاز</span>
+                            <span className="text-slate-500">{t('dev_device_id')}</span>
                           <span className="font-mono text-xs text-slate-600">{result.deviceId.substring(0, 8)}...</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-500">تم الربط بواسطة</span>
-                          <span className="text-slate-700">{result.matchedBy === 'auto' ? 'تلقائي 🤖' : result.matchedBy || '-'}</span>
+                            <span className="text-slate-500">{t('dev_matched_by')}</span>
+                          <span className="text-slate-700">{result.matchedBy === 'auto' ? t('dev_auto_matched') : result.matchedBy || '-'}</span>
                         </div>
                         {result.matchedAt && (
                           <div className="flex justify-between">
-                            <span className="text-slate-500">وقت الربط</span>
+                            <span className="text-slate-500">{t('dev_match_time')}</span>
                             <span className="text-slate-700">{formatDate(result.matchedAt)} {formatTime(result.matchedAt)}</span>
                           </div>
                         )}
                         {result.rawMessage && (
                           <details className="mt-2">
-                            <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600">عرض البيانات الخام</summary>
+                            <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600">{t('dev_raw_data')}</summary>
                             <pre className="mt-1 text-[10px] bg-slate-800 text-green-400 p-2 rounded overflow-x-auto whitespace-pre-wrap font-mono">
                               {result.rawMessage}
                             </pre>

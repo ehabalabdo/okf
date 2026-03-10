@@ -94,9 +94,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
       setNewEntityType('');
       setIsAddingEntity(false);
       await fetchData();
-      alert('تمت الإضافة بنجاح');
+      alert(t('added_success'));
     } catch (e: any) {
-      alert('Error: ' + (e.message || 'فشلت الإضافة'));
+      alert(t('error_prefix') + (e.message || t('add_failed')));
     }
   };
 
@@ -107,7 +107,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
   };
   
   const deleteClinic = async (id: string) => {
-      if(!currentUser || !window.confirm("Are you sure? This cannot be undone.")) return;
+      if(!currentUser || !window.confirm(t('confirm_delete'))) return;
       try {
         await ClinicService.delete(currentUser, id);
         fetchData();
@@ -156,7 +156,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!currentUser || !window.confirm("Are you sure you want to PERMANENTLY delete this user?")) return;
+    if (!currentUser || !window.confirm(t('confirm_delete_user'))) return;
     try {
         await AuthService.deleteUser(currentUser, userId);
         fetchData();
@@ -242,9 +242,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
       if(!currentUser) return;
       try {
           await SettingsService.updateSettings(currentUser, settings);
-          alert("Settings updated successfully!");
+          alert(t('settings_saved'));
       } catch (e: any) {
-          alert("Error saving settings: " + e.message);
+          alert(t('error_prefix') + e.message);
       }
   };
 
@@ -286,7 +286,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
               </button>
           </div>
           <div className="flex-1 overflow-auto max-h-[300px]">
-              {data.length === 0 ? <div className="p-8 text-center text-slate-400 text-sm">No {category}s defined.</div> : (
+              {data.length === 0 ? <div className="p-8 text-center text-slate-400 text-sm">{t('no_items')}</div> : (
               <table className="w-full text-left text-sm text-slate-600 border-collapse">
                   <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 tracking-widest sticky top-0 z-10">
                   <tr>
@@ -335,25 +335,25 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 onClick={() => setActiveTab('dashboard')} 
                 className={`px-6 py-2 rounded-xl font-bold transition-all ${activeTab === 'dashboard' ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
             >
-                <i className="fa-solid fa-chart-line mr-2"></i> Dashboard
+                <i className="fa-solid fa-chart-line mr-2"></i> {t('dashboard')}
             </button>
             <button 
                 onClick={() => setActiveTab('settings')} 
                 className={`px-6 py-2 rounded-xl font-bold transition-all ${activeTab === 'settings' ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
             >
-                <i className="fa-solid fa-gear mr-2"></i> System Settings
+                <i className="fa-solid fa-gear mr-2"></i> {t('system_settings')}
             </button>
             <button 
                 onClick={() => { const slug = window.location.pathname.split('/')[1]; window.location.href = `/${slug}/catalog`; }} 
                 className="px-6 py-2 rounded-xl font-bold transition-all bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
             >
-                <i className="fa-solid fa-book-medical mr-2"></i> Catalog
+                <i className="fa-solid fa-book-medical mr-2"></i> {t('catalog')}
             </button>
             <button 
                 onClick={() => { const slug = window.location.pathname.split('/')[1]; window.location.href = `/${slug}/accounting`; }} 
                 className="px-6 py-2 rounded-xl font-bold transition-all bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
             >
-                <i className="fa-solid fa-calculator mr-2"></i> Accounting
+                <i className="fa-solid fa-calculator mr-2"></i> {t('accounting')}
             </button>
         </div>
 
@@ -363,7 +363,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
             className="bg-yellow-400 text-slate-900 px-6 py-2 rounded-xl font-extrabold shadow-lg hover:bg-yellow-300 transition-all flex items-center gap-2 animate-pulse"
         >
             <i className="fa-solid fa-bolt"></i> 
-            Quick Login Portal
+            {t('quick_login_portal')}
         </button>
       </div>
 
@@ -374,9 +374,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                   <div className="bg-slate-900 p-6 flex justify-between items-center text-white shrink-0">
                       <div>
                           <h3 className="text-xl font-bold flex items-center gap-2">
-                              <i className="fa-solid fa-bolt text-yellow-400"></i> User Switcher Portal
+                              <i className="fa-solid fa-bolt text-yellow-400"></i> {t('user_switcher_portal')}
                           </h3>
-                          <p className="text-slate-400 text-xs mt-1">Select a user to instantly log in as them.</p>
+                          <p className="text-slate-400 text-xs mt-1">{t('select_user_hint')}</p>
                       </div>
                       <button onClick={() => setShowUserSwitcherModal(false)} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
                           <i className="fa-solid fa-xmark"></i>
@@ -420,13 +420,13 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                               </div>
                               <div className="flex justify-between items-center text-xs text-slate-500 mt-2 pt-2 border-t border-slate-50">
                                   <span className="truncate max-w-[150px]">{u.email}</span>
-                                  <span className="font-bold text-slate-300 group-hover:text-primary transition-colors">Login <i className="fa-solid fa-arrow-right ml-1"></i></span>
+                                  <span className="font-bold text-slate-300 group-hover:text-primary transition-colors">{t('login_label')} <i className="fa-solid fa-arrow-right ml-1"></i></span>
                               </div>
                           </button>
                       ))}
                   </div>
                   <div className="p-4 bg-slate-50 text-center text-xs text-slate-400 border-t border-slate-100 shrink-0">
-                      Access Level: Administrator Override Enabled
+                      {t('access_level_admin')}
                   </div>
               </div>
           </div>
@@ -436,45 +436,45 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
           <>
           <div className="bg-white rounded-[2rem] shadow-soft p-8 max-w-2xl animate-fade-in-down">
               <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                  <i className="fa-solid fa-sliders text-primary"></i> Clinic Configuration
+                  <i className="fa-solid fa-sliders text-primary"></i> {t('clinic_config')}
               </h2>
               <form onSubmit={handleSaveSettings} className="space-y-6">
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Clinic Group Name</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('clinic_group_name')}</label>
                       <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none" value={settings.clinicName} onChange={e => setSettings({...settings, clinicName: e.target.value})} />
                   </div>
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Address (For Invoices)</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('address_invoices')}</label>
                       <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none" value={settings.address} onChange={e => setSettings({...settings, address: e.target.value})} />
                   </div>
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Contact Phone</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('contact_phone')}</label>
                       <input type="text" className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none" value={settings.phone} onChange={e => setSettings({...settings, phone: e.target.value})} />
                   </div>
                   <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Logo</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('logo')}</label>
                       <div className="flex items-center gap-4">
                           <div className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
                               {settings.logoUrl ? <img src={settings.logoUrl} className="w-full h-full object-contain" alt="logo" /> : <i className="fa-solid fa-image text-gray-300"></i>}
                           </div>
                           <div>
                               <input type="file" accept="image/*" onChange={handleLogoUpload} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
-                              <p className="text-[10px] text-slate-400 mt-1">Recommended: PNG with transparent background.</p>
+                              <p className="text-[10px] text-slate-400 mt-1">{t('logo_hint')}</p>
                           </div>
                       </div>
                   </div>
-                  <button type="submit" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-lg">Save Settings</button>
+                  <button type="submit" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 shadow-lg">{t('save_settings')}</button>
               </form>
           </div>
 
           {/* Feature Toggles Section */}
           <div className="bg-white rounded-[2rem] shadow-soft p-8 max-w-2xl mt-6 animate-fade-in-down">
               <h2 className="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                  <i className="fa-solid fa-toggle-on text-primary"></i> الأقسام والميزات
+                  <i className="fa-solid fa-toggle-on text-primary"></i> {t('sections_features')}
               </h2>
-              <p className="text-slate-400 text-sm mb-6">فعّل الأقسام اللي بدك تظهر للموظفين والدكتور</p>
+              <p className="text-slate-400 text-sm mb-6">{t('sections_features_desc')}</p>
               {[
-                { key: 'device_results' as keyof ClientFeatures, label: 'نتائج الأجهزة', icon: 'fa-solid fa-microscope', desc: 'عرض نتائج الأجهزة الطبية للموظفين والمرضى' }
+                { key: 'device_results' as keyof ClientFeatures, label: t('device_results_label'), icon: 'fa-solid fa-microscope', desc: t('device_results_desc') }
               ].map(feature => {
                 const features = client?.enabledFeatures || { device_results: false };
                 const isOn = features[feature.key];
@@ -497,7 +497,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                           await pgClientsService.updateFeatures(client.id, updated);
                           await refreshClient();
                         } catch (err: any) {
-                          alert('خطأ: ' + err.message);
+                          alert(t('error_prefix') + err.message);
                         }
                       }}
                       className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${isOn ? 'bg-primary' : 'bg-slate-200'}`}
@@ -528,7 +528,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 </div>
                 <div>
                     <div className="text-3xl font-extrabold text-slate-800 tracking-tight">{users.length}</div>
-                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">Total Staff</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t('total_staff')}</div>
                 </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-soft border border-gray-100 flex items-center gap-4">
@@ -537,7 +537,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 </div>
                 <div>
                     <div className="text-3xl font-extrabold text-slate-800 tracking-tight">${totalRevenue.toLocaleString()}</div>
-                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">Collected Revenue</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t('collected_revenue')}</div>
                 </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-soft border border-gray-100 flex items-center gap-4">
@@ -546,7 +546,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 </div>
                 <div>
                     <div className="text-3xl font-extrabold text-slate-800 tracking-tight">${pendingRevenue.toLocaleString()}</div>
-                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">Pending Payments</div>
+                    <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t('pending_payments')}</div>
                 </div>
                 </div>
             </div>
@@ -566,7 +566,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                     ))}
                 </div>
                 <h3 className="text-lg font-bold mt-6 flex items-center gap-2">
-                    <i className="fa-solid fa-chart-line text-primary"></i> Revenue Analytics (Last 7 Days)
+                    <i className="fa-solid fa-chart-line text-primary"></i> {t('revenue_analytics')}
                 </h3>
             </div>
 
@@ -576,10 +576,10 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
             {isAddingEntity && (
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm animate-fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-                        <h3 className="text-xl font-bold mb-4 text-slate-800">Add New {targetCategory === 'clinic' ? 'Clinic' : 'Department'}</h3>
+                        <h3 className="text-xl font-bold mb-4 text-slate-800">{t('add_new_entity')} {targetCategory === 'clinic' ? t('add_clinic_label').replace(t('add_new_entity') + ' ', '') : t('add_department_label').replace(t('add_new_entity') + ' ', '')}</h3>
                         <form onSubmit={handleAddEntity} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Name</label>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('name_label')}</label>
                                 <input 
                                     className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none"
                                     placeholder={targetCategory === 'clinic' ? 'e.g. Dental Clinic' : 'e.g. Dental Lab'}
@@ -590,7 +590,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Specialty Type</label>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t('specialty_type')}</label>
                                 <input 
                                     className="w-full p-3 rounded-xl border border-gray-200 focus:border-primary outline-none"
                                     placeholder={targetCategory === 'clinic' ? 'e.g. Dental' : 'e.g. Laboratory'}
@@ -600,8 +600,8 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                 />
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <button type="button" onClick={() => setIsAddingEntity(false)} className="flex-1 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">Cancel</button>
-                                <button type="submit" className="flex-1 py-3 rounded-xl font-bold bg-primary text-white shadow-lg hover:bg-primary/90 transition-colors">Create</button>
+                                <button type="button" onClick={() => setIsAddingEntity(false)} className="flex-1 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors">{t('cancel')}</button>
+                                <button type="submit" className="flex-1 py-3 rounded-xl font-bold bg-primary text-white shadow-lg hover:bg-primary/90 transition-colors">{t('create')}</button>
                             </div>
                         </form>
                     </div>
@@ -613,7 +613,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 {/* --- LEFT COLUMN: ENTITIES --- */}
                 <div>
                     <EntityTable 
-                        title="Patient Clinics" 
+                        title={t('patient_clinics')} 
                         data={patientClinics} 
                         category="clinic" 
                         icon="fa-hospital-user" 
@@ -621,7 +621,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                     />
                     
                     <EntityTable 
-                        title="Operational Departments" 
+                        title={t('operational_depts')} 
                         data={departments} 
                         category="department" 
                         icon="fa-building-shield" 
@@ -634,7 +634,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <div className="flex items-center gap-3">
                         <i className="fa-solid fa-user-gear text-purple-600"></i>
-                        <h2 className="font-extrabold text-slate-800 tracking-tight">Staff & Roles</h2>
+                        <h2 className="font-extrabold text-slate-800 tracking-tight">{t('staff_roles')}</h2>
                     </div>
                     <button 
                         onClick={() => isStaffFormOpen ? closeStaffForm() : openStaffForm()}
@@ -643,7 +643,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                         }`}
                     >
                     <i className={`fa-solid ${isStaffFormOpen ? 'fa-xmark' : 'fa-plus'}`}></i> 
-                    {isStaffFormOpen ? 'Cancel' : 'Add Staff Member'}
+                    {isStaffFormOpen ? t('cancel') : t('add_staff')}
                     </button>
                 </div>
 
@@ -652,33 +652,33 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                         <form onSubmit={handleStaffSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t('full_name_label')}</label>
                                     <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-purple-100 outline-none focus:ring-4 focus:ring-purple-100" placeholder="e.g. Dr. John Doe" value={userFormData.name} onChange={e => setUserFormData({...userFormData, name: e.target.value})} required />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email (Username)</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t('email_username')}</label>
                                     <input type="email" className="w-full px-4 py-2.5 rounded-xl border border-purple-100 outline-none focus:ring-4 focus:ring-purple-100" placeholder="staff@clinic.com" value={userFormData.email} onChange={e => setUserFormData({...userFormData, email: e.target.value})} required />
                                 </div>
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t('password')}</label>
                                 <input type="password" className="w-full px-4 py-2.5 rounded-xl border border-purple-100 outline-none focus:ring-4 focus:ring-purple-100" placeholder="Enter password" value={userFormData.password} onChange={e => setUserFormData({...userFormData, password: e.target.value})} required={!editingUserId} />
-                                {editingUserId && <p className="text-xs text-slate-400 mt-1 ml-1">Leave blank to keep current password</p>}
+                                {editingUserId && <p className="text-xs text-slate-400 mt-1 ml-1">{t('keep_password_hint')}</p>}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">System Role</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t('system_role')}</label>
                                     <select className="w-full px-4 py-2.5 rounded-xl border border-purple-100 bg-white outline-none" value={userFormData.role} onChange={e => setUserFormData({...userFormData, role: e.target.value as UserRole})}>
-                                        <option value={UserRole.DOCTOR}>Doctor (Medical Access)</option>
-                                        <option value={UserRole.TECHNICIAN}>Technician (فني الفحوصات)</option>
-                                        <option value={UserRole.SECRETARY}>Secretary (Front-Desk Access)</option>
-                                        <option value={UserRole.ADMIN}>Admin (System Control)</option>
+                                        <option value={UserRole.DOCTOR}>{t('doctor_medical')}</option>
+                                        <option value={UserRole.TECHNICIAN}>{t('technician_role')}</option>
+                                        <option value={UserRole.SECRETARY}>{t('secretary_frontdesk')}</option>
+                                        <option value={UserRole.ADMIN}>{t('admin_system')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Assigned Access</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t('assigned_access')}</label>
                                     <div className="flex flex-wrap gap-2 pt-1 max-h-32 overflow-y-auto">
                                         {/* Show all (Clinics + Departments) so staff can be assigned to labs etc */}
                                         {clinics.map(c => (
@@ -700,7 +700,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                             </div>
 
                             <button type="submit" className="w-full bg-purple-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-purple-900/20 hover:bg-purple-700 transition-all flex items-center justify-center gap-3">
-                                <i className={`fa-solid ${editingUserId ? 'fa-save' : 'fa-user-plus'}`}></i> {editingUserId ? 'Save Changes' : 'Create Account'}
+                                <i className={`fa-solid ${editingUserId ? 'fa-save' : 'fa-user-plus'}`}></i> {editingUserId ? t('save_changes_btn') : t('create_account')}
                             </button>
                         </form>
                     </div>
@@ -710,9 +710,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                     <table className="w-full text-left text-sm text-slate-600 border-collapse">
                         <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 tracking-widest sticky top-0 z-10">
                         <tr>
-                            <th className="px-6 py-4 border-b border-slate-100">User Details</th>
-                            <th className="px-6 py-4 border-b border-slate-100">Permissions</th>
-                            <th className="px-6 py-4 border-b border-slate-100 text-end">Manage</th>
+                            <th className="px-6 py-4 border-b border-slate-100">{t('user_details')}</th>
+                            <th className="px-6 py-4 border-b border-slate-100">{t('permissions')}</th>
+                            <th className="px-6 py-4 border-b border-slate-100 text-end">{t('manage')}</th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -749,7 +749,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                         {user.role}
                                     </span>
                                     <div className="text-[9px] font-bold text-slate-400 truncate max-w-[150px]">
-                                        {user.role === 'admin' ? 'All Access' : user.clinicIds.map(id => clinics.find(c => c.id === id)?.name).join(', ') || 'No Clinics Assigned'}
+                                        {user.role === 'admin' ? t('all_access') : user.clinicIds.map(id => clinics.find(c => c.id === id)?.name).join(', ') || t('no_clinics_assigned')}
                                     </div>
                                 </div>
                             </td>

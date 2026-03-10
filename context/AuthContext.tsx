@@ -73,10 +73,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         if (!foundUser.isActive) {
-          throw new Error('هذا الحساب غير مفعل');
+          throw new Error('account_inactive');
         }
         if (clientId && foundUser.clientId && foundUser.clientId !== clientId) {
-          throw new Error('هذا الحساب لا ينتمي لهذا المركز');
+          throw new Error('account_wrong_center');
         }
 
         localStorage.setItem('user', JSON.stringify(foundUser));
@@ -99,11 +99,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      throw new Error('بيانات تسجيل الدخول غير صحيحة');
+      throw new Error('invalid_credentials');
     } catch (error: any) {
-      // Re-throw with Arabic message if it's a credentials error
+      // Re-throw with key if it's a credentials error
       if (error.message?.includes('Invalid credentials') || error.message?.includes('401')) {
-        throw new Error('بيانات تسجيل الدخول غير صحيحة');
+        throw new Error('invalid_credentials');
       }
       throw error;
     }
@@ -138,10 +138,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      throw new Error('رقم الهاتف أو كلمة المرور غير صحيحة');
+      throw new Error('invalid_phone_password');
     } catch (error: any) {
       if (error.message?.includes('Invalid credentials') || error.message?.includes('401')) {
-        throw new Error('رقم الهاتف أو كلمة المرور غير صحيحة');
+        throw new Error('invalid_phone_password');
       }
       throw error;
     }

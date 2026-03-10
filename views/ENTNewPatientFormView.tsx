@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useClient } from '../context/ClientContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ENTNewPatientForm, Patient } from '../types';
 import { api } from '../src/api';
 import Layout from '../components/Layout';
@@ -17,6 +18,7 @@ const defaultSymptoms = {
 const ENTNewPatientFormView: React.FC = () => {
   const { user } = useAuth();
   const { client } = useClient();
+  const { t, language } = useLanguage();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [saving, setSaving] = useState(false);
@@ -66,8 +68,8 @@ const ENTNewPatientFormView: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedPatientId) return alert('يرجى اختيار المريض');
-    if (!form.chiefComplaint) return alert('يرجى إدخال الشكوى الرئيسية');
+    if (!selectedPatientId) return alert(t('ent_please_select_patient'));
+    if (!form.chiefComplaint) return alert(t('ent_chief_complaint_enter'));
     
     setSaving(true);
     try {
@@ -87,24 +89,24 @@ const ENTNewPatientFormView: React.FC = () => {
       });
       setSelectedPatientId('');
     } catch (err: any) {
-      alert(err.message || 'حدث خطأ');
+      alert(err.message || t('ent_error_occurred'));
     } finally {
       setSaving(false);
     }
   };
 
   const symptomLabels: Record<string, string> = {
-    earPain: 'ألم أذن', hearingLoss: 'ضعف سمع', tinnitus: 'طنين',
-    earDischarge: 'إفرازات أذن', vertigo: 'دوخة / دوار', nasalObstruction: 'انسداد أنف',
-    nasalDischarge: 'إفرازات أنف', sneezing: 'عطاس', soreThroat: 'ألم حلق',
-    voiceChange: 'تغير في الصوت', dysphagia: 'صعوبة بلع', snoring: 'شخير',
-    sleepApnea: 'انقطاع نفس أثناء النوم', facialPain: 'ألم وجه', headache: 'صداع',
-    nosebleeds: 'رعاف (نزيف أنف)', lossOfSmell: 'فقدان حاسة الشم', neckMass: 'كتلة في الرقبة',
+    earPain: t('ent_ear_pain'), hearingLoss: t('ent_hearing_loss'), tinnitus: t('ent_tinnitus'),
+    earDischarge: t('ent_ear_discharge'), vertigo: t('ent_vertigo'), nasalObstruction: t('ent_nasal_obstruction'),
+    nasalDischarge: t('ent_nasal_discharge'), sneezing: t('ent_sneezing'), soreThroat: t('ent_sore_throat'),
+    voiceChange: t('ent_voice_change'), dysphagia: t('ent_dysphagia'), snoring: t('ent_snoring'),
+    sleepApnea: t('ent_sleep_apnea'), facialPain: t('ent_facial_pain'), headache: t('ent_headache'),
+    nosebleeds: t('ent_nosebleeds'), lossOfSmell: t('ent_loss_of_smell'), neckMass: t('ent_neck_mass'),
   };
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-amber-50 dark:from-slate-900 dark:to-slate-800 p-3 md:p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header */}
         <div className="max-w-5xl mx-auto mb-6">
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl">
@@ -113,8 +115,8 @@ const ENTNewPatientFormView: React.FC = () => {
                 <i className="fa-solid fa-user-plus text-white text-2xl"></i>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-white">استبيان مريض جديد</h1>
-                <p className="text-slate-500 dark:text-slate-400">New Patient Questionnaire - ENT Department</p>
+                <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('ent_new_patient_title')}</h1>
+                <p className="text-slate-500 dark:text-slate-400">{t('ent_new_patient_subtitle')}</p>
               </div>
             </div>
           </div>
@@ -124,11 +126,11 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Patient Selection */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-user text-amber-500"></i> اختيار المريض
+              <i className="fa-solid fa-user text-amber-500"></i> {t('ent_select_patient')}
             </h2>
             <input
               type="text"
-              placeholder="ابحث بالاسم أو رقم الهاتف..."
+              placeholder={t('ent_search_patient')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white mb-3"
@@ -147,7 +149,7 @@ const ENTNewPatientFormView: React.FC = () => {
             {selectedPatient && (
               <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
                 <p className="font-bold text-amber-800 dark:text-amber-300">{selectedPatient.name}</p>
-                <p className="text-sm text-amber-600 dark:text-amber-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? 'ذكر' : 'أنثى'} | العمر: {selectedPatient.age}</p>
+                <p className="text-sm text-amber-600 dark:text-amber-400">{selectedPatient.phone} | {selectedPatient.gender === 'male' ? t('ent_male') : t('ent_female')} | {t('ent_age_label')}: {selectedPatient.age}</p>
               </div>
             )}
           </div>
@@ -155,29 +157,29 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Chief Complaint */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-comment-medical text-red-500"></i> الشكوى الرئيسية
+              <i className="fa-solid fa-comment-medical text-red-500"></i> {t('ent_chief_complaint')}
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">الشكوى الرئيسية *</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('ent_chief_complaint_required')}</label>
                 <textarea value={form.chiefComplaint} onChange={e => setForm(f => ({ ...f, chiefComplaint: e.target.value }))}
                   rows={3} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-                  placeholder="وصف الشكوى الرئيسية للمريض..." />
+                  placeholder={t('ent_chief_complaint_placeholder')} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">مدة الأعراض</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('ent_symptom_duration')}</label>
                   <input type="text" value={form.symptomDuration} onChange={e => setForm(f => ({ ...f, symptomDuration: e.target.value }))}
                     className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-                    placeholder="مثال: أسبوعين، شهر..." />
+                    placeholder={t('ent_symptom_duration_placeholder')} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">جهة الأعراض</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('ent_symptom_side')}</label>
                   <div className="flex gap-2 flex-wrap">
                     {(['right', 'left', 'both', 'none'] as const).map(side => (
                       <button key={side} onClick={() => setForm(f => ({ ...f, symptomSide: side }))}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.symptomSide === side ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
-                        {{ right: 'يمين', left: 'يسار', both: 'كلاهما', none: 'غير محدد' }[side]}
+                        {{ right: t('ent_side_right'), left: t('ent_side_left'), both: t('ent_side_both'), none: t('ent_side_none') }[side]}
                       </button>
                     ))}
                   </div>
@@ -189,7 +191,7 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Symptoms Checklist */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-list-check text-amber-500"></i> قائمة الأعراض
+              <i className="fa-solid fa-list-check text-amber-500"></i> {t('ent_symptoms_checklist')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {Object.entries(symptomLabels).map(([key, label]) => (
@@ -205,18 +207,18 @@ const ENTNewPatientFormView: React.FC = () => {
               ))}
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">أعراض أخرى</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('ent_other_symptoms')}</label>
               <input type="text" value={form.symptoms.other || ''} 
                 onChange={e => setForm(f => ({ ...f, symptoms: { ...f.symptoms, other: e.target.value } }))}
                 className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-                placeholder="أدخل أي أعراض إضافية..." />
+                placeholder={t('ent_other_symptoms_placeholder')} />
             </div>
           </div>
 
           {/* Previous ENT Treatment */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-clock-rotate-left text-purple-500"></i> العلاج السابق
+              <i className="fa-solid fa-clock-rotate-left text-purple-500"></i> {t('ent_previous_treatment')}
             </h2>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
@@ -224,26 +226,26 @@ const ENTNewPatientFormView: React.FC = () => {
                   <input type="checkbox" checked={form.previousENTTreatment}
                     onChange={e => setForm(f => ({ ...f, previousENTTreatment: e.target.checked }))}
                     className="w-5 h-5 rounded text-amber-500" />
-                  <span className="text-slate-700 dark:text-slate-300">هل تلقى علاج أنف أذن حنجرة سابقاً؟</span>
+                  <span className="text-slate-700 dark:text-slate-300">{t('ent_prev_ent_treatment')}</span>
                 </label>
               </div>
               {form.previousENTTreatment && (
                 <textarea value={form.previousENTDetails} onChange={e => setForm(f => ({ ...f, previousENTDetails: e.target.value }))}
                   rows={2} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-                  placeholder="تفاصيل العلاج السابق..." />
+                  placeholder={t('ent_prev_treatment_details')} />
               )}
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.previousENTSurgery}
                     onChange={e => setForm(f => ({ ...f, previousENTSurgery: e.target.checked }))}
                     className="w-5 h-5 rounded text-amber-500" />
-                  <span className="text-slate-700 dark:text-slate-300">هل أجرى عمليات جراحية في الأنف أو الأذن أو الحنجرة؟</span>
+                  <span className="text-slate-700 dark:text-slate-300">{t('ent_prev_ent_surgery')}</span>
                 </label>
               </div>
               {form.previousENTSurgery && (
                 <textarea value={form.previousENTSurgeryDetails} onChange={e => setForm(f => ({ ...f, previousENTSurgeryDetails: e.target.value }))}
                   rows={2} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-                  placeholder="تفاصيل العمليات السابقة..." />
+                  placeholder={t('ent_prev_surgery_details')} />
               )}
             </div>
           </div>
@@ -251,20 +253,20 @@ const ENTNewPatientFormView: React.FC = () => {
           {/* Notes */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-note-sticky text-green-500"></i> ملاحظات إضافية
+              <i className="fa-solid fa-note-sticky text-green-500"></i> {t('ent_additional_notes')}
             </h2>
             <textarea value={form.notes || ''} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
               rows={3} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white"
-              placeholder="أي ملاحظات إضافية..." />
+              placeholder={t('ent_any_additional_notes')} />
           </div>
 
           {/* Submit */}
           <div className="flex justify-center pb-8">
             <button onClick={handleSubmit} disabled={saving}
               className="px-12 py-4 bg-gradient-to-r from-amber-600 to-sky-500 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-50 text-lg">
-              {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> جاري الحفظ...</> 
-                : saved ? <><i className="fa-solid fa-check ml-2"></i> تم الحفظ بنجاح</>
-                : <><i className="fa-solid fa-save ml-2"></i> حفظ الاستبيان</>}
+              {saving ? <><i className="fa-solid fa-spinner fa-spin ml-2"></i> {t('ent_saving')}</> 
+                : saved ? <><i className="fa-solid fa-check ml-2"></i> {t('ent_saved_success')}</>
+                : <><i className="fa-solid fa-save ml-2"></i> {t('ent_save_questionnaire')}</>}
             </button>
           </div>
         </div>

@@ -51,15 +51,17 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      const isAr = localStorage.getItem('language') !== 'en';
+
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4" dir="rtl">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4" dir={isAr ? 'rtl' : 'ltr'}>
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-8 text-center">
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <i className="fa-solid fa-triangle-exclamation text-red-500 text-3xl"></i>
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 mb-2">حدث خطأ غير متوقع</h1>
+            <h1 className="text-2xl font-bold text-slate-800 mb-2">{isAr ? 'حدث خطأ غير متوقع' : 'An Unexpected Error Occurred'}</h1>
             <p className="text-slate-500 text-sm mb-6">
-              نعتذر عن هذا الخطأ. يمكنك المحاولة مرة أخرى أو تسجيل الدخول من جديد.
+              {isAr ? 'نعتذر عن هذا الخطأ. يمكنك المحاولة مرة أخرى أو تسجيل الدخول من جديد.' : 'We apologize for the error. You can try again or log in again.'}
             </p>
             
             {this.state.error && window.location.hostname === 'localhost' && (
@@ -79,14 +81,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
               >
                 <i className="fa-solid fa-rotate-right"></i>
-                إعادة المحاولة
+                {isAr ? 'إعادة المحاولة' : 'Try Again'}
               </button>
               <button
                 onClick={this.handleFullReset}
                 className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-2"
               >
                 <i className="fa-solid fa-right-from-bracket"></i>
-                تسجيل خروج وإعادة تحميل
+                {isAr ? 'تسجيل خروج وإعادة تحميل' : 'Logout & Reload'}
               </button>
             </div>
             

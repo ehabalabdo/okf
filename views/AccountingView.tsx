@@ -55,7 +55,7 @@ const AccountingView: React.FC = () => {
   const handleSaveInvoiceEdit = async () => {
     if (!user || !editingInvoice) return;
     const validItems = editItems.filter(i => i.description.trim() && i.price > 0);
-    if (validItems.length === 0) return alert(isRTL ? 'أضف خدمة واحدة على الأقل' : 'Add at least one item');
+    if (validItems.length === 0) return alert(t('add_one_item'));
     try {
       const newItems = validItems.map((item, idx) => ({ id: `item-${idx}`, ...item }));
       const newTotal = validItems.reduce((sum, i) => sum + i.price, 0);
@@ -71,7 +71,7 @@ const AccountingView: React.FC = () => {
 
   const handleDeleteInvoice = async (inv: Invoice) => {
     if (!user) return;
-    if (!confirm(isRTL ? `حذف فاتورة ${inv.patientName} نهائياً؟` : `Delete invoice for ${inv.patientName}?`)) return;
+    if (!confirm(`${t('delete_invoice_confirm')} ${inv.patientName}?`)) return;
     try {
       await api.del(`/invoices/${inv.id}`);
       setEditingInvoice(null);
@@ -153,7 +153,7 @@ const AccountingView: React.FC = () => {
   const handleExportPDF = useCallback(() => {
     const { from, to } = getDateRangeMs(dateRange);
     const rangedInvoices = invoices.filter(i => i.createdAt >= from && i.createdAt <= to);
-    const rangeLabel = dateRange === '7d' ? '7 أيام' : dateRange === '30d' ? '30 يوم' : dateRange === '90d' ? '3 أشهر' : dateRange === '365d' ? 'سنة' : 'الكل';
+    const rangeLabel = dateRange === '7d' ? t('range_7d') : dateRange === '30d' ? t('range_30d') : dateRange === '90d' ? t('range_90d') : dateRange === '365d' ? t('range_365d') : t('range_all');
     const fromDate = formatDate(from);
     const toDate = formatDate(to);
     const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -164,10 +164,10 @@ const AccountingView: React.FC = () => {
     const insuranceTotal = rangedInvoices.filter(i => i.paymentMethod === 'insurance').reduce((s, i) => s + i.totalAmount, 0);
 
     const html = `<!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="${isRTL ? 'rtl' : 'ltr'}" lang="${language}">
 <head>
 <meta charset="utf-8"/>
-<title>كشف محاسبي - MED LOOP</title>
+<title>${t('pdf_title')}</title>
 <style>
 @page { size: A4; margin: 15mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -205,60 +205,60 @@ tr:nth-child(even) { background: #f8fafc; }
 <body>
 <div class="header">
   <h1>MED LOOP</h1>
-  <div class="clinic">عيادة الدكتور طارق خريس - أنف وأذن وحنجرة</div>
-  <div class="subtitle">كشف محاسبي - ${rangeLabel} (${fromDate} إلى ${toDate})</div>
+  <div class="clinic">${t('pdf_clinic')}</div>
+  <div class="subtitle">${t('pdf_subtitle')} - ${rangeLabel} (${fromDate} - ${toDate})</div>
 </div>
 
 <div class="meta">
-  <span>تاريخ الطباعة: ${now} - ${nowTime}</span>
-  <span>عدد الفواتير: ${rangedInvoices.length}</span>
+  <span>${t('pdf_print_date')}: ${now} - ${nowTime}</span>
+  <span>${t('pdf_invoice_count')}: ${rangedInvoices.length}</span>
 </div>
 
 <div class="summary-grid">
   <div class="summary-card revenue">
     <div class="val">${formatCurrency(localSummary.total_revenue)}</div>
-    <div class="lbl">إجمالي الإيرادات</div>
+    <div class="lbl">${t('pdf_total_revenue')}</div>
   </div>
   <div class="summary-card collected">
     <div class="val">${formatCurrency(localSummary.total_collected)}</div>
-    <div class="lbl">المحصّل</div>
+    <div class="lbl">${t('pdf_collected')}</div>
   </div>
   <div class="summary-card pending">
     <div class="val">${formatCurrency(localSummary.total_pending)}</div>
-    <div class="lbl">المعلّق</div>
+    <div class="lbl">${t('pdf_pending')}</div>
   </div>
   <div class="summary-card partial">
     <div class="val">${formatCurrency(rangedInvoices.filter(i => i.status === 'partial').reduce((s, i) => s + i.totalAmount, 0))}</div>
-    <div class="lbl">دفع جزئي</div>
+    <div class="lbl">${t('pdf_partial')}</div>
   </div>
 </div>
 
-<div class="section-title">طرق الدفع</div>
+<div class="section-title">${t('pdf_payment_methods')}</div>
 <div class="method-grid">
-  <div class="method-card"><div class="val" style="color:#10b981">${formatCurrency(cashTotal)}</div><div class="lbl">نقدي (${rangedInvoices.filter(i => i.paymentMethod === 'cash').length})</div></div>
-  <div class="method-card"><div class="val" style="color:#3b82f6">${formatCurrency(cardTotal)}</div><div class="lbl">بطاقة (${rangedInvoices.filter(i => i.paymentMethod === 'card').length})</div></div>
-  <div class="method-card"><div class="val" style="color:#8b5cf6">${formatCurrency(insuranceTotal)}</div><div class="lbl">تأمين (${rangedInvoices.filter(i => i.paymentMethod === 'insurance').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#10b981">${formatCurrency(cashTotal)}</div><div class="lbl">${t('cash_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'cash').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#3b82f6">${formatCurrency(cardTotal)}</div><div class="lbl">${t('card_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'card').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#8b5cf6">${formatCurrency(insuranceTotal)}</div><div class="lbl">${t('insurance_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'insurance').length})</div></div>
 </div>
 
-<div class="section-title">تفاصيل الفواتير</div>
+<div class="section-title">${t('pdf_invoice_details')}</div>
 <table>
   <thead>
     <tr>
       <th>#</th>
-      <th>المريض</th>
-      <th>المبلغ</th>
-      <th>المدفوع</th>
-      <th>الباقي</th>
-      <th>طريقة الدفع</th>
-      <th>الحالة</th>
-      <th>التاريخ</th>
+      <th>${t('pdf_patient')}</th>
+      <th>${t('pdf_amount')}</th>
+      <th>${t('pdf_paid')}</th>
+      <th>${t('pdf_balance')}</th>
+      <th>${t('pdf_method')}</th>
+      <th>${t('pdf_status')}</th>
+      <th>${t('pdf_date')}</th>
     </tr>
   </thead>
   <tbody>
     ${rangedInvoices.sort((a, b) => b.createdAt - a.createdAt).map((inv, idx) => {
       const balance = inv.totalAmount - inv.paidAmount;
-      const methodMap: Record<string, string> = { cash: 'نقدي', card: 'بطاقة', insurance: 'تأمين' };
-      const statusMap: Record<string, string> = { paid: 'مدفوعة', unpaid: 'غير مدفوعة', partial: 'جزئية' };
+      const methodMap: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), insurance: t('insurance_method') };
+      const statusMap: Record<string, string> = { paid: t('paid'), unpaid: t('unpaid'), partial: t('partial_label') };
       return `<tr>
         <td>${idx + 1}</td>
         <td style="font-weight:600">${inv.patientName || '-'}</td>
@@ -271,7 +271,7 @@ tr:nth-child(even) { background: #f8fafc; }
       </tr>`;
     }).join('')}
     <tr class="totals-row">
-      <td colspan="2">المجموع</td>
+      <td colspan="2">${t('pdf_total')}</td>
       <td>${formatCurrency(rangedInvoices.reduce((s, i) => s + i.totalAmount, 0))}</td>
       <td style="color:#10b981">${formatCurrency(rangedInvoices.reduce((s, i) => s + i.paidAmount, 0))}</td>
       <td style="color:#ef4444">${formatCurrency(rangedInvoices.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0))}</td>
@@ -281,7 +281,7 @@ tr:nth-child(even) { background: #f8fafc; }
 </table>
 
 <div class="footer">
-  تم إنشاء هذا التقرير بواسطة نظام MED LOOP &bull; ${now}
+  ${t('pdf_footer')} &bull; ${now}
 </div>
 </body>
 </html>`;
@@ -295,30 +295,30 @@ tr:nth-child(even) { background: #f8fafc; }
   }, [invoices, dateRange, localSummary]);
 
   const paymentMethodLabel = (m: string) => {
-    const map: Record<string, string> = { cash: 'نقدي', card: 'بطاقة', insurance: 'تأمين' };
-    return isRTL ? (map[m] || m) : m;
+    const map: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), insurance: t('insurance_method') };
+    return map[m] || m;
   };
 
   // Chart: max bar height
   const maxDailyRevenue = Math.max(...dailyRevenue.map(d => parseFloat(d.total || 0)), 100);
 
   const tabs: { key: TabKey; label: string; icon: string }[] = [
-    { key: 'overview', label: isRTL ? 'نظرة عامة' : 'Overview', icon: 'fa-chart-pie' },
-    { key: 'invoices', label: isRTL ? 'الفواتير' : 'Invoices', icon: 'fa-file-invoice-dollar' },
-    { key: 'services', label: isRTL ? 'الخدمات' : 'Top Services', icon: 'fa-ranking-star' },
+    { key: 'overview', label: t('overview_tab'), icon: 'fa-chart-pie' },
+    { key: 'invoices', label: t('invoices_tab'), icon: 'fa-file-invoice-dollar' },
+    { key: 'services', label: t('top_services_tab'), icon: 'fa-ranking-star' },
   ];
 
   const dateRanges: { key: DateRange; label: string }[] = [
-    { key: '7d', label: isRTL ? '7 أيام' : '7 Days' },
-    { key: '30d', label: isRTL ? '30 يوم' : '30 Days' },
-    { key: '90d', label: isRTL ? '3 أشهر' : '3 Months' },
-    { key: '365d', label: isRTL ? 'سنة' : '1 Year' },
-    { key: 'all', label: isRTL ? 'الكل' : 'All' },
+    { key: '7d', label: t('range_7d') },
+    { key: '30d', label: t('range_30d') },
+    { key: '90d', label: t('range_90d') },
+    { key: '365d', label: t('range_365d') },
+    { key: 'all', label: t('range_all') },
   ];
 
   if (loading) {
     return (
-      <Layout title={isRTL ? 'المحاسبة' : 'Accounting'}>
+      <Layout title={t('acct_title')}>
         <div className="flex items-center justify-center h-64">
           <i className="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i>
         </div>
@@ -327,7 +327,7 @@ tr:nth-child(even) { background: #f8fafc; }
   }
 
   return (
-    <Layout title={isRTL ? 'المحاسبة والتقارير المالية' : 'Accounting & Financial Reports'} titleExtra={<div onClick={handleTitleTap} className="h-1 w-16 bg-primary rounded-full mt-1.5 cursor-default select-none"></div>}>
+    <Layout title={t('acct_subtitle')} titleExtra={<div onClick={handleTitleTap} className="h-1 w-16 bg-primary rounded-full mt-1.5 cursor-default select-none"></div>}>
       {/* Header: Tabs + Date Range */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="flex gap-2 flex-wrap">
@@ -364,7 +364,7 @@ tr:nth-child(even) { background: #f8fafc; }
             className="px-4 py-2.5 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-lg"
           >
             <i className="fa-solid fa-file-pdf"></i>
-            {isRTL ? 'طباعة كشف' : 'Print Report'}
+            {t('print_report')}
           </button>
         </div>
       </div>
@@ -375,10 +375,10 @@ tr:nth-child(even) { background: #f8fafc; }
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
             {[
-              { label: isRTL ? 'إجمالي الإيرادات' : 'Total Revenue', value: formatCurrency(s.total_revenue), icon: 'fa-coins', color: 'bg-blue-100 text-blue-600', count: `${s.total_invoices || 0} ${isRTL ? 'فاتورة' : 'invoices'}` },
-              { label: isRTL ? 'المحصّل' : 'Collected', value: formatCurrency(s.total_collected), icon: 'fa-circle-check', color: 'bg-emerald-100 text-emerald-600', count: `${s.paid_count || 0} ${isRTL ? 'مدفوعة' : 'paid'}` },
-              { label: isRTL ? 'المعلّق' : 'Pending', value: formatCurrency(s.total_pending), icon: 'fa-clock', color: 'bg-amber-100 text-amber-600', count: `${s.unpaid_count || 0} ${isRTL ? 'غير مدفوعة' : 'unpaid'}` },
-              { label: isRTL ? 'دفع جزئي' : 'Partial', value: formatCurrency(s.partial_total || 0), icon: 'fa-circle-half-stroke', color: 'bg-purple-100 text-purple-600', count: `${s.partial_count || 0} ${isRTL ? 'جزئية' : 'partial'}` },
+              { label: t('total_revenue'), value: formatCurrency(s.total_revenue), icon: 'fa-coins', color: 'bg-blue-100 text-blue-600', count: `${s.total_invoices || 0} ${t('invoice_count')}` },
+              { label: t('collected_label'), value: formatCurrency(s.total_collected), icon: 'fa-circle-check', color: 'bg-emerald-100 text-emerald-600', count: `${s.paid_count || 0} ${t('paid')}` },
+              { label: t('pending_label'), value: formatCurrency(s.total_pending), icon: 'fa-clock', color: 'bg-amber-100 text-amber-600', count: `${s.unpaid_count || 0} ${t('unpaid')}` },
+              { label: t('partial_label'), value: formatCurrency(s.partial_total || 0), icon: 'fa-circle-half-stroke', color: 'bg-purple-100 text-purple-600', count: `${s.partial_count || 0} ${t('partial_label')}` },
             ].map((card, i) => (
               <div key={i} className="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex items-center gap-4">
                 <div className={`w-14 h-14 rounded-2xl ${card.color} flex items-center justify-center text-2xl shadow-inner`}>
@@ -399,7 +399,7 @@ tr:nth-child(even) { background: #f8fafc; }
               <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
               <h3 className="text-lg font-bold mb-6 flex items-center gap-2 relative z-10">
                 <i className="fa-solid fa-chart-bar text-primary"></i>
-                {isRTL ? 'الإيرادات اليومية' : 'Daily Revenue'}
+                {t('daily_revenue')}
               </h3>
               <div className="relative z-10 flex gap-1 items-end h-48 overflow-x-auto">
                 {dailyRevenue.map((d, i) => {
@@ -429,10 +429,10 @@ tr:nth-child(even) { background: #f8fafc; }
             <div className="bg-white rounded-2xl shadow-soft border border-slate-100 p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i className="fa-solid fa-credit-card text-primary"></i>
-                {isRTL ? 'طرق الدفع' : 'Payment Methods'}
+                {t('payment_methods')}
               </h3>
               {paymentMethods.length === 0 ? (
-                <div className="text-slate-400 text-sm text-center py-8">{isRTL ? 'لا توجد بيانات' : 'No data'}</div>
+                <div className="text-slate-400 text-sm text-center py-8">{t('no_data')}</div>
               ) : (
                 <div className="space-y-3">
                   {paymentMethods.map((m, i) => {
@@ -462,13 +462,13 @@ tr:nth-child(even) { background: #f8fafc; }
             <div className="bg-white rounded-2xl shadow-soft border border-slate-100 p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i className="fa-solid fa-chart-pie text-primary"></i>
-                {isRTL ? 'حالة الفواتير' : 'Invoice Status'}
+                {t('invoice_status')}
               </h3>
               <div className="space-y-4">
                 {[
-                  { label: isRTL ? 'مدفوعة' : 'Paid', count: s.paid_count || 0, color: 'bg-emerald-500', textColor: 'text-emerald-600' },
-                  { label: isRTL ? 'غير مدفوعة' : 'Unpaid', count: s.unpaid_count || 0, color: 'bg-red-500', textColor: 'text-red-600' },
-                  { label: isRTL ? 'جزئية' : 'Partial', count: s.partial_count || 0, color: 'bg-amber-500', textColor: 'text-amber-600' },
+                  { label: t('paid'), count: s.paid_count || 0, color: 'bg-emerald-500', textColor: 'text-emerald-600' },
+                  { label: t('unpaid'), count: s.unpaid_count || 0, color: 'bg-red-500', textColor: 'text-red-600' },
+                  { label: t('partial_label'), count: s.partial_count || 0, color: 'bg-amber-500', textColor: 'text-amber-600' },
                 ].map((item, i) => {
                   const total = (s.paid_count || 0) + (s.unpaid_count || 0) + (s.partial_count || 0);
                   const pct = total > 0 ? (item.count / total * 100).toFixed(1) : '0';
@@ -501,10 +501,10 @@ tr:nth-child(even) { background: #f8fafc; }
           <div className="p-5 border-b border-slate-100 flex flex-col md:flex-row gap-3 items-start md:items-center justify-between bg-slate-50/50">
             <div className="flex gap-2 flex-wrap">
               {[
-                { key: 'all', label: isRTL ? 'الكل' : 'All' },
-                { key: 'paid', label: isRTL ? 'مدفوعة' : 'Paid' },
-                { key: 'unpaid', label: isRTL ? 'غير مدفوعة' : 'Unpaid' },
-                { key: 'partial', label: isRTL ? 'جزئية' : 'Partial' },
+                { key: 'all', label: t('all_filter') },
+                { key: 'paid', label: t('paid') },
+                { key: 'unpaid', label: t('unpaid') },
+                { key: 'partial', label: t('partial_label') },
               ].map(f => (
                 <button
                   key={f.key}
@@ -521,7 +521,7 @@ tr:nth-child(even) { background: #f8fafc; }
               <i className="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input
                 type="text"
-                placeholder={isRTL ? 'بحث بالاسم أو رقم الفاتورة...' : 'Search by name or invoice #...'}
+                placeholder={t('search_invoice')}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary w-64"
@@ -535,18 +535,18 @@ tr:nth-child(even) { background: #f8fafc; }
               <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 tracking-widest sticky top-0 z-10">
                 <tr>
                   <th className="px-5 py-3 border-b border-slate-100">#</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'المريض' : 'Patient'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'المبلغ' : 'Amount'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'المدفوع' : 'Paid'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'الباقي' : 'Balance'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'طريقة الدفع' : 'Method'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'الحالة' : 'Status'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'التاريخ' : 'Date'}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('patient_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('amount_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('paid_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('balance_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('method_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('status_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('date_col')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredInvoices.length === 0 ? (
-                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{isRTL ? 'لا توجد فواتير' : 'No invoices found'}</td></tr>
+                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{t('no_invoices')}</td></tr>
                 ) : (
                   filteredInvoices.map(inv => {
                     const balance = inv.totalAmount - inv.paidAmount;
@@ -569,9 +569,9 @@ tr:nth-child(even) { background: #f8fafc; }
                         </td>
                         <td className="px-5 py-3">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-tight border ${statusColors[inv.status] || ''}`}>
-                            {inv.status === 'paid' ? (isRTL ? 'مدفوعة' : 'Paid') :
-                             inv.status === 'unpaid' ? (isRTL ? 'غير مدفوعة' : 'Unpaid') :
-                             (isRTL ? 'جزئية' : 'Partial')}
+                            {inv.status === 'paid' ? t('paid') :
+                             inv.status === 'unpaid' ? t('unpaid') :
+                             t('partial_label')}
                           </span>
                         </td>
                         <td className="px-5 py-3 text-xs text-slate-500">{formatDate(inv.createdAt)}</td>
@@ -592,10 +592,10 @@ tr:nth-child(even) { background: #f8fafc; }
 
           {/* Footer Summary */}
           <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-6 text-sm">
-            <div><span className="text-slate-400 font-bold">{isRTL ? 'عدد الفواتير:' : 'Count:'}</span> <span className="font-extrabold text-slate-800">{filteredInvoices.length}</span></div>
-            <div><span className="text-slate-400 font-bold">{isRTL ? 'الإجمالي:' : 'Total:'}</span> <span className="font-extrabold text-slate-800">{formatCurrency(filteredInvoices.reduce((s, i) => s + i.totalAmount, 0))}</span></div>
-            <div><span className="text-slate-400 font-bold">{isRTL ? 'المحصّل:' : 'Collected:'}</span> <span className="font-extrabold text-emerald-600">{formatCurrency(filteredInvoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.totalAmount, 0))}</span></div>
-            <div><span className="text-slate-400 font-bold">{isRTL ? 'المعلّق:' : 'Pending:'}</span> <span className="font-extrabold text-red-600">{formatCurrency(filteredInvoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.totalAmount - i.paidAmount, 0))}</span></div>
+            <div><span className="text-slate-400 font-bold">{t('count_label')}</span> <span className="font-extrabold text-slate-800">{filteredInvoices.length}</span></div>
+            <div><span className="text-slate-400 font-bold">{t('total_label')}</span> <span className="font-extrabold text-slate-800">{formatCurrency(filteredInvoices.reduce((s, i) => s + i.totalAmount, 0))}</span></div>
+            <div><span className="text-slate-400 font-bold">{t('collected_colon')}</span> <span className="font-extrabold text-emerald-600">{formatCurrency(filteredInvoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.totalAmount, 0))}</span></div>
+            <div><span className="text-slate-400 font-bold">{t('pending_colon')}</span> <span className="font-extrabold text-red-600">{formatCurrency(filteredInvoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.totalAmount - i.paidAmount, 0))}</span></div>
           </div>
         </div>
       )}
@@ -605,7 +605,7 @@ tr:nth-child(even) { background: #f8fafc; }
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4" dir="rtl">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="p-5 bg-amber-600 text-white flex justify-between items-center">
-              <h3 className="font-bold"><i className="fa-solid fa-pen-to-square ml-2"></i>تعديل فاتورة - {editingInvoice.patientName}</h3>
+              <h3 className="font-bold"><i className="fa-solid fa-pen-to-square ml-2"></i>{t('edit_invoice')} - {editingInvoice.patientName}</h3>
               <button onClick={() => setEditingInvoice(null)}><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div className="p-5 space-y-3">
@@ -613,14 +613,14 @@ tr:nth-child(even) { background: #f8fafc; }
                 <div key={idx} className="flex gap-2 items-center">
                   <input
                     className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-primary outline-none"
-                    placeholder="الخدمة"
+                    placeholder={t('service_placeholder')}
                     value={item.description}
                     onChange={e => { const arr = [...editItems]; arr[idx].description = e.target.value; setEditItems(arr); }}
                   />
                   <input
                     className="w-24 border border-slate-200 rounded-xl px-3 py-2 text-sm text-left font-mono focus:border-primary outline-none"
                     type="number"
-                    placeholder="السعر"
+                    placeholder={t('price_placeholder_acct')}
                     value={item.price || ''}
                     onChange={e => { const arr = [...editItems]; arr[idx].price = parseFloat(e.target.value) || 0; setEditItems(arr); }}
                   />
@@ -628,17 +628,17 @@ tr:nth-child(even) { background: #f8fafc; }
                 </div>
               ))}
               <button onClick={() => setEditItems([...editItems, { description: '', price: 0 }])} className="w-full border-2 border-dashed border-slate-200 rounded-xl py-2 text-sm text-slate-400 hover:border-primary hover:text-primary transition-colors">
-                <i className="fa-solid fa-plus ml-1"></i> إضافة خدمة
+                <i className="fa-solid fa-plus ml-1"></i> {t('add_service_btn')}
               </button>
               <div className="flex justify-between items-center pt-3 border-t border-slate-100">
-                <span className="font-bold text-slate-600">المجموع:</span>
-                <span className="text-2xl font-bold text-emerald-600">{editItems.reduce((s, i) => s + i.price, 0).toFixed(2)} د.أ</span>
+                <span className="font-bold text-slate-600">{t('subtotal_label')}</span>
+                <span className="text-2xl font-bold text-emerald-600">{editItems.reduce((s, i) => s + i.price, 0).toFixed(2)} {t('currency_jod')}</span>
               </div>
               <button onClick={handleSaveInvoiceEdit} className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-amber-700 shadow-lg mt-2">
-                <i className="fa-solid fa-check ml-2"></i> حفظ التعديلات
+                <i className="fa-solid fa-check ml-2"></i> {t('save_edits')}
               </button>
               <button onClick={() => handleDeleteInvoice(editingInvoice)} className="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-red-700 mt-1 opacity-60 hover:opacity-100 transition-opacity">
-                <i className="fa-solid fa-trash ml-2"></i> حذف الفاتورة نهائياً
+                <i className="fa-solid fa-trash ml-2"></i> {t('delete_invoice_permanent')}
               </button>
             </div>
           </div>
@@ -651,7 +651,7 @@ tr:nth-child(even) { background: #f8fafc; }
           <div className="p-6 border-b border-slate-100 bg-slate-50/50">
             <h3 className="font-bold text-slate-800 flex items-center gap-2">
               <i className="fa-solid fa-ranking-star text-amber-500"></i>
-              {isRTL ? 'أعلى الخدمات ربحاً' : 'Top Revenue Services'}
+              {t('top_revenue_services')}
             </h3>
           </div>
           <div className="overflow-auto max-h-[600px]">
@@ -659,15 +659,15 @@ tr:nth-child(even) { background: #f8fafc; }
               <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 tracking-widest sticky top-0 z-10">
                 <tr>
                   <th className="px-5 py-3 border-b border-slate-100 w-12">#</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'الخدمة' : 'Service'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100 text-center">{isRTL ? 'العدد' : 'Count'}</th>
-                  <th className="px-5 py-3 border-b border-slate-100">{isRTL ? 'الإيرادات' : 'Revenue'}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('service_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100 text-center">{t('count_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('revenue_col')}</th>
                   <th className="px-5 py-3 border-b border-slate-100 w-48"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {topServices.length === 0 ? (
-                  <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-400">{isRTL ? 'لا توجد بيانات' : 'No data'}</td></tr>
+                  <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-400">{t('no_data')}</td></tr>
                 ) : (
                   topServices.map((svc, i) => {
                     const maxTotal = parseFloat(topServices[0]?.total || 1);

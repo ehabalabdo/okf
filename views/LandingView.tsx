@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 /* ═══════════════════════════ TYPES ═══════════════════════════════ */
 interface Feature {
@@ -7,8 +8,10 @@ interface Feature {
   title: string;
   titleEn: string;
   desc: string;
+  descEn: string;
   color: string;
   details: string[];
+  detailsEn: string[];
 }
 interface FeatureCategory {
   id: string;
@@ -110,52 +113,52 @@ const featureCategories: FeatureCategory[] = [
   {
     id: 'clinic', label: 'إدارة العيادة', labelEn: 'Clinic Ops', icon: 'fa-hospital', gradient: 'from-sky-500 to-sky-600',
     features: [
-      { icon: 'fa-hospital-user', title: 'إدارة العيادات المتعددة', titleEn: 'Multi-Clinic', desc: 'عيادات وأقسام غير محدودة من لوحة تحكم واحدة.', color: 'cyan', details: ['إنشاء عيادات وأقسام غير محدودة','تعيين كوادر بصلاحيات منفصلة','لوحة تحكم مركزية','تقارير مقارنة بين الفروع','إعدادات مستقلة لكل عيادة'] },
-      { icon: 'fa-user-nurse', title: 'الاستقبال الذكي', titleEn: 'Smart Reception', desc: 'تسجيل المرضى وإدارة الانتظار بنقرة واحدة.', color: 'cyan', details: ['تسجيل دخول بنقرة واحدة','إدارة قائمة الانتظار','تحويل فوري للعيادة','إشعارات فورية للطبيب','بحث بالاسم أو الهاتف أو الرقم الوطني','عرض حالة المريض لحظياً'] },
-      { icon: 'fa-calendar-check', title: 'نظام المواعيد', titleEn: 'Appointments', desc: 'حجز وتأكيد وتذكير تلقائي بدون تضارب.', color: 'cyan', details: ['عرض يومي/أسبوعي/شهري','حالات: مؤكد، معلق، ملغي، مكتمل','منع التضارب التلقائي','ملاحظات وسبب الزيارة','ربط مع شاشة الانتظار','تذكير عبر واتساب'] },
-      { icon: 'fa-tv', title: 'شاشة الانتظار', titleEn: 'Queue Display', desc: 'شاشة حية بنداء صوتي تلقائي.', color: 'cyan', details: ['تصميم احترافي للـ TV','نداء صوتي باسم المريض','تحديث Real-time','رقم الدور والطبيب والعيادة','دعم عربي/إنجليزي','بدون تحديث يدوي للصفحة'] },
+      { icon: 'fa-hospital-user', title: 'إدارة العيادات المتعددة', titleEn: 'Multi-Clinic', desc: 'عيادات وأقسام غير محدودة من لوحة تحكم واحدة.', descEn: 'Unlimited clinics and departments from a single dashboard.', color: 'cyan', details: ['إنشاء عيادات وأقسام غير محدودة','تعيين كوادر بصلاحيات منفصلة','لوحة تحكم مركزية','تقارير مقارنة بين الفروع','إعدادات مستقلة لكل عيادة'], detailsEn: ['Create unlimited clinics and departments','Assign staff with separate permissions','Central dashboard','Comparative reports across branches','Independent settings per clinic'] },
+      { icon: 'fa-user-nurse', title: 'الاستقبال الذكي', titleEn: 'Smart Reception', desc: 'تسجيل المرضى وإدارة الانتظار بنقرة واحدة.', descEn: 'Register patients and manage the queue with one click.', color: 'cyan', details: ['تسجيل دخول بنقرة واحدة','إدارة قائمة الانتظار','تحويل فوري للعيادة','إشعارات فورية للطبيب','بحث بالاسم أو الهاتف أو الرقم الوطني','عرض حالة المريض لحظياً'], detailsEn: ['One-click check-in','Queue management','Instant clinic transfer','Real-time doctor notifications','Search by name, phone, or national ID','Live patient status view'] },
+      { icon: 'fa-calendar-check', title: 'نظام المواعيد', titleEn: 'Appointments', desc: 'حجز وتأكيد وتذكير تلقائي بدون تضارب.', descEn: 'Book, confirm, and auto-remind without conflicts.', color: 'cyan', details: ['عرض يومي/أسبوعي/شهري','حالات: مؤكد، معلق، ملغي، مكتمل','منع التضارب التلقائي','ملاحظات وسبب الزيارة','ربط مع شاشة الانتظار','تذكير عبر واتساب'], detailsEn: ['Daily/weekly/monthly view','Statuses: confirmed, pending, cancelled, completed','Auto conflict prevention','Notes and visit reason','Queue display integration','WhatsApp reminders'] },
+      { icon: 'fa-tv', title: 'شاشة الانتظار', titleEn: 'Queue Display', desc: 'شاشة حية بنداء صوتي تلقائي.', descEn: 'Live display with automatic voice calling.', color: 'cyan', details: ['تصميم احترافي للـ TV','نداء صوتي باسم المريض','تحديث Real-time','رقم الدور والطبيب والعيادة','دعم عربي/إنجليزي','بدون تحديث يدوي للصفحة'], detailsEn: ['Professional TV design','Voice call by patient name','Real-time updates','Queue number, doctor, and clinic','Arabic/English support','No manual page refresh'] },
     ]
   },
   {
     id: 'medical', label: 'الملف الطبي', labelEn: 'Medical', icon: 'fa-stethoscope', gradient: 'from-amber-500 to-amber-600',
     features: [
-      { icon: 'fa-user-doctor', title: 'لوحة الطبيب', titleEn: 'Doctor Dashboard', desc: 'تشخيص، وصفات، خطط علاجية، مرفقات.', color: 'teal', details: ['ملف طبي شامل لكل مريض','تشخيصات وملاحظات تفصيلية','وصفات طبية قابلة للطباعة','رفع صور وأشعة وتحاليل','خطط علاجية متعددة الجلسات','قوالب جاهزة للتشخيصات الشائعة'] },
-      { icon: 'fa-clipboard-list', title: 'السجل السريري', titleEn: 'Clinical History', desc: 'تاريخ كامل لكل زيارة وعلاج.', color: 'teal', details: ['عرض زمني للزيارات','تصفية حسب التاريخ أو النوع','ملاحظات ومرفقات لكل زيارة','طباعة ملخص السجل','مشاركة مع طبيب آخر','أرشيف كامل قابل للبحث'] },
-      { icon: 'fa-address-book', title: 'سجل المرضى', titleEn: 'Patient Registry', desc: 'قاعدة بيانات شاملة مع بحث متقدم.', color: 'teal', details: ['بيانات ديموغرافية كاملة','بحث متقدم وفلترة','تصدير إلى Excel','إحصائيات جدد وعائدين','تاريخ أول وآخر زيارة','أرقام التواصل والرقم الوطني'] },
-      { icon: 'fa-mobile-screen', title: 'بوابة المريض', titleEn: 'Patient Portal', desc: 'المريض يحجز ويتابع ملفه بنفسه.', color: 'teal', details: ['تسجيل دخول بالجوال','عرض السجل الطبي الكامل','حجز وإلغاء المواعيد','عرض الوصفات والتعليمات','متابعة الطلبات والحجوزات','واجهة بسيطة للمريض'] },
+      { icon: 'fa-user-doctor', title: 'لوحة الطبيب', titleEn: 'Doctor Dashboard', desc: 'تشخيص، وصفات، خطط علاجية، مرفقات.', descEn: 'Diagnosis, prescriptions, treatment plans, attachments.', color: 'teal', details: ['ملف طبي شامل لكل مريض','تشخيصات وملاحظات تفصيلية','وصفات طبية قابلة للطباعة','رفع صور وأشعة وتحاليل','خطط علاجية متعددة الجلسات','قوالب جاهزة للتشخيصات الشائعة'], detailsEn: ['Comprehensive patient file','Detailed diagnoses and notes','Printable prescriptions','Upload images, X-rays, and labs','Multi-session treatment plans','Ready templates for common diagnoses'] },
+      { icon: 'fa-clipboard-list', title: 'السجل السريري', titleEn: 'Clinical History', desc: 'تاريخ كامل لكل زيارة وعلاج.', descEn: 'Complete history of every visit and treatment.', color: 'teal', details: ['عرض زمني للزيارات','تصفية حسب التاريخ أو النوع','ملاحظات ومرفقات لكل زيارة','طباعة ملخص السجل','مشاركة مع طبيب آخر','أرشيف كامل قابل للبحث'], detailsEn: ['Timeline view of visits','Filter by date or type','Notes and attachments per visit','Print record summary','Share with another doctor','Fully searchable archive'] },
+      { icon: 'fa-address-book', title: 'سجل المرضى', titleEn: 'Patient Registry', desc: 'قاعدة بيانات شاملة مع بحث متقدم.', descEn: 'Comprehensive database with advanced search.', color: 'teal', details: ['بيانات ديموغرافية كاملة','بحث متقدم وفلترة','تصدير إلى Excel','إحصائيات جدد وعائدين','تاريخ أول وآخر زيارة','أرقام التواصل والرقم الوطني'], detailsEn: ['Full demographic data','Advanced search and filtering','Export to Excel','New and returning patient stats','First and last visit dates','Contact numbers and national ID'] },
+      { icon: 'fa-mobile-screen', title: 'بوابة المريض', titleEn: 'Patient Portal', desc: 'المريض يحجز ويتابع ملفه بنفسه.', descEn: 'Patients book and track their own records.', color: 'teal', details: ['تسجيل دخول بالجوال','عرض السجل الطبي الكامل','حجز وإلغاء المواعيد','عرض الوصفات والتعليمات','متابعة الطلبات والحجوزات','واجهة بسيطة للمريض'], detailsEn: ['Mobile login','View complete medical record','Book and cancel appointments','View prescriptions and instructions','Track requests and bookings','Simple patient interface'] },
     ]
   },
   {
     id: 'financial', label: 'المالية', labelEn: 'Finance', icon: 'fa-coins', gradient: 'from-sky-500 to-amber-600',
     features: [
-      { icon: 'fa-file-invoice-dollar', title: 'الفواتير والمحاسبة', titleEn: 'Billing', desc: 'فواتير تفصيلية ودفعات جزئية وتقارير مالية.', color: 'cyan', details: ['فواتير تفصيلية مع بنود','دفعات جزئية ومتابعة المتبقي','تقارير يومية وشهرية وسنوية','طباعة احترافية','خصومات مرنة','ربط مع ملف المريض'] },
-      { icon: 'fa-tags', title: 'كتالوج الخدمات', titleEn: 'Service Catalog', desc: 'إدارة الخدمات والأسعار بمرونة تامة.', color: 'cyan', details: ['قائمة خدمات شاملة','تصنيف حسب القسم','تعديل أسعار مع حفظ التاريخ','ربط مع الفواتير','تصدير إلى Excel','دعم العملات المختلفة'] },
-      { icon: 'fa-chart-pie', title: 'التقارير والـ KPI', titleEn: 'Reports & KPI', desc: 'لوحة مؤشرات أداء ورسوم بيانية تفاعلية.', color: 'cyan', details: ['إيرادات ومصروفات','إحصائيات المرضى','أداء الأطباء','رسوم بيانية تفاعلية','مقارنة بين الفترات','لوحة KPI للإدارة'] },
+      { icon: 'fa-file-invoice-dollar', title: 'الفواتير والمحاسبة', titleEn: 'Billing', desc: 'فواتير تفصيلية ودفعات جزئية وتقارير مالية.', descEn: 'Detailed invoices, partial payments, and financial reports.', color: 'cyan', details: ['فواتير تفصيلية مع بنود','دفعات جزئية ومتابعة المتبقي','تقارير يومية وشهرية وسنوية','طباعة احترافية','خصومات مرنة','ربط مع ملف المريض'], detailsEn: ['Itemized invoices','Partial payments and balance tracking','Daily, monthly, and annual reports','Professional printing','Flexible discounts','Linked to patient file'] },
+      { icon: 'fa-tags', title: 'كتالوج الخدمات', titleEn: 'Service Catalog', desc: 'إدارة الخدمات والأسعار بمرونة تامة.', descEn: 'Manage services and pricing with full flexibility.', color: 'cyan', details: ['قائمة خدمات شاملة','تصنيف حسب القسم','تعديل أسعار مع حفظ التاريخ','ربط مع الفواتير','تصدير إلى Excel','دعم العملات المختلفة'], detailsEn: ['Comprehensive service list','Categorize by department','Price editing with history','Link to invoices','Export to Excel','Multi-currency support'] },
+      { icon: 'fa-chart-pie', title: 'التقارير والـ KPI', titleEn: 'Reports & KPI', desc: 'لوحة مؤشرات أداء ورسوم بيانية تفاعلية.', descEn: 'Performance dashboard with interactive charts.', color: 'cyan', details: ['إيرادات ومصروفات','إحصائيات المرضى','أداء الأطباء','رسوم بيانية تفاعلية','مقارنة بين الفترات','لوحة KPI للإدارة'], detailsEn: ['Revenue and expenses','Patient statistics','Doctor performance','Interactive charts','Period comparisons','Management KPI dashboard'] },
     ]
   },
   {
     id: 'hr', label: 'الموارد البشرية', labelEn: 'HR', icon: 'fa-people-group', gradient: 'from-sky-500 to-sky-600',
     features: [
-      { icon: 'fa-id-card', title: 'إدارة الموظفين', titleEn: 'Employees', desc: 'ملفات كاملة، هيكل تنظيمي، صلاحيات.', color: 'cyan', details: ['ملف شامل لكل موظف','تحديد القسم والراتب','بدلات وخصومات','هيكل تنظيمي شجري','تاريخ التوظيف والترقيات','صلاحيات حسب الدور'] },
-      { icon: 'fa-fingerprint', title: 'الحضور والبصمة', titleEn: 'Biometric', desc: 'ربط مع أجهزة البصمة وحساب الساعات آلياً.', color: 'cyan', details: ['ربط أجهزة البصمة','تسجيل يدوي بديل','حساب ساعات العمل والتأخير','تقارير حضور مفصلة','إشعارات تأخير وغياب','دعم الورديات المرنة'] },
-      { icon: 'fa-money-check-dollar', title: 'الرواتب و PDF', titleEn: 'Payroll', desc: 'معالجة رواتب وكشف PDF يحمله الموظف.', color: 'cyan', details: ['حساب الراتب آلياً بناءً على الحضور','بدلات وخصومات مرنة','كشف راتب PDF احترافي','الموظف يحمّل كشفه','تقارير رواتب للإدارة','دعم العملات المحلية'] },
-      { icon: 'fa-chart-bar', title: 'تقارير HR', titleEn: 'HR Reports', desc: 'تقارير حضور ورواتب وأداء.', color: 'cyan', details: ['تقارير حضور وغياب','تكلفة رواتب شهرية','إحصائيات إنتاجية','تقارير إجازات','تصدير Excel و PDF','مقارنة أداء الأقسام'] },
+      { icon: 'fa-id-card', title: 'إدارة الموظفين', titleEn: 'Employees', desc: 'ملفات كاملة، هيكل تنظيمي، صلاحيات.', descEn: 'Complete profiles, org chart, permissions.', color: 'cyan', details: ['ملف شامل لكل موظف','تحديد القسم والراتب','بدلات وخصومات','هيكل تنظيمي شجري','تاريخ التوظيف والترقيات','صلاحيات حسب الدور'], detailsEn: ['Comprehensive employee profile','Set department and salary','Allowances and deductions','Tree org chart','Employment and promotion history','Role-based permissions'] },
+      { icon: 'fa-fingerprint', title: 'الحضور والبصمة', titleEn: 'Biometric', desc: 'ربط مع أجهزة البصمة وحساب الساعات آلياً.', descEn: 'Biometric device integration with auto hour calculation.', color: 'cyan', details: ['ربط أجهزة البصمة','تسجيل يدوي بديل','حساب ساعات العمل والتأخير','تقارير حضور مفصلة','إشعارات تأخير وغياب','دعم الورديات المرنة'], detailsEn: ['Biometric device integration','Manual backup entry','Work hours and lateness calculation','Detailed attendance reports','Late and absence alerts','Flexible shift support'] },
+      { icon: 'fa-money-check-dollar', title: 'الرواتب و PDF', titleEn: 'Payroll', desc: 'معالجة رواتب وكشف PDF يحمله الموظف.', descEn: 'Salary processing with downloadable PDF payslips.', color: 'cyan', details: ['حساب الراتب آلياً بناءً على الحضور','بدلات وخصومات مرنة','كشف راتب PDF احترافي','الموظف يحمّل كشفه','تقارير رواتب للإدارة','دعم العملات المحلية'], detailsEn: ['Auto salary calculation based on attendance','Flexible allowances and deductions','Professional PDF payslip','Employee downloads their payslip','Payroll reports for management','Local currency support'] },
+      { icon: 'fa-chart-bar', title: 'تقارير HR', titleEn: 'HR Reports', desc: 'تقارير حضور ورواتب وأداء.', descEn: 'Attendance, payroll, and performance reports.', color: 'cyan', details: ['تقارير حضور وغياب','تكلفة رواتب شهرية','إحصائيات إنتاجية','تقارير إجازات','تصدير Excel و PDF','مقارنة أداء الأقسام'], detailsEn: ['Attendance and absence reports','Monthly payroll cost','Productivity stats','Leave reports','Export to Excel and PDF','Department performance comparison'] },
     ]
   },
   {
     id: 'specialty', label: 'وحدات متخصصة', labelEn: 'Specialty', icon: 'fa-puzzle-piece', gradient: 'from-amber-500 to-amber-600',
     features: [
-      { icon: 'fa-microchip', title: 'ربط الأجهزة الطبية', titleEn: 'Device Integration', desc: 'استقبال نتائج HL7 تلقائياً في الملف الطبي.', color: 'teal', details: ['بروتوكول HL7','نتائج مباشرة في الملف','Serial Port و MLLP','تنبيهات القيم غير الطبيعية','أرشفة تلقائية','Bridge Agent سحابي'] },
+      { icon: 'fa-microchip', title: 'ربط الأجهزة الطبية', titleEn: 'Device Integration', desc: 'استقبال نتائج HL7 تلقائياً في الملف الطبي.', descEn: 'Auto-receive HL7 results directly in the medical record.', color: 'teal', details: ['بروتوكول HL7','نتائج مباشرة في الملف','Serial Port و MLLP','تنبيهات القيم غير الطبيعية','أرشفة تلقائية','Bridge Agent سحابي'], detailsEn: ['HL7 protocol','Results directly in file','Serial Port and MLLP','Abnormal value alerts','Auto archiving','Cloud Bridge Agent'] },
     ]
   },
   {
     id: 'platform', label: 'المنصة', labelEn: 'Platform', icon: 'fa-shield-halved', gradient: 'from-amber-500 to-sky-600',
     features: [
-      { icon: 'fa-shield-halved', title: 'الأمان والخصوصية', titleEn: 'Security', desc: 'تشفير، صلاحيات، حماية متقدمة.', color: 'teal', details: ['تشفير SSL/TLS','صلاحيات متعددة المستويات','Rate Limiting + Helmet + CORS','JWT Token','تسجيل أنشطة','فصل بيانات العملاء'] },
-      { icon: 'fa-language', title: 'عربي وإنجليزي', titleEn: 'Multi-Language', desc: 'تبديل فوري بين اللغتين.', color: 'teal', details: ['واجهة عربية RTL كاملة','تبديل فوري للإنجليزية','تقارير وفواتير بكلتا اللغتين','تذكر اللغة المفضلة','خدمات وتشخيصات بكلتا اللغتين','قابل لإضافة لغات مستقبلاً'] },
-      { icon: 'fa-moon', title: 'الوضع الليلي', titleEn: 'Dark Mode', desc: 'وضع ليلي مريح مع تبديل فوري.', color: 'teal', details: ['وضع ليلي مريح للعين','وضع نهاري واضح','تبديل فوري','حفظ تفضيل المستخدم','تصميم متجاوب','ألوان احترافية لكلا الوضعين'] },
-      { icon: 'fa-building', title: 'SaaS متعددة العملاء', titleEn: 'Multi-Tenant', desc: 'كل مركز برابطه وبياناته المستقلة.', color: 'teal', details: ['رابط مخصص لكل عميل','بيانات منفصلة تماماً','لوحة Super Admin','إنشاء عميل بدقائق','خطط اشتراك مرنة','نسخ احتياطي تلقائي'] },
-      { icon: 'fa-brands fa-whatsapp', title: 'تكامل واتساب', titleEn: 'WhatsApp', desc: 'تأكيد مواعيد وتذكيرات عبر واتساب.', color: 'green', details: ['تأكيد موعد تلقائي','تذكير قبل الموعد','رابط حجز للمريض','رد سريع على استفسارات','زر واتساب في ملف المريض','إشعارات مخصصة'] },
+      { icon: 'fa-shield-halved', title: 'الأمان والخصوصية', titleEn: 'Security', desc: 'تشفير، صلاحيات، حماية متقدمة.', descEn: 'Encryption, permissions, advanced protection.', color: 'teal', details: ['تشفير SSL/TLS','صلاحيات متعددة المستويات','Rate Limiting + Helmet + CORS','JWT Token','تسجيل أنشطة','فصل بيانات العملاء'], detailsEn: ['SSL/TLS encryption','Multi-level permissions','Rate Limiting + Helmet + CORS','JWT Token','Activity logging','Client data isolation'] },
+      { icon: 'fa-language', title: 'عربي وإنجليزي', titleEn: 'Multi-Language', desc: 'تبديل فوري بين اللغتين.', descEn: 'Instant switch between languages.', color: 'teal', details: ['واجهة عربية RTL كاملة','تبديل فوري للإنجليزية','تقارير وفواتير بكلتا اللغتين','تذكر اللغة المفضلة','خدمات وتشخيصات بكلتا اللغتين','قابل لإضافة لغات مستقبلاً'], detailsEn: ['Full Arabic RTL interface','Instant English toggle','Reports and invoices in both languages','Remember language preference','Services and diagnoses in both languages','Extensible for future languages'] },
+      { icon: 'fa-moon', title: 'الوضع الليلي', titleEn: 'Dark Mode', desc: 'وضع ليلي مريح مع تبديل فوري.', descEn: 'Comfortable dark mode with instant toggle.', color: 'teal', details: ['وضع ليلي مريح للعين','وضع نهاري واضح','تبديل فوري','حفظ تفضيل المستخدم','تصميم متجاوب','ألوان احترافية لكلا الوضعين'], detailsEn: ['Eye-friendly dark mode','Clear light mode','Instant toggle','Save user preference','Responsive design','Professional colors for both modes'] },
+      { icon: 'fa-building', title: 'SaaS متعددة العملاء', titleEn: 'Multi-Tenant', desc: 'كل مركز برابطه وبياناته المستقلة.', descEn: 'Each center gets its own URL and isolated data.', color: 'teal', details: ['رابط مخصص لكل عميل','بيانات منفصلة تماماً','لوحة Super Admin','إنشاء عميل بدقائق','خطط اشتراك مرنة','نسخ احتياطي تلقائي'], detailsEn: ['Custom URL per client','Fully separate data','Super Admin panel','Create client in minutes','Flexible subscription plans','Auto backup'] },
+      { icon: 'fa-brands fa-whatsapp', title: 'تكامل واتساب', titleEn: 'WhatsApp', desc: 'تأكيد مواعيد وتذكيرات عبر واتساب.', descEn: 'Appointment confirmation and reminders via WhatsApp.', color: 'green', details: ['تأكيد موعد تلقائي','تذكير قبل الموعد','رابط حجز للمريض','رد سريع على استفسارات','زر واتساب في ملف المريض','إشعارات مخصصة'], detailsEn: ['Auto appointment confirmation','Pre-appointment reminder','Booking link for patient','Quick reply to inquiries','WhatsApp button in patient file','Custom notifications'] },
     ]
   },
 ];
@@ -164,18 +167,21 @@ const allFeatures = featureCategories.flatMap(c => c.features);
 
 /* ═══════════════════════ AUTOMATION FLOW ════════════════════════ */
 const automationSteps = [
-  { icon: 'fa-calendar-plus', label: 'مريض يحجز موعد', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-bell', label: 'إشعار للطبيب', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-user-check', label: 'تسجيل الحضور', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-stethoscope', label: 'فحص وتشخيص', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-file-invoice-dollar', label: 'فاتورة تلقائية', color: 'from-sky-500 to-amber-500' },
-  { icon: 'fa-chart-line', label: 'تقرير KPI', color: 'from-amber-500 to-amber-500' },
+  { icon: 'fa-calendar-plus', label: 'مريض يحجز موعد', labelEn: 'Patient books appointment', color: 'from-sky-500 to-sky-500' },
+  { icon: 'fa-bell', label: 'إشعار للطبيب', labelEn: 'Doctor notification', color: 'from-sky-500 to-sky-500' },
+  { icon: 'fa-user-check', label: 'تسجيل الحضور', labelEn: 'Check-in', color: 'from-sky-500 to-sky-500' },
+  { icon: 'fa-stethoscope', label: 'فحص وتشخيص', labelEn: 'Exam & diagnosis', color: 'from-sky-500 to-sky-500' },
+  { icon: 'fa-file-invoice-dollar', label: 'فاتورة تلقائية', labelEn: 'Auto invoice', color: 'from-sky-500 to-amber-500' },
+  { icon: 'fa-chart-line', label: 'تقرير KPI', labelEn: 'KPI report', color: 'from-amber-500 to-amber-500' },
 ];
 
 /* ═══════════════════════ COMPONENT ══════════════════════════════ */
 const rotatingWords = ['ذكية', 'مؤتمتة', 'دقيقة', 'متكاملة', 'بلا أخطاء'];
+const rotatingWordsEn = ['smart', 'automated', 'precise', 'integrated', 'error-free'];
 
 const LandingView: React.FC = () => {
+  const { t, language, dir } = useLanguage();
+  const isAr = language === 'ar';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeCategory, setActiveCategory] = useState('clinic');
@@ -240,11 +246,11 @@ const LandingView: React.FC = () => {
           </div>
           <div className="hidden md:flex items-center gap-8">
             {[
-              { href: '#command-center', label: 'المنصة' },
-              { href: '#features', label: 'المميزات' },
-              { href: '#transform', label: 'التحول' },
-              { href: '#tech', label: 'البنية التحتية' },
-              { href: '#contact', label: 'تواصل معنا' },
+              { href: '#command-center', label: t('lp_nav_platform') },
+              { href: '#features', label: t('lp_nav_features') },
+              { href: '#transform', label: t('lp_nav_transform') },
+              { href: '#tech', label: t('lp_nav_infrastructure') },
+              { href: '#contact', label: t('lp_nav_contact') },
             ].map(l => (
               <a key={l.href} href={l.href} className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">{l.label}</a>
             ))}
@@ -257,7 +263,7 @@ const LandingView: React.FC = () => {
           <div className="md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-white/5 px-6 py-4 space-y-3">
             {['#command-center', '#features', '#transform', '#tech', '#contact'].map((h, i) => (
               <a key={h} href={h} onClick={() => setMobileMenu(false)} className="block text-slate-300 hover:text-primary py-2">
-                {['المنصة', 'المميزات', 'التحول', 'البنية التحتية', 'تواصل معنا'][i]}
+                {[t('lp_nav_platform'), t('lp_nav_features'), t('lp_nav_transform'), t('lp_nav_infrastructure'), t('lp_nav_contact')][i]}
               </a>
             ))}
           </div>
@@ -301,7 +307,7 @@ const LandingView: React.FC = () => {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                 </span>
                 <span className="text-xs font-medium text-amber-300 tracking-wider uppercase" style={{ fontFamily: "'Cairo', sans-serif" }}>
-                  نظام إدارة طبية متكامل
+                  {t('lp_badge')}
                 </span>
               </motion.div>
 
@@ -314,7 +320,7 @@ const LandingView: React.FC = () => {
                   className="block text-[clamp(2.5rem,5vw,4.5rem)] font-black text-white leading-[1.1] mb-2 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
                   style={{ fontFamily: "'Cairo', sans-serif" }}
                 >
-                  إدارة طبية
+                  {t('lp_headline')}
                 </motion.span>
 
                 {/* Rotating word container */}
@@ -335,7 +341,7 @@ const LandingView: React.FC = () => {
                         textShadow: '0 0 40px rgba(129, 140, 248, 0.3)'
                       }}
                     >
-                      {rotatingWords[wordIndex]}
+                      {isAr ? rotatingWords[wordIndex] : rotatingWordsEn[wordIndex]}
                     </motion.span>
                   </AnimatePresence>
                 </span>
@@ -349,7 +355,7 @@ const LandingView: React.FC = () => {
                 className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-xl mr-0 ml-auto lg:ml-0 mb-10 font-light"
                 style={{ fontFamily: "'Cairo', sans-serif" }}
               >
-                نظام سحابي شامل يجمع الاستقبال، المواعيد، الملف الطبي، الفواتير، والموارد البشرية في منصة واحدة سهلة الاستخدام. وفّر وقتك وركّز على مرضاك.
+                {t('lp_subheading')}
               </motion.p>
 
               {/* CTAs */}
@@ -362,13 +368,13 @@ const LandingView: React.FC = () => {
                 <a href="#contact" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl text-[16px] text-center overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(45,212,191,0.4)]">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                   <span className="relative z-10 flex items-center justify-center gap-3">
-                    اطلب عرض تجريبي
+                    {t('lp_cta_demo')}
                     <i className="fa-solid fa-rocket text-sm group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300"></i>
                   </span>
                 </a>
                 <a href="#demo-video" className="group px-8 py-4 border border-white/10 bg-white/[0.02] backdrop-blur-sm text-white/80 font-bold rounded-2xl text-[16px] text-center transition-all duration-300 hover:bg-white/[0.08] hover:border-white/20 hover:text-white">
                   <span className="flex items-center justify-center gap-3">
-                    شاهد النظام
+                    {t('lp_cta_watch')}
                     <i className="fa-solid fa-play text-xs opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"></i>
                   </span>
                 </a>
@@ -402,8 +408,8 @@ const LandingView: React.FC = () => {
                     {/* Holographic Stats Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       {[
-                        { label: 'المرضى النشطين', val: '124', icon: 'fa-users', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
-                        { label: 'معدل الإشغال', val: '92%', icon: 'fa-chart-pie', color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
+                        { label: t('lp_active_patients'), val: '124', icon: 'fa-users', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+                        { label: t('lp_occupancy_rate'), val: '92%', icon: 'fa-chart-pie', color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
                       ].map((stat, i) => (
                         <div key={i} className={`relative p-4 rounded-2xl border ${stat.border} ${stat.bg} overflow-hidden group`}>
                           <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -422,15 +428,15 @@ const LandingView: React.FC = () => {
                     <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
                       <div className="text-[11px] text-white/40 mb-4 font-medium flex justify-between items-center">
-                        <span>تدفق العمليات المباشر</span>
+                        <span>{t('lp_live_stream')}</span>
                         <i className="fa-solid fa-satellite-dish text-amber-400/50 animate-pulse"></i>
                       </div>
                       
                       <div className="space-y-3">
                         {[
-                          { action: 'تم تسجيل دخول مريض جديد', time: 'الآن', color: 'teal' },
-                          { action: 'تحديث السجل الطبي', time: 'قبل دقيقتين', color: 'teal' },
-                          { action: 'اكتمال تحليل المختبر', time: 'قبل 5 دقائق', color: 'cyan' }
+                          { action: t('lp_action_new_patient'), time: t('lp_time_now'), color: 'teal' },
+                          { action: t('lp_action_medical_update'), time: t('lp_time_2min'), color: 'teal' },
+                          { action: t('lp_action_lab_complete'), time: t('lp_time_5min'), color: 'cyan' }
                         ].map((item, i) => (
                           <motion.div 
                             key={i}
@@ -476,7 +482,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-microchip animate-pulse"></i> سير عمل مؤتمت
+              <i className="fa-solid fa-microchip animate-pulse"></i> {t('lp_automated_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -485,7 +491,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
-              رحلة المريض — <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">من الحجز حتى الفاتورة</span>
+              {t('lp_patient_journey')} — <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_patient_journey_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -494,7 +500,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              كل خطوة مترابطة تلقائياً: المريض يحجز، الطبيب يُبلّغ، السجل يُحدّث، والفاتورة تصدر — بدون إدخال يدوي مكرر.
+              {t('lp_patient_journey_desc')}
             </motion.p>
           </div>
 
@@ -522,7 +528,7 @@ const LandingView: React.FC = () => {
                   
                   <span className={`mt-6 text-sm font-bold text-center max-w-[100px] transition-colors duration-300
                     ${activeFlowStep === i ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'text-slate-500'}`}>
-                    {step.label}
+                    {isAr ? step.label : step.labelEn}
                   </span>
                   
                   {activeFlowStep === i && (
@@ -566,7 +572,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-eye animate-pulse"></i> تطور ملموس
+              <i className="fa-solid fa-eye animate-pulse"></i> {t('lp_transform_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -575,7 +581,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              تخيّل مركزك بعد <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">٦ أشهر</span>
+              {t('lp_transform_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_transform_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -584,18 +590,18 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              هذا ما يتغير فعلياً في مركزك بعد استخدام النظام — نتائج حقيقية يلمسها فريقك ومرضاك.
+              {t('lp_transform_desc')}
             </motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: 'fa-file-circle-xmark', text: 'تقليل الأوراق بشكل كبير', desc: 'سجلات رقمية للمرضى والمواعيد والفواتير بدل الملفات الورقية', color: 'teal' },
-              { icon: 'fa-calculator', text: 'فواتير دقيقة ومنظمة', desc: 'ربط تلقائي بين الخدمات المقدمة والفواتير مع تتبع المدفوعات', color: 'teal' },
-              { icon: 'fa-calendar-check', text: 'مواعيد بدون تضارب', desc: 'النظام يمنع حجز نفس الوقت مرتين ويدير قائمة الانتظار', color: 'cyan' },
-              { icon: 'fa-chart-pie', text: 'تقارير وإحصائيات واضحة', desc: 'إيرادات، عدد المرضى، أداء الأطباء — في لوحة واحدة', color: 'cyan' },
-              { icon: 'fa-user-doctor', text: 'لوحة تحكم لكل طبيب', desc: 'كل طبيب يرى مرضاه، تشخيصاته، وملاحظاته في مكان واحد', color: 'teal' },
-              { icon: 'fa-building-shield', text: 'إدارة مؤسسية منظمة', desc: 'صلاحيات واضحة لكل موظف، وتقارير HR وحضور مؤتمتة', color: 'cyan' },
+              { icon: 'fa-file-circle-xmark', text: t('lp_transform_1'), desc: t('lp_transform_1d'), color: 'teal' },
+              { icon: 'fa-calculator', text: t('lp_transform_2'), desc: t('lp_transform_2d'), color: 'teal' },
+              { icon: 'fa-calendar-check', text: t('lp_transform_3'), desc: t('lp_transform_3d'), color: 'cyan' },
+              { icon: 'fa-chart-pie', text: t('lp_transform_4'), desc: t('lp_transform_4d'), color: 'cyan' },
+              { icon: 'fa-user-doctor', text: t('lp_transform_5'), desc: t('lp_transform_5d'), color: 'teal' },
+              { icon: 'fa-building-shield', text: t('lp_transform_6'), desc: t('lp_transform_6d'), color: 'cyan' },
             ].map((item, i) => (
               <motion.div 
                 key={i}
@@ -635,7 +641,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              لماذا <span className="text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.3)]">تنهار</span> الأنظمة التقليدية؟
+              {t('lp_why_fail_title_pre')} <span className="text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.3)]">{t('lp_why_fail_highlight')}</span> {t('lp_why_fail_title_post')}
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -644,7 +650,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              مقارنة واقعية بين ما اعتدت عليه وما يقدمه لك نظامنا الإلكتروني.
+              {t('lp_why_fail_desc')}
             </motion.p>
           </div>
 
@@ -664,24 +670,16 @@ const LandingView: React.FC = () => {
                     <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-xl">
                       <i className="fa-solid fa-triangle-exclamation"></i>
                     </div>
-                    <h3 className="text-2xl font-bold text-red-400">الطريقة التقليدية</h3>
+                    <h3 className="text-2xl font-bold text-red-400">{t('lp_traditional_title')}</h3>
                   </div>
                   
                   <div className="space-y-5">
-                    {[
-                      'برنامج مثبت على جهاز واحد — لا يمكن الوصول من الخارج',
-                      'بيانات محفوظة محلياً — خطر الضياع عند تعطل الجهاز',
-                      'لا يوجد نسخ احتياطي سحابي تلقائي',
-                      'لا يوجد بوابة إلكترونية للمريض',
-                      'تقارير محدودة تحتاج تصدير يدوي',
-                      'لا يدعم ربط الأجهزة الطبية (HL7)',
-                      'واجهات قديمة تحتاج تدريب طويل',
-                    ].map((t, i) => (
+                    {[t('lp_trad_1'),t('lp_trad_2'),t('lp_trad_3'),t('lp_trad_4'),t('lp_trad_5'),t('lp_trad_6'),t('lp_trad_7')].map((txt, i) => (
                       <div key={i} className="flex items-start gap-4">
                         <div className="w-6 h-6 rounded-full bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5">
                           <i className="fa-solid fa-xmark text-red-400 text-xs"></i>
                         </div>
-                        <span className="text-slate-400 text-base leading-relaxed">{t}</span>
+                        <span className="text-slate-400 text-base leading-relaxed">{txt}</span>
                       </div>
                     ))}
                   </div>
@@ -705,24 +703,16 @@ const LandingView: React.FC = () => {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-sky-500 flex items-center justify-center text-white text-xl shadow-[0_0_20px_rgba(45,212,191,0.4)]">
                       <i className="fa-solid fa-shield-halved"></i>
                     </div>
-                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-sky-400">عيادة د. طارق خريس</h3>
+                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_modern_title')}</h3>
                   </div>
                   
                   <div className="space-y-5 relative z-10">
-                    {[
-                      'نظام سحابي — ادخل من أي جهاز وأي مكان بأمان',
-                      'تشفير SSL/TLS ومصادقة JWT وصلاحيات متعددة المستويات',
-                      'نسخ احتياطي سحابي تلقائي عبر Neon Database',
-                      'بوابة إلكترونية للمريض: حجز، متابعة، سجل طبي',
-                      'تقارير تفصيلية: إيرادات، مرضى، حضور، أداء',
-                      'ربط أجهزة طبية عبر بروتوكول HL7 و Bridge Agent',
-                      'واجهة عصرية وسهلة تعمل من المتصفح مباشرة',
-                    ].map((t, i) => (
+                    {[t('lp_mod_1'),t('lp_mod_2'),t('lp_mod_3'),t('lp_mod_4'),t('lp_mod_5'),t('lp_mod_6'),t('lp_mod_7')].map((txt, i) => (
                       <div key={i} className="flex items-start gap-4">
                         <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(45,212,191,0.3)]">
                           <i className="fa-solid fa-check text-amber-400 text-xs"></i>
                         </div>
-                        <span className="text-white/90 text-base font-medium leading-relaxed">{t}</span>
+                        <span className="text-white/90 text-base font-medium leading-relaxed">{txt}</span>
                       </div>
                     ))}
                   </div>
@@ -744,7 +734,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-server animate-pulse"></i> منصة SaaS متعددة المراكز
+              <i className="fa-solid fa-server animate-pulse"></i> {t('lp_saas_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -753,7 +743,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              كل مركز — <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-sky-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">بيئة معزولة تماماً</span>
+              {t('lp_saas_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-sky-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">{t('lp_saas_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -762,16 +752,16 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              كل مركز طبي يحصل على رابطه الخاص وقاعدة بياناته المنفصلة — بيانات عملائك لا يراها أحد غيرك.
+              {t('lp_saas_desc')}
             </motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: 'fa-globe', title: 'رابط خاص لكل مركز', desc: 'your-clinic.medloop.com — رابط مخصص لمركزك', color: 'cyan' },
-              { icon: 'fa-database', title: 'بيانات منفصلة', desc: 'قاعدة بيانات مستقلة لكل عميل لضمان الخصوصية', color: 'cyan' },
-              { icon: 'fa-shield-halved', title: 'حماية وصلاحيات', desc: 'SSL/TLS + JWT + صلاحيات حسب الدور الوظيفي', color: 'cyan' },
-              { icon: 'fa-sliders', title: 'تخصيص مرن', desc: 'حدد خدماتك وأسعارك وأقسامك حسب احتياجك', color: 'cyan' },
+              { icon: 'fa-globe', title: t('lp_saas_1'), desc: t('lp_saas_1d'), color: 'cyan' },
+              { icon: 'fa-database', title: t('lp_saas_2'), desc: t('lp_saas_2d'), color: 'cyan' },
+              { icon: 'fa-shield-halved', title: t('lp_saas_3'), desc: t('lp_saas_3d'), color: 'cyan' },
+              { icon: 'fa-sliders', title: t('lp_saas_4'), desc: t('lp_saas_4d'), color: 'cyan' },
             ].map((item, i) => (
               <motion.div 
                 key={i}
@@ -825,7 +815,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-cubes animate-pulse"></i> {allFeatures.length}+ ميزة متكاملة
+              <i className="fa-solid fa-cubes animate-pulse"></i> {allFeatures.length}+ {t('lp_features_badge_suffix')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -834,7 +824,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              كل ما يحتاجه مركزك في <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">منصة واحدة</span>
+              {t('lp_features_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">{t('lp_features_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -843,7 +833,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              تصفّح الأقسام واكتشف كيف يغطي النظام جميع احتياجات مركزك الطبي.
+              {t('lp_features_desc')}
             </motion.p>
           </div>
 
@@ -870,7 +860,7 @@ const LandingView: React.FC = () => {
                   />
                 )}
                 <i className={`fa-solid ${cat.icon} relative z-10 ${activeCategory === cat.id ? 'animate-bounce' : ''}`}></i>
-                <span className="relative z-10">{cat.label}</span>
+                <span className="relative z-10">{isAr ? cat.label : cat.labelEn}</span>
               </motion.button>
             ))}
           </div>
@@ -910,13 +900,13 @@ const LandingView: React.FC = () => {
                         <i className={`${f.icon.startsWith('fa-brands') ? f.icon : `fa-solid ${f.icon}`}`}></i>
                       </div>
                       
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-400 transition-all">{f.title}</h3>
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-400 transition-all">{isAr ? f.title : f.titleEn}</h3>
                       <p className={`text-[10px] ${c.text} font-mono tracking-widest uppercase mb-4 opacity-70`}>{f.titleEn}</p>
                       
-                      <p className="text-slate-400 text-sm leading-relaxed mb-8 font-light">{f.desc}</p>
+                      <p className="text-slate-400 text-sm leading-relaxed mb-8 font-light">{isAr ? f.desc : f.descEn}</p>
                       
                       <div className={`inline-flex items-center gap-2 text-xs font-bold ${c.text} opacity-60 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-[-5px]`}>
-                        <span>استكشف النظام</span>
+                        <span>{t('lp_explore')}</span>
                         <i className="fa-solid fa-arrow-left text-[10px]"></i>
                       </div>
                     </div>
@@ -974,15 +964,15 @@ const LandingView: React.FC = () => {
                           <i className={`${f.icon.startsWith('fa-brands') ? f.icon : `fa-solid ${f.icon}`}`}></i>
                         </div>
                         <div className="pt-2">
-                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2">{f.title}</h3>
-                          <p className={`text-sm ${c.text} font-mono tracking-widest uppercase opacity-80`}>{f.titleEn}</p>
+                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2">{isAr ? f.title : f.titleEn}</h3>
+                          <p className={`text-sm ${c.text} font-mono tracking-widest uppercase opacity-80`}>{isAr ? f.titleEn : f.title}</p>
                         </div>
                       </div>
                       
-                      <p className="text-slate-300 text-lg leading-relaxed mb-10 font-light border-r-2 border-white/[0.1] pr-4">{f.desc}</p>
+                      <p className="text-slate-300 text-lg leading-relaxed mb-10 font-light border-r-2 border-white/[0.1] pr-4">{isAr ? f.desc : f.descEn}</p>
                       
                       <div className="grid sm:grid-cols-2 gap-4 mb-10">
-                        {f.details.map((d, i) => (
+                        {(isAr ? f.details : f.detailsEn).map((d, i) => (
                           <motion.div 
                             key={i} 
                             initial={{ opacity: 0, x: 20 }}
@@ -1000,10 +990,10 @@ const LandingView: React.FC = () => {
                       
                       <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/[0.05]">
                         <a href="#contact" onClick={closeModal} className={`flex-1 text-center px-8 py-4 bg-gradient-to-r ${cat?.gradient || 'from-amber-400 to-sky-500'} text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-[1.02]`}>
-                          <i className="fa-solid fa-rocket ml-2"></i> ابدأ التحول الرقمي
+                          <i className={`fa-solid fa-rocket ${isAr ? 'ml-2' : 'mr-2'}`}></i> {t('lp_start_digital')}
                         </a>
                         <button onClick={closeModal} className="px-8 py-4 bg-white/[0.05] border border-white/[0.1] text-white font-bold rounded-2xl hover:bg-white/[0.1] transition-all duration-300">
-                          إغلاق النافذة
+                          {t('lp_close_modal')}
                         </button>
                       </div>
                     </div>
@@ -1027,7 +1017,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-microchip animate-pulse"></i> البنية التقنية
+              <i className="fa-solid fa-microchip animate-pulse"></i> {t('lp_tech_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -1036,7 +1026,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              بنية تحتية <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">موثوقة وآمنة</span>
+              {t('lp_tech_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">{t('lp_tech_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -1045,16 +1035,16 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              نعتمد على تقنيات حديثة ومجربة لضمان أمان بياناتك، سرعة الأداء، واستمرارية الخدمة.
+              {t('lp_tech_desc')}
             </motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              { icon: 'fa-cloud', title: 'استضافة سحابية (Neon + Vercel)', desc: 'النظام يعمل على سحابة Vercel مع قاعدة بيانات Neon Serverless لضمان سرعة وتوافر عالي.', color: 'teal' },
-              { icon: 'fa-lock', title: 'تشفير وحماية متقدمة', desc: 'SSL/TLS لتشفير البيانات أثناء النقل، JWT للمصادقة، Helmet و Rate Limiting للحماية.', color: 'cyan' },
-              { icon: 'fa-clock-rotate-left', title: 'نسخ احتياطي تلقائي', desc: 'نسخ احتياطية سحابية تلقائية عبر Neon Database لحماية بياناتك من الضياع.', color: 'teal' },
-              { icon: 'fa-bolt', title: 'أداء سريع ومستقر', desc: 'بنية Serverless تتوسع تلقائياً حسب الحاجة مع استجابة سريعة.', color: 'cyan' },
+              { icon: 'fa-cloud', title: t('lp_tech_item1'), desc: t('lp_tech_item1_desc'), color: 'teal' },
+              { icon: 'fa-lock', title: t('lp_tech_item2'), desc: t('lp_tech_item2_desc'), color: 'cyan' },
+              { icon: 'fa-clock-rotate-left', title: t('lp_tech_item3'), desc: t('lp_tech_item3_desc'), color: 'teal' },
+              { icon: 'fa-bolt', title: t('lp_tech_item4'), desc: t('lp_tech_item4_desc'), color: 'cyan' },
             ].map((item, i) => (
               <motion.div 
                 key={i}
@@ -1102,10 +1092,10 @@ const LandingView: React.FC = () => {
                     { icon: 'fa-cloud', label: 'Neon Serverless' },
                     { icon: 'fa-server', label: 'Vite Edge' },
                     { icon: 'fa-code', label: 'TypeScript' },
-                  ].map((t, j) => (
+                  ].map((tk, j) => (
                     <div key={`${i}-${j}`} className="flex items-center gap-3 text-slate-500">
-                      <i className={`fa-solid ${t.icon} text-amber-500/50`}></i>
-                      <span className="font-mono text-sm tracking-wider">{t.label}</span>
+                      <i className={`fa-solid ${tk.icon} text-amber-500/50`}></i>
+                      <span className="font-mono text-sm tracking-wider">{tk.label}</span>
                     </div>
                   ))}
                 </React.Fragment>
@@ -1127,7 +1117,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-circle-play animate-pulse"></i> شاهد النظام
+              <i className="fa-solid fa-circle-play animate-pulse"></i> {t('lp_demo_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -1136,7 +1126,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              شاهد كيف يعمل <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">النظام</span> من الداخل
+              {t('lp_demo_title_1')} <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_demo_title_2')}</span> {t('lp_demo_title_3')}
             </motion.h2>
           </div>
 
@@ -1179,7 +1169,7 @@ const LandingView: React.FC = () => {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
             >
-              <i className="fa-solid fa-headset animate-pulse"></i> تواصل معنا
+              <i className="fa-solid fa-headset animate-pulse"></i> {t('lp_contact_badge')}
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -1188,7 +1178,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-5xl font-black mb-6 text-white"
             >
-              نحن هنا <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">لخدمتك</span>
+              {t('lp_contact_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_contact_highlight')}</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -1197,7 +1187,7 @@ const LandingView: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
             >
-              فريق من الخبراء جاهز للإجابة على استفساراتك وتجهيز عرض تجريبي مخصص لمركزك.
+              {t('lp_contact_desc')}
             </motion.p>
           </div>
 
@@ -1206,7 +1196,7 @@ const LandingView: React.FC = () => {
               { 
                 href: "tel:0790904030", 
                 icon: "fa-phone", 
-                title: "الاتصال المباشر", 
+                title: t('lp_contact_call'), 
                 value: "079 090 4030", 
                 color: "teal",
                 delay: 0
@@ -1214,7 +1204,7 @@ const LandingView: React.FC = () => {
               { 
                 href: "mailto:dr.tarek.khrais@gmail.com", 
                 icon: "fa-envelope", 
-                title: "البريد الإلكتروني", 
+                title: t('lp_contact_email'), 
                 value: "dr.tarek.khrais@gmail.com", 
                 color: "cyan",
                 delay: 0.1
@@ -1222,8 +1212,8 @@ const LandingView: React.FC = () => {
               { 
                 href: "https://wa.me/962790904030", 
                 icon: "fa-whatsapp", 
-                title: "واتساب", 
-                value: "محادثة فورية", 
+                title: t('lp_contact_whatsapp'), 
+                value: t('lp_contact_chat'), 
                 color: "teal",
                 delay: 0.2,
                 isBrand: true
@@ -1282,18 +1272,18 @@ const LandingView: React.FC = () => {
                   </div>
                   
                   <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight text-white">
-                    جاهز تنقل مركزك
+                    {t('lp_final_title')}
                     <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">للمستوى التالي؟</span>
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_final_highlight')}</span>
                   </h2>
                   
                   <p className="text-slate-400 mb-12 text-xl max-w-2xl mx-auto font-light">
-                    وفّر وقت فريقك، نظّم عملك، وقدّم تجربة أفضل لمرضاك. ابدأ اليوم مع عيادة د. طارق خريس.
+                    {t('lp_final_desc')}
                   </p>
                   
                   <a href="#contact" className="inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] transition-all duration-300 hover:scale-[1.02] text-lg group">
-                    <span>اطلب عرض تجريبي خاص</span>
-                    <i className="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform duration-300"></i>
+                    <span>{t('lp_final_cta')}</span>
+                    <i className={`fa-solid ${isAr ? 'fa-arrow-left group-hover:-translate-x-2' : 'fa-arrow-right group-hover:translate-x-2'} transition-transform duration-300`}></i>
                   </a>
                 </div>
               </div>
@@ -1313,13 +1303,13 @@ const LandingView: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-white font-bold tracking-wider">Dr. Tarek Khrais - ENT</span>
-              <span className="text-slate-500 text-xs">© 2025 جميع الحقوق محفوظة.</span>
+              <span className="text-slate-500 text-xs">© 2025 {t('lp_copyright')}</span>
             </div>
           </div>
           
           <div className="flex items-center gap-6 text-slate-500 text-sm">
             <span className="flex items-center gap-2">
-              من تطوير 
+              {t('lp_developed_by')} 
               <a href="https://okf.vercel.app" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 transition-colors font-bold flex items-center gap-1 group">
                 OKF Systems
                 <i className="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-50 group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all"></i>

@@ -16,35 +16,26 @@ interface ApiKey {
   created_at: string;
 }
 
-const DEVICE_TYPES: { value: DeviceType; label: string; icon: string }[] = [
-  { value: 'cbc', label: 'جهاز تحليل دم (CBC)', icon: 'fa-droplet' },
-  { value: 'chemistry', label: 'كيمياء حيوية (Chemistry)', icon: 'fa-flask' },
-  { value: 'glucose', label: 'سكر الدم (Glucose)', icon: 'fa-candy-cane' },
-  { value: 'ecg', label: 'تخطيط القلب (ECG)', icon: 'fa-heart-pulse' },
-  { value: 'xray', label: 'أشعة (X-Ray)', icon: 'fa-x-ray' },
-  { value: 'other', label: 'أخرى', icon: 'fa-microscope' },
-];
-
-const CONNECTION_TYPES: { value: DeviceConnectionType; label: string; icon: string }[] = [
-  { value: 'lan', label: 'شبكة LAN / TCP', icon: 'fa-network-wired' },
-  { value: 'serial', label: 'منفذ تسلسلي (COM Port)', icon: 'fa-plug' },
-  { value: 'hl7', label: 'HL7 / MLLP', icon: 'fa-file-medical' },
-  { value: 'folder', label: 'مراقبة مجلد (Folder Watch)', icon: 'fa-folder-open' },
-  { value: 'api', label: 'API مباشر', icon: 'fa-code' },
-];
-
-const SAMPLE_HL7 = `MSH|^~\\&|Mindray|Lab|MedLoop|Clinic|20260216120000||ORU^R01|MSG001|P|2.3
-PID|||12345||Ahmad^Mohammad||19850315|M
-OBR|1||LAB001|CBC^Complete Blood Count
-OBX|1|NM|WBC^White Blood Cells||7.2|10^3/uL|4.0-11.0|N|||F
-OBX|2|NM|RBC^Red Blood Cells||4.8|10^6/uL|4.5-5.5|N|||F
-OBX|3|NM|HGB^Hemoglobin||14.2|g/dL|13.0-17.0|N|||F
-OBX|4|NM|HCT^Hematocrit||42.1|%|38.0-50.0|N|||F
-OBX|5|NM|PLT^Platelets||245|10^3/uL|150-400|N|||F`;
-
 const DeviceManagementView: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
+
+  const DEVICE_TYPES: { value: DeviceType; label: string; icon: string }[] = [
+    { value: 'cbc', label: t('device_type_cbc'), icon: 'fa-droplet' },
+    { value: 'chemistry', label: t('device_type_chemistry'), icon: 'fa-flask' },
+    { value: 'glucose', label: t('device_type_glucose'), icon: 'fa-candy-cane' },
+    { value: 'ecg', label: t('device_type_ecg'), icon: 'fa-heart-pulse' },
+    { value: 'xray', label: t('device_type_xray'), icon: 'fa-x-ray' },
+    { value: 'other', label: t('device_type_other'), icon: 'fa-microscope' },
+  ];
+
+  const CONNECTION_TYPES: { value: DeviceConnectionType; label: string; icon: string }[] = [
+    { value: 'lan', label: t('conn_lan'), icon: 'fa-network-wired' },
+    { value: 'serial', label: t('conn_serial'), icon: 'fa-plug' },
+    { value: 'hl7', label: t('conn_hl7'), icon: 'fa-file-medical' },
+    { value: 'folder', label: t('conn_folder'), icon: 'fa-folder-open' },
+    { value: 'api', label: t('conn_api'), icon: 'fa-code' },
+  ];
 
   // State
   const [devices, setDevices] = useState<Device[]>([]);
@@ -152,9 +143,9 @@ const DeviceManagementView: React.FC = () => {
         })
       });
       const data = await res.json();
-      setHl7TestResult(`✅ تم الإرسال بنجاح — ID: ${data.id || 'OK'}`);
+      setHl7TestResult(`✅ ${t('send_success')} — ID: ${data.id || 'OK'}`);
     } catch (err: any) {
-      setHl7TestResult(`❌ فشل الإرسال: ${err.message}`);
+      setHl7TestResult(`❌ ${t('send_failed')}: ${err.message}`);
     } finally {
       setHl7Sending(false);
     }
@@ -214,7 +205,7 @@ const DeviceManagementView: React.FC = () => {
       setShowDeviceModal(false);
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل حفظ الجهاز');
+      alert(err.message || t('save_device_failed'));
     } finally {
       setSaving(false);
     }
@@ -226,7 +217,7 @@ const DeviceManagementView: React.FC = () => {
       setDeletingId(null);
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل حذف الجهاز');
+      alert(err.message || t('delete_device_failed'));
     }
   };
 
@@ -235,7 +226,7 @@ const DeviceManagementView: React.FC = () => {
       await api.put(`/api/devices/${d.id}`, { isActive: !d.isActive });
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل تحديث الجهاز');
+      alert(err.message || t('update_device_failed'));
     }
   };
 
@@ -249,7 +240,7 @@ const DeviceManagementView: React.FC = () => {
       setKeyLabel('');
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل إنشاء المفتاح');
+      alert(err.message || t('create_key_failed'));
     } finally {
       setSaving(false);
     }
@@ -260,7 +251,7 @@ const DeviceManagementView: React.FC = () => {
       await api.del(`/api/device-api-keys/${id}`);
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'فشل إلغاء المفتاح');
+      alert(err.message || t('revoke_key_failed'));
     }
   };
 
@@ -284,19 +275,19 @@ const DeviceManagementView: React.FC = () => {
   };
 
   const getStatusLabel = (d: Device) => {
-    if (!d.isActive) return 'معطّل';
+    if (!d.isActive) return t('device_disabled');
     if (d.lastSeenAt) {
       const diff = Date.now() - new Date(d.lastSeenAt).getTime();
-      if (diff < 5 * 60 * 1000) return 'متصل';
-      if (diff < 30 * 60 * 1000) return 'خامل';
+      if (diff < 5 * 60 * 1000) return t('device_connected');
+      if (diff < 30 * 60 * 1000) return t('device_idle');
     }
-    return 'غير متصل';
+    return t('device_offline');
   };
 
   if (loading) {
     return (
-      <Layout title="إدارة الأجهزة">
-        <div className="flex items-center justify-center h-64">
+      <Layout title={t('device_mgmt_title')}>
+        <div className="flex justify-center items-center p-12">
           <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
       </Layout>
@@ -304,24 +295,24 @@ const DeviceManagementView: React.FC = () => {
   }
 
   return (
-    <Layout title="إدارة الأجهزة">
+    <Layout title={t('device_mgmt_title')}>
       <div className="space-y-6" dir="rtl">
 
         {/* Header Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard icon="fa-microchip" label="إجمالي الأجهزة" value={devices.length} color="bg-amber-500" />
-          <StatCard icon="fa-circle-check" label="أجهزة نشطة" value={devices.filter(d => d.isActive).length} color="bg-emerald-500" />
-          <StatCard icon="fa-wifi" label="متصل الآن" value={devices.filter(d => d.isActive && d.lastSeenAt && (Date.now() - new Date(d.lastSeenAt).getTime() < 5 * 60 * 1000)).length} color="bg-violet-500" />
-          <StatCard icon="fa-key" label="مفاتيح API" value={apiKeys.filter(k => k.is_active).length} color="bg-amber-500" />
+          <StatCard icon="fa-microchip" label={t('total_devices')} value={devices.length} color="bg-amber-500" />
+          <StatCard icon="fa-circle-check" label={t('active_devices')} value={devices.filter(d => d.isActive).length} color="bg-emerald-500" />
+          <StatCard icon="fa-wifi" label={t('connected_now')} value={devices.filter(d => d.isActive && d.lastSeenAt && (Date.now() - new Date(d.lastSeenAt).getTime() < 5 * 60 * 1000)).length} color="bg-violet-500" />
+          <StatCard icon="fa-key" label={t('api_keys_count')} value={apiKeys.filter(k => k.is_active).length} color="bg-amber-500" />
         </div>
 
         {/* Tab Switcher */}
         <div className="flex gap-2 bg-white rounded-2xl p-1.5 shadow-sm border border-slate-100 w-fit">
           {[
-            { id: 'devices' as const, label: 'الأجهزة', icon: 'fa-microchip' },
-            { id: 'hl7' as const, label: 'HL7 / MLLP', icon: 'fa-file-medical' },
-            { id: 'apikeys' as const, label: 'مفاتيح الربط', icon: 'fa-key' },
-            { id: 'guide' as const, label: 'دليل الإعداد', icon: 'fa-book' },
+            { id: 'devices' as const, label: t('devices_label'), icon: 'fa-microchip' },
+            { id: 'hl7' as const, label: t('hl7_mllp'), icon: 'fa-file-medical' },
+            { id: 'apikeys' as const, label: t('api_keys'), icon: 'fa-key' },
+            { id: 'guide' as const, label: t('setup_guide'), icon: 'fa-book' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -342,9 +333,9 @@ const DeviceManagementView: React.FC = () => {
         {activeTab === 'devices' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-800">الأجهزة المسجلة</h3>
+              <h3 className="text-lg font-bold text-slate-800">{t('registered_devices')}</h3>
               <button onClick={openAddDevice} className="bg-gradient-to-r from-primary to-secondary text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-all flex items-center gap-2">
-                <i className="fa-solid fa-plus"></i> إضافة جهاز
+                <i className="fa-solid fa-plus"></i> {t('add_device')}
               </button>
             </div>
 
@@ -353,10 +344,10 @@ const DeviceManagementView: React.FC = () => {
                 <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <i className="fa-solid fa-microchip text-3xl text-slate-300"></i>
                 </div>
-                <h3 className="text-xl font-bold text-slate-600 mb-2">لا توجد أجهزة مسجلة</h3>
-                <p className="text-slate-400 mb-6">ابدأ بإضافة أول جهاز طبي لربطه بالنظام</p>
+                <h3 className="text-xl font-bold text-slate-600 mb-2">{t('no_devices_registered')}</h3>
+                <p className="text-slate-400 mb-6">{t('start_add_device')}</p>
                 <button onClick={openAddDevice} className="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm">
-                  <i className="fa-solid fa-plus ml-2"></i> إضافة جهاز
+                  <i className="fa-solid fa-plus ml-2"></i> {t('add_device')}
                 </button>
               </div>
             ) : (
@@ -410,15 +401,15 @@ const DeviceManagementView: React.FC = () => {
                       {/* Actions */}
                       <div className="flex gap-2 border-t border-slate-50 pt-3">
                         <button onClick={() => openEditDevice(d)} className="flex-1 text-xs font-bold text-slate-500 hover:text-primary py-1.5 rounded-lg hover:bg-slate-50 transition-all">
-                          <i className="fa-solid fa-pen-to-square ml-1"></i> تعديل
+                          <i className="fa-solid fa-pen-to-square ml-1"></i> {t('edit_label')}
                         </button>
                         <button onClick={() => handleToggleDevice(d)} className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${d.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-emerald-500 hover:bg-emerald-50'}`}>
-                          <i className={`fa-solid ${d.isActive ? 'fa-pause' : 'fa-play'} ml-1`}></i> {d.isActive ? 'تعطيل' : 'تفعيل'}
+                          <i className={`fa-solid ${d.isActive ? 'fa-pause' : 'fa-play'} ml-1`}></i> {d.isActive ? t('disable_label') : t('enable_label')}
                         </button>
                         {deletingId === d.id ? (
                           <div className="flex gap-1">
-                            <button onClick={() => handleDeleteDevice(d.id)} className="text-xs font-bold text-red-500 px-2 py-1.5 rounded-lg bg-red-50">تأكيد</button>
-                            <button onClick={() => setDeletingId(null)} className="text-xs font-bold text-slate-400 px-2 py-1.5">إلغاء</button>
+                            <button onClick={() => handleDeleteDevice(d.id)} className="text-xs font-bold text-red-500 px-2 py-1.5 rounded-lg bg-red-50">{t('confirm_label')}</button>
+                            <button onClick={() => setDeletingId(null)} className="text-xs font-bold text-slate-400 px-2 py-1.5">{t('cancel_label')}</button>
                           </div>
                         ) : (
                           <button onClick={() => setDeletingId(d.id)} className="text-xs font-bold text-red-400 hover:text-red-500 py-1.5 px-2 rounded-lg hover:bg-red-50 transition-all">
@@ -441,11 +432,11 @@ const DeviceManagementView: React.FC = () => {
             {/* Bridge Agent Connection */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-server text-violet-500"></i> اتصال Bridge Agent
+                <i className="fa-solid fa-server text-violet-500"></i> {t('bridge_agent_conn')}
               </h3>
               <div className="flex gap-3 items-end">
                 <div className="flex-1">
-                  <label className="text-xs font-bold text-slate-500 mb-1 block">عنوان Bridge Agent</label>
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">{t('bridge_agent_url')}</label>
                   <input
                     type="text"
                     placeholder="http://localhost:9090"
@@ -461,7 +452,7 @@ const DeviceManagementView: React.FC = () => {
                   className="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
                   {hl7Loading ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-plug-circle-check"></i>}
-                  فحص الاتصال
+                  {t('check_connection')}
                 </button>
               </div>
 
@@ -470,7 +461,7 @@ const DeviceManagementView: React.FC = () => {
                 <div className="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4" dir="ltr">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="font-bold text-emerald-700">Bridge Agent متصل</span>
+                    <span className="font-bold text-emerald-700">{t('bridge_connected')}</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                     <div className="bg-white rounded-lg p-3 border border-emerald-100">
@@ -524,7 +515,7 @@ const DeviceManagementView: React.FC = () => {
               {bridgeConnected === false && hl7Status === null && !hl7Loading && (
                 <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
                   <i className="fa-solid fa-triangle-exclamation ml-1"></i>
-                  لم يتم الاتصال بعد. تأكد أن Bridge Agent يعمل على <code className="bg-white px-1 rounded font-mono" dir="ltr">{bridgeUrl}</code>
+                  {t('bridge_not_connected')} <code className="bg-white px-1 rounded font-mono" dir="ltr">{bridgeUrl}</code>
                 </div>
               )}
             </div>
@@ -534,7 +525,7 @@ const DeviceManagementView: React.FC = () => {
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-50 flex justify-between items-center">
                   <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                    <i className="fa-solid fa-link text-amber-500"></i> اتصالات HL7 النشطة
+                    <i className="fa-solid fa-link text-amber-500"></i> {t('active_hl7_connections')}
                   </h3>
                   <span className="bg-amber-100 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">{hl7Connections.length}</span>
                 </div>
@@ -562,9 +553,9 @@ const DeviceManagementView: React.FC = () => {
             {/* HL7 Test Tool */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-vial text-rose-500"></i> اختبار إرسال نتيجة
+                <i className="fa-solid fa-vial text-rose-500"></i> {t('test_send_result')}
               </h3>
-              <p className="text-sm text-slate-500 mb-3">أرسل نتيجة اختبارية عبر Bridge Agent للتأكد من سلامة الاتصال بين الجهاز والسيرفر.</p>
+              <p className="text-sm text-slate-500 mb-3">{t('test_send_desc')}</p>
               
               <div className="bg-slate-800 rounded-xl overflow-hidden">
                 <div className="flex justify-between items-center px-4 py-2 bg-slate-700/50 border-b border-slate-600">
@@ -590,9 +581,9 @@ const DeviceManagementView: React.FC = () => {
                   className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-50 hover:from-rose-600 hover:to-pink-600 transition-all flex items-center gap-2"
                 >
                   {hl7Sending ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-paper-plane"></i>}
-                  إرسال اختبار
+                  {t('send_test')}
                 </button>
-                {!bridgeConnected && <span className="text-xs text-slate-400">⚠️ اتصل بـ Bridge Agent أولاً</span>}
+                {!bridgeConnected && <span className="text-xs text-slate-400">⚠️ {t('connect_bridge_first')}</span>}
               </div>
 
               {hl7TestResult && (
@@ -605,27 +596,27 @@ const DeviceManagementView: React.FC = () => {
             {/* HL7 Quick Reference */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-circle-question text-amber-500"></i> مرجع سريع — بنية رسالة HL7
+                <i className="fa-solid fa-circle-question text-amber-500"></i> {t('hl7_quick_ref')}
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm" dir="ltr">
                   <thead>
                     <tr className="bg-slate-50 text-slate-600">
                       <th className="text-right p-3 rounded-r-xl font-bold">Segment</th>
-                      <th className="text-right p-3 font-bold">الوصف</th>
-                      <th className="text-right p-3 rounded-l-xl font-bold">مثال</th>
+                      <th className="text-right p-3 font-bold">{t('description_col')}</th>
+                      <th className="text-right p-3 rounded-l-xl font-bold">{t('example_col')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
-                    <tr><td className="p-3 font-mono font-bold text-violet-600">MSH</td><td className="p-3 text-slate-600">ترويسة الرسالة (المرسل، المستقبل، النوع)</td><td className="p-3 font-mono text-xs text-slate-400">MSH|^~\&|Lab|Clinic|...</td></tr>
-                    <tr><td className="p-3 font-mono font-bold text-amber-600">PID</td><td className="p-3 text-slate-600">بيانات المريض (الرقم، الاسم، الجنس)</td><td className="p-3 font-mono text-xs text-slate-400">PID|||12345||Ahmad^M...</td></tr>
-                    <tr><td className="p-3 font-mono font-bold text-emerald-600">OBR</td><td className="p-3 text-slate-600">طلب الفحص (اسم التحليل)</td><td className="p-3 font-mono text-xs text-slate-400">OBR|1||LAB001|CBC^...</td></tr>
-                    <tr><td className="p-3 font-mono font-bold text-rose-600">OBX</td><td className="p-3 text-slate-600">نتيجة التحليل (القيمة، الوحدة، المرجع)</td><td className="p-3 font-mono text-xs text-slate-400">OBX|1|NM|WBC||7.2|...</td></tr>
+                    <tr><td className="p-3 font-mono font-bold text-violet-600">MSH</td><td className="p-3 text-slate-600">{t('msh_desc')}</td><td className="p-3 font-mono text-xs text-slate-400">MSH|^~\&|Lab|Clinic|...</td></tr>
+                    <tr><td className="p-3 font-mono font-bold text-amber-600">PID</td><td className="p-3 text-slate-600">{t('pid_desc')}</td><td className="p-3 font-mono text-xs text-slate-400">PID|||12345||Ahmad^M...</td></tr>
+                    <tr><td className="p-3 font-mono font-bold text-emerald-600">OBR</td><td className="p-3 text-slate-600">{t('obr_desc')}</td><td className="p-3 font-mono text-xs text-slate-400">OBR|1||LAB001|CBC^...</td></tr>
+                    <tr><td className="p-3 font-mono font-bold text-rose-600">OBX</td><td className="p-3 text-slate-600">{t('obx_desc')}</td><td className="p-3 font-mono text-xs text-slate-400">OBX|1|NM|WBC||7.2|...</td></tr>
                   </tbody>
                 </table>
               </div>
               <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-700">
-                <strong>MLLP Protocol:</strong> الأجهزة الطبية ترسل رسائل HL7 عبر TCP مغلفة بـ MLLP (Start: <code className="bg-white px-1 rounded">0x0B</code> • End: <code className="bg-white px-1 rounded">0x1C 0x0D</code>). Bridge Agent يستمع على Port <code className="bg-white px-1 rounded">2575</code> افتراضياً.
+                <strong>MLLP Protocol:</strong> {t('mllp_protocol_note')} (Start: <code className="bg-white px-1 rounded">0x0B</code> • End: <code className="bg-white px-1 rounded">0x1C 0x0D</code>). Bridge Agent يستمع على Port <code className="bg-white px-1 rounded">2575</code> افتراضياً.
               </div>
             </div>
           </div>
@@ -637,19 +628,19 @@ const DeviceManagementView: React.FC = () => {
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
               <i className="fa-solid fa-circle-info text-amber-500 mt-0.5"></i>
               <div className="text-sm text-amber-800">
-                <strong>مفتاح API</strong> يُستخدم لمصادقة Bridge Agent مع السيرفر. يظهر المفتاح <strong>مرة واحدة فقط</strong> عند الإنشاء — احفظه في مكان آمن.
+                <strong>{t('api_keys')}</strong> {t('api_key_info').replace(t('api_keys'), '')}
               </div>
             </div>
 
             {/* Generate New Key */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-key text-amber-500"></i> إنشاء مفتاح جديد
+                <i className="fa-solid fa-key text-amber-500"></i> {t('create_new_key')}
               </h3>
               <div className="flex gap-3">
                 <input
                   type="text"
-                  placeholder="تسمية المفتاح (مثال: جهاز مختبر الطابق الأول)"
+                  placeholder={t('key_label_placeholder')}
                   value={keyLabel}
                   onChange={e => setKeyLabel(e.target.value)}
                   className="flex-1 p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary"
@@ -660,7 +651,7 @@ const DeviceManagementView: React.FC = () => {
                   className="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm disabled:opacity-50 hover:bg-slate-700 transition-all flex items-center gap-2"
                 >
                   {saving ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-wand-magic-sparkles"></i>}
-                  إنشاء
+                  {t('create_btn')}
                 </button>
               </div>
 
@@ -668,8 +659,8 @@ const DeviceManagementView: React.FC = () => {
               {generatedKey && (
                 <div className="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-bold text-emerald-700"><i className="fa-solid fa-check-circle ml-1"></i> تم إنشاء المفتاح بنجاح</span>
-                    <span className="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-full">يظهر مرة واحدة فقط!</span>
+                    <span className="text-sm font-bold text-emerald-700"><i className="fa-solid fa-check-circle ml-1"></i> {t('key_created_success')}</span>
+                    <span className="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-full">{t('shows_once')}</span>
                   </div>
                   <div className="flex gap-2">
                     <code className="flex-1 bg-white p-3 rounded-lg text-xs font-mono break-all border border-emerald-100 text-slate-700 select-all">
@@ -680,7 +671,7 @@ const DeviceManagementView: React.FC = () => {
                     </button>
                   </div>
                   <p className="text-xs text-emerald-600 mt-2">
-                    ضع هذا المفتاح في ملف <code className="bg-white px-1 rounded">.env</code> الخاص بـ Bridge Agent: <code className="bg-white px-1 rounded">API_KEY=mdl_...</code>
+                    {t('put_key_in_env')}: <code className="bg-white px-1 rounded">API_KEY=mdl_...</code>
                   </p>
                 </div>
               )}
@@ -689,12 +680,12 @@ const DeviceManagementView: React.FC = () => {
             {/* Keys List */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="p-4 border-b border-slate-50">
-                <h3 className="font-bold text-slate-800">المفاتيح الموجودة</h3>
+                <h3 className="font-bold text-slate-800">{t('existing_keys')}</h3>
               </div>
               {apiKeys.length === 0 ? (
                 <div className="p-8 text-center text-slate-400">
                   <i className="fa-solid fa-key text-3xl opacity-20 mb-2"></i>
-                  <p className="text-sm">لا توجد مفاتيح — أنشئ مفتاح أعلاه</p>
+                  <p className="text-sm">{t('no_keys_hint')}</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-50">
@@ -707,18 +698,18 @@ const DeviceManagementView: React.FC = () => {
                         <div>
                           <span className="font-bold text-slate-700 text-sm">{k.label}</span>
                           <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5">
-                            <span>أُنشئ: {fmtDate(k.created_at)}</span>
-                            {k.last_used_at && <span>آخر استخدام: {fmtDate(k.last_used_at)}</span>}
+                            <span>{t('created_date')}: {fmtDate(k.created_at)}</span>
+                            {k.last_used_at && <span>{t('last_used')}: {fmtDate(k.last_used_at)}</span>}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${k.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'}`}>
-                          {k.is_active ? 'نشط' : 'ملغى'}
+                          {k.is_active ? t('key_active') : t('key_revoked')}
                         </span>
                         {k.is_active && (
                           <button onClick={() => handleRevokeKey(k.id)} className="text-xs text-red-400 hover:text-red-600 font-bold">
-                            <i className="fa-solid fa-ban ml-1"></i> إلغاء
+                            <i className="fa-solid fa-ban ml-1"></i> {t('revoke_label')}
                           </button>
                         )}
                       </div>
@@ -735,23 +726,23 @@ const DeviceManagementView: React.FC = () => {
           <div className="space-y-4">
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <i className="fa-solid fa-book text-primary"></i> دليل ربط الأجهزة الطبية
+                <i className="fa-solid fa-book text-primary"></i> {t('device_guide_title')}
               </h3>
 
               {/* Step 1 */}
-              <StepCard step={1} title="سجّل الجهاز" icon="fa-microchip" color="bg-amber-500">
-                <p>اذهب لتبويب "الأجهزة" واضغط "إضافة جهاز". اختر نوع الجهاز وطريقة الاتصال (LAN أو Serial أو HL7).</p>
-                <p className="text-slate-400 mt-1">احفظ الـ <strong>Device ID</strong> — ستحتاجه في الخطوة التالية.</p>
+              <StepCard step={1} title={t('step_register')} icon="fa-microchip" color="bg-amber-500">
+                <p>{t('step_register_body')}</p>
+                <p className="text-slate-400 mt-1">{t('step_register_hint')}</p>
               </StepCard>
 
               {/* Step 2 */}
-              <StepCard step={2} title="أنشئ مفتاح API" icon="fa-key" color="bg-amber-500">
-                <p>اذهب لتبويب "مفاتيح الربط" وأنشئ مفتاح جديد. <strong className="text-red-500">انسخه فوراً</strong> — لن يظهر مرة ثانية.</p>
+              <StepCard step={2} title={t('step_create_key')} icon="fa-key" color="bg-amber-500">
+                <p>{t('step_create_key_body')} <strong className="text-red-500">{t('step_create_key_warn')}</strong></p>
               </StepCard>
 
               {/* Step 3 */}
-              <StepCard step={3} title="ثبّت Bridge Agent" icon="fa-server" color="bg-violet-500">
-                <p>على كمبيوتر العيادة المتصل بالأجهزة:</p>
+              <StepCard step={3} title={t('step_install_bridge')} icon="fa-server" color="bg-violet-500">
+                <p>{t('step_install_body')}</p>
                 <CodeBlock lines={[
                   'cd bridge-agent',
                   'npm install',
@@ -760,26 +751,26 @@ const DeviceManagementView: React.FC = () => {
               </StepCard>
 
               {/* Step 4 */}
-              <StepCard step={4} title="اضبط ملف .env" icon="fa-file-code" color="bg-emerald-500">
+              <StepCard step={4} title={t('step_config_env')} icon="fa-file-code" color="bg-emerald-500">
                 <CodeBlock lines={[
                   '# Server',
                   'API_URL=https://medloop-api.onrender.com',
-                  'API_KEY=mdl_xxxxx  # المفتاح اللي نسخته',
+                  `API_KEY=mdl_xxxxx  # ${t('env_comment_key')}`,
                   '',
                   '# Device',
-                  `DEVICE_ID=xxx  # ID الجهاز من الخطوة 1`,
+                  `DEVICE_ID=xxx  # ${t('env_comment_device_id')}`,
                   '',
-                  '# Connection (اختر واحدة)',
-                  'SERIAL_PORT=COM3       # لأجهزة Serial',
-                  'MLLP_PORT=2575         # لأجهزة HL7',
-                  'WATCH_FOLDER=C:\\Results # لمراقبة مجلد',
+                  `# Connection (${t('env_comment_choose_one')})`,
+                  `SERIAL_PORT=COM3       # ${t('env_comment_serial')}`,
+                  `MLLP_PORT=2575         # ${t('env_comment_hl7')}`,
+                  `WATCH_FOLDER=C:\\Results # ${t('env_comment_folder')}`,
                 ]} />
               </StepCard>
 
               {/* Step 5 */}
-              <StepCard step={5} title="شغّل Bridge Agent" icon="fa-play" color="bg-rose-500">
+              <StepCard step={5} title={t('step_run_bridge')} icon="fa-play" color="bg-rose-500">
                 <CodeBlock lines={['node bridge-agent.js']} />
-                <p className="mt-2">حالة الجهاز ستتحول لـ "متصل" هنا، والنتائج ستظهر تلقائياً في صفحة نتائج الأجهزة.</p>
+                <p className="mt-2">{t('step_run_body')}</p>
               </StepCard>
             </div>
           </div>
@@ -791,7 +782,7 @@ const DeviceManagementView: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="text-lg font-bold text-slate-800">
-                  {editingDevice ? 'تعديل جهاز' : 'إضافة جهاز جديد'}
+                  {editingDevice ? t('edit_device') : t('add_new_device')}
                 </h3>
                 <button onClick={() => setShowDeviceModal(false)} className="text-slate-400 hover:text-slate-600"><i className="fa-solid fa-xmark text-lg"></i></button>
               </div>
@@ -799,10 +790,10 @@ const DeviceManagementView: React.FC = () => {
               <div className="p-6 space-y-5">
                 {/* Name */}
                 <div>
-                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">اسم الجهاز</label>
+                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('device_name')}</label>
                   <input
                     type="text"
-                    placeholder="مثال: Mindray BC-5000"
+                    placeholder={t('device_name_placeholder')}
                     value={deviceForm.name}
                     onChange={e => setDeviceForm({ ...deviceForm, name: e.target.value })}
                     className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary"
@@ -811,13 +802,13 @@ const DeviceManagementView: React.FC = () => {
 
                 {/* Clinic */}
                 <div>
-                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">العيادة</label>
+                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('clinic_label')}</label>
                   <select
                     value={deviceForm.clinicId}
                     onChange={e => setDeviceForm({ ...deviceForm, clinicId: e.target.value })}
                     className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary bg-white"
                   >
-                    <option value="">— اختر العيادة —</option>
+                    <option value="">{t('choose_clinic')}</option>
                     {clinics.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
@@ -826,7 +817,7 @@ const DeviceManagementView: React.FC = () => {
 
                 {/* Type */}
                 <div>
-                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">نوع الجهاز</label>
+                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('device_type')}</label>
                   <div className="grid grid-cols-3 gap-2">
                     {DEVICE_TYPES.map(dt => (
                       <button
@@ -847,7 +838,7 @@ const DeviceManagementView: React.FC = () => {
 
                 {/* Connection Type */}
                 <div>
-                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">طريقة الاتصال</label>
+                  <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('connection_type')}</label>
                   <div className="grid grid-cols-2 gap-2">
                     {CONNECTION_TYPES.map(ct => (
                       <button
@@ -869,11 +860,11 @@ const DeviceManagementView: React.FC = () => {
                 {(deviceForm.connectionType === 'lan' || deviceForm.connectionType === 'hl7' || deviceForm.connectionType === 'api') && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-bold text-slate-600 mb-1.5 block">عنوان IP</label>
+                      <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('ip_address')}</label>
                       <input type="text" placeholder="192.168.1.100" value={deviceForm.ipAddress} onChange={e => setDeviceForm({ ...deviceForm, ipAddress: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary font-mono" />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-600 mb-1.5 block">المنفذ (Port)</label>
+                      <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('port_label')}</label>
                       <input type="text" placeholder={deviceForm.connectionType === 'hl7' ? '2575' : '9100'} value={deviceForm.port} onChange={e => setDeviceForm({ ...deviceForm, port: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary font-mono" />
                     </div>
                   </div>
@@ -881,27 +872,27 @@ const DeviceManagementView: React.FC = () => {
 
                 {deviceForm.connectionType === 'serial' && (
                   <div>
-                    <label className="text-sm font-bold text-slate-600 mb-1.5 block">منفذ COM</label>
+                    <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('com_port')}</label>
                     <input type="text" placeholder="COM3" value={deviceForm.comPort} onChange={e => setDeviceForm({ ...deviceForm, comPort: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary font-mono" />
                   </div>
                 )}
 
                 {deviceForm.connectionType === 'folder' && (
                   <div>
-                    <label className="text-sm font-bold text-slate-600 mb-1.5 block">مسار المجلد</label>
+                    <label className="text-sm font-bold text-slate-600 mb-1.5 block">{t('folder_path')}</label>
                     <input type="text" placeholder="C:\Lab\Results" value={deviceForm.ipAddress} onChange={e => setDeviceForm({ ...deviceForm, ipAddress: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-primary font-mono" />
-                    <p className="text-[11px] text-slate-400 mt-1">المجلد اللي الجهاز بيحفظ فيه النتائج كملفات</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{t('folder_path_hint')}</p>
                   </div>
                 )}
               </div>
 
               <div className="p-6 border-t border-slate-100 flex gap-3">
                 <button onClick={() => setShowDeviceModal(false)} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-500 font-bold text-sm hover:bg-slate-50">
-                  إلغاء
+                  {t('cancel_label')}
                 </button>
                 <button onClick={handleSaveDevice} disabled={!deviceForm.name.trim() || saving} className="flex-1 py-3 rounded-xl bg-slate-800 text-white font-bold text-sm disabled:opacity-50 hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
                   {saving ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-check"></i>}
-                  {editingDevice ? 'حفظ التعديلات' : 'إضافة الجهاز'}
+                  {editingDevice ? t('save_changes_device') : t('add_device_btn')}
                 </button>
               </div>
             </div>

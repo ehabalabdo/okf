@@ -63,7 +63,9 @@ const LoginView: React.FC = () => {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'خطأ في تسجيل الدخول');
+      const key = err.message as any;
+      const authKeys = ['account_inactive', 'account_wrong_center', 'invalid_credentials', 'invalid_phone_password'];
+      setError(authKeys.includes(key) ? t(key) : (err.message || t('login_error')));
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +119,7 @@ const LoginView: React.FC = () => {
                 : 'bg-slate-800/50 text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fa-solid fa-shield-halved me-1"></i> تسجيل دخول النظام
+            <i className="fa-solid fa-shield-halved me-1"></i> {t('system_login')}
           </button>
           <button
             type="button"
@@ -128,13 +130,13 @@ const LoginView: React.FC = () => {
                 : 'bg-slate-800/50 text-slate-400 hover:text-white'
             }`}
           >
-            <i className="fa-solid fa-id-badge me-1"></i> بوابة الموظفين
+            <i className="fa-solid fa-id-badge me-1"></i> {t('staff_portal')}
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="w-full space-y-5">
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1">الاسم / البريد الإلكتروني / اسم المستخدم</label>
+            <label className="block text-xs font-bold text-slate-300 mb-1">{t('login_identifier_label')}</label>
             <div className="relative">
               <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
               <input
@@ -142,7 +144,7 @@ const LoginView: React.FC = () => {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm font-medium text-white hover:bg-slate-800 transition"
-                placeholder="أدخل الاسم أو البريد أو اسم المستخدم"
+                placeholder={t('login_identifier_placeholder')}
                 required
               />
             </div>

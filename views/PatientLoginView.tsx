@@ -22,7 +22,9 @@ const PatientLoginView: React.FC = () => {
       await patientLogin(username, password);
       navigate('/patient/dashboard');
     } catch (err: any) {
-      setError(err.message || 'فشل تسجيل الدخول');
+      const key = err.message as any;
+      const authKeys = ['account_inactive', 'account_wrong_center', 'invalid_credentials', 'invalid_phone_password'];
+      setError(authKeys.includes(key) ? t(key) : (err.message || t('login_failed')));
     } finally {
       setLoading(false);
     }
@@ -34,8 +36,8 @@ const PatientLoginView: React.FC = () => {
         {/* Logo Section */}
         <div className="text-center mb-8">
           <img src="/logo.png" alt="MED LOOP" className="w-20 h-20 object-contain mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">بوابة المريض</h1>
-          <p className="text-slate-500 text-sm">MED LOOP Patient Portal</p>
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">{t('patient_portal')}</h1>
+          <p className="text-slate-500 text-sm">{t('patient_portal_subtitle')}</p>
         </div>
 
         {/* Login Card */}
@@ -50,30 +52,30 @@ const PatientLoginView: React.FC = () => {
 
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">
-                <i className="fa-solid fa-phone ml-1"></i> رقم الهاتف
+                <i className="fa-solid fa-phone ml-1"></i> {t('phone_number')}
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                placeholder="مثال: 0791234567"
+                placeholder={t('phone_example')}
                 required
                 disabled={loading}
               />
-              <p className="text-xs text-gray-500 mt-1">استخدم رقم هاتفك المسجل في العيادة</p>
+              <p className="text-xs text-gray-500 mt-1">{t('phone_hint')}</p>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">
-                <i className="fa-solid fa-lock ml-1"></i> كلمة المرور
+                <i className="fa-solid fa-lock ml-1"></i> {t('password_label_patient')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all"
-                placeholder="أدخل كلمة المرور"
+                placeholder={t('enter_password')}
                 required
                 disabled={loading}
               />
@@ -87,12 +89,12 @@ const PatientLoginView: React.FC = () => {
               {loading ? (
                 <>
                   <i className="fa-solid fa-spinner fa-spin"></i>
-                  جاري تسجيل الدخول...
+                  {t('logging_in')}
                 </>
               ) : (
                 <>
                   <i className="fa-solid fa-right-to-bracket"></i>
-                  تسجيل الدخول
+                  {t('login_btn')}
                 </>
               )}
             </button>
@@ -104,14 +106,14 @@ const PatientLoginView: React.FC = () => {
               className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center justify-center gap-2 mx-auto"
             >
               <i className="fa-solid fa-arrow-left"></i>
-              تسجيل دخول الموظفين
+              {t('staff_login')}
             </button>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-6 text-center text-xs text-slate-400">
-          <p>للمساعدة، يرجى الاتصال بالعيادة</p>
+          <p>{t('help_contact')}</p>
         </div>
       </div>
     </div>
