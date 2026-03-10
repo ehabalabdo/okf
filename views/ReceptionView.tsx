@@ -264,36 +264,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   };
 
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance'>('cash');
-  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
-  const [editItems, setEditItems] = useState<{description: string; price: number}[]>([]);
-  const longPressTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleLongPressStart = (inv: Invoice) => {
-    longPressTimer.current = setTimeout(() => {
-      setEditingInvoice(inv);
-      setEditItems(inv.items.map(i => ({ description: i.description, price: i.price })));
-    }, 800);
-  };
-
-  const handleLongPressEnd = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
-  const handleSaveInvoiceEdit = async () => {
-    if (!user || !editingInvoice) return;
-    const validItems = editItems.filter(i => i.description.trim() && i.price > 0);
-    if (validItems.length === 0) return alert('أضف خدمة واحدة على الأقل');
-    try {
-      await BillingService.update(user, editingInvoice.id, {
-        items: validItems.map((item, idx) => ({ id: `item-${idx}`, ...item })),
-      });
-      setEditingInvoice(null);
-      loadData();
-    } catch (e: any) { alert(e.message); }
-  };
 
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
@@ -519,11 +489,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                     <div key={inv.id}
                                         className="flex justify-between items-center p-4 border border-slate-100 rounded-xl hover:border-primary cursor-pointer transition-colors select-none"
                                         onClick={() => setSelectedInvoice(inv)}
-                                        onMouseDown={() => handleLongPressStart(inv)}
-                                        onMouseUp={handleLongPressEnd}
-                                        onMouseLeave={handleLongPressEnd}
-                                        onTouchStart={() => handleLongPressStart(inv)}
-                                        onTouchEnd={handleLongPressEnd}
                                     >
                                         <div>
                                             <div className="font-bold text-slate-800">{inv.patientName}</div>
@@ -537,48 +502,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                     </div>
                  </div>
              </div>
-        )}
-
-        {/* EDIT INVOICE MODAL */}
-        {editingInvoice && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4" dir="rtl">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in-up">
-              <div className="p-5 bg-amber-600 text-white flex justify-between items-center">
-                <h3 className="font-bold"><i className="fa-solid fa-pen-to-square ml-2"></i>تعديل فاتورة - {editingInvoice.patientName}</h3>
-                <button onClick={() => setEditingInvoice(null)}><i className="fa-solid fa-xmark text-lg"></i></button>
-              </div>
-              <div className="p-5 space-y-3">
-                {editItems.map((item, idx) => (
-                  <div key={idx} className="flex gap-2 items-center">
-                    <input
-                      className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-primary outline-none"
-                      placeholder="الخدمة"
-                      value={item.description}
-                      onChange={e => { const arr = [...editItems]; arr[idx].description = e.target.value; setEditItems(arr); }}
-                    />
-                    <input
-                      className="w-24 border border-slate-200 rounded-xl px-3 py-2 text-sm text-left font-mono focus:border-primary outline-none"
-                      type="number"
-                      placeholder="السعر"
-                      value={item.price || ''}
-                      onChange={e => { const arr = [...editItems]; arr[idx].price = parseFloat(e.target.value) || 0; setEditItems(arr); }}
-                    />
-                    <button onClick={() => setEditItems(editItems.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600 text-lg"><i className="fa-solid fa-trash"></i></button>
-                  </div>
-                ))}
-                <button onClick={() => setEditItems([...editItems, { description: '', price: 0 }])} className="w-full border-2 border-dashed border-slate-200 rounded-xl py-2 text-sm text-slate-400 hover:border-primary hover:text-primary transition-colors">
-                  <i className="fa-solid fa-plus ml-1"></i> إضافة خدمة
-                </button>
-                <div className="flex justify-between items-center pt-3 border-t border-slate-100">
-                  <span className="font-bold text-slate-600">المجموع:</span>
-                  <span className="text-2xl font-bold text-emerald-600">{editItems.reduce((s, i) => s + i.price, 0).toFixed(2)} د.أ</span>
-                </div>
-                <button onClick={handleSaveInvoiceEdit} className="w-full bg-amber-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-amber-700 shadow-lg mt-2">
-                  <i className="fa-solid fa-check ml-2"></i> حفظ التعديلات
-                </button>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* 1. FUTURISTIC MEDICAL HOLOGRAPHIC CLOCK WIDGET */}
