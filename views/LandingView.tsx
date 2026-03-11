@@ -208,8 +208,8 @@ const ServiceCard = ({ icon, title, desc, delay }: { icon: string; title: string
   >
     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     <div className="relative z-10">
-      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        <i className={`fa-solid ${icon} text-xl text-cyan-400`}></i>
+      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+        <i className={`fa-solid ${icon} text-xl text-primary`}></i>
       </div>
       <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
       <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
@@ -219,7 +219,7 @@ const ServiceCard = ({ icon, title, desc, delay }: { icon: string; title: string
 
 /* ═══════════════════════ MAIN COMPONENT ═══════════════════════ */
 const LandingView: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
   const isAr = language === 'ar';
   const [scrolled, setScrolled] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -263,28 +263,34 @@ const LandingView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#050a15] text-white overflow-x-hidden" dir={isAr ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Plus Jakarta Sans', sans-serif" }}>
       
-      {/* ════════════════ FLOATING LOGIN BUTTON ════════════════ */}
-      <a
-        href="/login"
-        className="fixed top-5 left-5 z-[60] px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]"
-        style={{ [isAr ? 'left' : 'right']: 20, [isAr ? 'right' : 'left']: 'auto' }}
-      >
-        <i className="fa-solid fa-right-to-bracket ml-2 mr-2 opacity-70"></i>
-        {isAr ? 'تسجيل الدخول' : 'Login'}
-      </a>
+      {/* ════════════════ FLOATING BUTTONS (Login + Language) ════════════════ */}
+      <div className="fixed top-5 z-[60] flex items-center gap-2" style={{ [isAr ? 'left' : 'right']: 20, [isAr ? 'right' : 'left']: 'auto' }}>
+        <button
+          onClick={toggleLanguage}
+          className="px-4 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-bold text-primary hover:text-white hover:bg-primary/20 hover:border-primary/30 transition-all duration-300"
+        >
+          <i className="fa-solid fa-globe mr-1.5 ml-1.5 opacity-70"></i>
+          {language === 'en' ? 'عربي' : 'EN'}
+        </button>
+        <a
+          href="/login"
+          className="px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(232,150,31,0.2)]"
+        >
+          <i className="fa-solid fa-right-to-bracket ml-2 mr-2 opacity-70"></i>
+          {isAr ? 'تسجيل الدخول' : 'Login'}
+        </a>
+      </div>
 
       {/* ════════════════ NAVBAR ════════════════ */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#050a15]/80 backdrop-blur-2xl shadow-2xl shadow-black/30 border-b border-white/[0.04]' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a href="#hero" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow duration-300">
-              <i className="fa-solid fa-stethoscope text-white text-lg"></i>
-            </div>
+            <img src="/logo.png" alt="MED LOOP" className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300" />
             <div>
               <span className="text-lg font-bold text-white block leading-tight">
                 {isAr ? 'د. طارق خريس' : 'Dr. Tarek Khrais'}
               </span>
-              <span className="text-[10px] text-cyan-400/70 font-medium tracking-wider uppercase">
+              <span className="text-[10px] text-primary/70 font-medium tracking-wider uppercase">
                 {isAr ? 'أذن · أنف · حنجرة' : 'ENT Specialist'}
               </span>
             </div>
@@ -296,7 +302,7 @@ const LandingView: React.FC = () => {
                 href={l.href}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                   activeSection === l.id
-                    ? 'text-cyan-400 bg-cyan-500/10'
+                    ? 'text-primary bg-primary/10'
                     : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -315,23 +321,23 @@ const LandingView: React.FC = () => {
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
         {/* Deep gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08)_0%,rgba(5,10,21,1)_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,150,31,0.06)_0%,rgba(5,10,21,1)_70%)]" />
         
         {/* Ambient orbital rings */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[800px] h-[800px] rounded-full border border-cyan-500/[0.04]"
+          className="absolute w-[800px] h-[800px] rounded-full border border-primary/[0.06]"
           style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[1100px] h-[1100px] rounded-full border border-violet-500/[0.03]"
+          className="absolute w-[1100px] h-[1100px] rounded-full border border-secondary/[0.04]"
           style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
         />
 
-        <FloatingParticles color="rgba(6,182,212,0.3)" count={15} />
+        <FloatingParticles color="rgba(232,150,31,0.25)" count={15} />
 
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
           {/* Badge */}
@@ -342,10 +348,10 @@ const LandingView: React.FC = () => {
             className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md mb-10"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            <span className="text-xs font-semibold text-cyan-300 tracking-widest uppercase">
+            <span className="text-xs font-semibold text-primary tracking-widest uppercase">
               {isAr ? 'أخصائي أذن · أنف · حنجرة' : 'Ear · Nose · Throat Specialist'}
             </span>
           </motion.div>
@@ -360,7 +366,7 @@ const LandingView: React.FC = () => {
             <span className="block text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]">
               {isAr ? 'د. طارق' : 'Dr. Tarek'}
             </span>
-            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-violet-400 to-cyan-400 drop-shadow-[0_0_60px_rgba(6,182,212,0.3)]">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary drop-shadow-[0_0_60px_rgba(232,150,31,0.3)]">
               {isAr ? 'خريس' : 'Khrais'}
             </span>
           </motion.h1>
@@ -382,7 +388,7 @@ const LandingView: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-base text-slate-500 mb-12 flex items-center justify-center gap-2"
           >
-            <i className="fa-solid fa-location-dot text-cyan-500/60"></i>
+            <i className="fa-solid fa-location-dot text-primary/60"></i>
             {isAr ? 'عمّان، الأردن' : 'Amman, Jordan'}
           </motion.p>
 
@@ -395,7 +401,7 @@ const LandingView: React.FC = () => {
           >
             <a
               href="#contact"
-              className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-bold rounded-2xl text-base overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_50px_rgba(6,182,212,0.4)]"
+              className="group relative px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-2xl text-base overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_50px_rgba(232,150,31,0.4)]"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
               <span className="relative z-10 flex items-center justify-center gap-3">
@@ -419,7 +425,7 @@ const LandingView: React.FC = () => {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
           <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
             <div className="w-6 h-10 rounded-full border-2 border-white/10 flex items-start justify-center pt-2">
-              <div className="w-1 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <div className="w-1 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(232,150,31,0.8)]" />
             </div>
           </motion.div>
         </div>
@@ -429,8 +435,8 @@ const LandingView: React.FC = () => {
            JOURNEY 1: THE EAR — Hearing the World
            ════════════════════════════════════════════════════════════════ */}
       <section id="ear" className="relative py-32 md:py-40 overflow-hidden bg-gradient-to-b from-[#050a15] via-[#0a1628] to-[#050a15]">
-        <FloatingParticles color="rgba(139,92,246,0.3)" count={12} />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(6,182,212,0.06)_0%,transparent_60%)] pointer-events-none" />
+        <FloatingParticles color="rgba(37,99,235,0.3)" count={12} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(37,99,235,0.06)_0%,transparent_60%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -447,18 +453,18 @@ const LandingView: React.FC = () => {
                   animate={{ rotate: [0, 5, -5, 0] }}
                   transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <EarIllustration className="w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(6,182,212,0.15)]" />
+                  <EarIllustration className="w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(37,99,235,0.15)]" />
                 </motion.div>
                 {/* Sound wave animation overlay */}
                 <motion.div
                   animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-40 h-40 rounded-full border border-cyan-500/20"
+                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-40 h-40 rounded-full border border-secondary/20"
                 />
                 <motion.div
                   animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0, 0.2] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
-                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-60 h-60 rounded-full border border-violet-500/15"
+                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-60 h-60 rounded-full border border-primary/15"
                 />
               </div>
             </motion.div>
@@ -471,15 +477,15 @@ const LandingView: React.FC = () => {
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
               className="order-1 lg:order-2"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold mb-6">
                 <i className="fa-solid fa-ear-listen"></i>
                 {isAr ? 'الأذن' : 'The Ear'}
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
                 {isAr ? (
-                  <>اسمع العالم <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">بوضوح</span></>
+                  <>اسمع العالم <span className="bg-clip-text text-transparent bg-gradient-to-r from-secondary to-primary">بوضوح</span></>
                 ) : (
-                  <>Hear the World <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Clearly</span></>
+                  <>Hear the World <span className="bg-clip-text text-transparent bg-gradient-to-r from-secondary to-primary">Clearly</span></>
                 )}
               </h2>
               <p className="text-lg text-slate-400 leading-relaxed mb-8">
@@ -510,7 +516,7 @@ const LandingView: React.FC = () => {
                     transition={{ delay: 0.1 * i }}
                     className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]"
                   >
-                    <i className={`fa-solid ${item.icon} text-cyan-400/80`}></i>
+                    <i className={`fa-solid ${item.icon} text-secondary/80`}></i>
                     <span className="text-sm text-slate-300">{item.text}</span>
                   </motion.div>
                 ))}
@@ -542,9 +548,9 @@ const LandingView: React.FC = () => {
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
                 {isAr ? (
-                  <>تنفّس <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">بحرية</span></>
+                  <>تنفّس <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">بحرية</span></>
                 ) : (
-                  <>Breathe <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">Freely</span></>
+                  <>Breathe <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">Freely</span></>
                 )}
               </h2>
               <p className="text-lg text-slate-400 leading-relaxed mb-8">
@@ -706,7 +712,7 @@ const LandingView: React.FC = () => {
            SERVICES
            ════════════════════════════════════════════════════════════════ */}
       <section id="services" className="relative py-32 overflow-hidden bg-[#050a15]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.04)_0%,transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(232,150,31,0.04)_0%,transparent_50%)] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div
@@ -715,15 +721,15 @@ const LandingView: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-bold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-6">
               <i className="fa-solid fa-hand-holding-medical"></i>
               {isAr ? 'خدماتنا الطبية' : 'Our Medical Services'}
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               {isAr ? (
-                <>رعاية <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">شاملة</span> ومتخصصة</>
+                <>رعاية <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">شاملة</span> ومتخصصة</>
               ) : (
-                <><span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Comprehensive</span> Specialized Care</>
+                <><span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Comprehensive</span> Specialized Care</>
               )}
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
@@ -771,9 +777,9 @@ const LandingView: React.FC = () => {
           >
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               {isAr ? (
-                <>لماذا <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">تختارنا</span>؟</>
+                <>لماذا <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">تختارنا</span>؟</>
               ) : (
-                <>Why <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">Choose Us</span>?</>
+                <>Why <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Choose Us</span>?</>
               )}
             </h2>
           </motion.div>
@@ -794,9 +800,9 @@ const LandingView: React.FC = () => {
                 ]
             ).map((item, i) => {
               const colors: Record<string, string> = {
-                cyan: 'from-cyan-500/20 to-cyan-500/5 text-cyan-400 border-cyan-500/20',
-                violet: 'from-violet-500/20 to-violet-500/5 text-violet-400 border-violet-500/20',
-                emerald: 'from-emerald-500/20 to-emerald-500/5 text-emerald-400 border-emerald-500/20',
+                cyan: 'from-primary/20 to-primary/5 text-primary border-primary/20',
+                violet: 'from-secondary/20 to-secondary/5 text-secondary border-secondary/20',
+                emerald: 'from-accent/20 to-accent/5 text-accent border-accent/20',
                 amber: 'from-amber-500/20 to-amber-500/5 text-amber-400 border-amber-500/20',
               };
               const c = colors[item.color] || colors.cyan;
@@ -825,7 +831,7 @@ const LandingView: React.FC = () => {
            CONTACT
            ════════════════════════════════════════════════════════════════ */}
       <section id="contact" className="relative py-32 overflow-hidden bg-[#050a15]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(6,182,212,0.06)_0%,transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(232,150,31,0.06)_0%,transparent_50%)] pointer-events-none" />
         
         <div className="max-w-4xl mx-auto px-6 relative z-10">
           <motion.div
@@ -834,15 +840,15 @@ const LandingView: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-6">
               <i className="fa-solid fa-paper-plane"></i>
               {isAr ? 'تواصل معنا' : 'Get In Touch'}
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               {isAr ? (
-                <>صحتك <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">أولويتنا</span></>
+                <>صحتك <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">أولويتنا</span></>
               ) : (
-                <>Your Health is <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Our Priority</span></>
+                <>Your Health is <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Our Priority</span></>
               )}
             </h2>
             <p className="text-lg text-slate-400 max-w-xl mx-auto">
@@ -877,9 +883,9 @@ const LandingView: React.FC = () => {
               },
             ].map((item, i) => {
               const colorMap: Record<string, string> = {
-                cyan: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20',
-                green: 'bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/20',
-                violet: 'bg-violet-500/10 border-violet-500/20 text-violet-400 hover:bg-violet-500/20',
+                cyan: 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20',
+                green: 'bg-accent/10 border-accent/20 text-accent hover:bg-accent/20',
+                violet: 'bg-secondary/10 border-secondary/20 text-secondary hover:bg-secondary/20',
               };
               return (
                 <motion.a
@@ -910,9 +916,7 @@ const LandingView: React.FC = () => {
       <footer className="border-t border-white/[0.04] bg-[#030710] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center">
-              <i className="fa-solid fa-stethoscope text-white text-sm"></i>
-            </div>
+            <img src="/logo.png" alt="MED LOOP" className="w-8 h-8 object-contain" />
             <span className="text-sm font-semibold text-white/80">
               {isAr ? 'عيادة د. طارق خريس' : 'Dr. Tarek Khrais Clinic'}
             </span>
@@ -922,7 +926,7 @@ const LandingView: React.FC = () => {
             {' '}
             <span className="text-slate-600">
               {isAr ? 'من تطوير' : 'Developed by'}{' '}
-              <span className="text-cyan-500/60">MED LOOP</span>
+              <span className="text-primary/60">MED LOOP</span>
             </span>
           </p>
         </div>
