@@ -6,27 +6,51 @@ import { useLanguage } from '../context/LanguageContext';
 
 const EarIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Outer ear (pinna) */}
-    <path d="M200 50 C120 50 60 120 60 220 C60 340 120 420 200 450 C250 430 280 380 290 320 C300 260 280 220 260 200 C240 180 250 150 270 140 C290 130 300 110 290 90 C280 70 250 50 200 50Z" 
-      stroke="url(#earGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
-    {/* Anti-helix */}
-    <path d="M220 100 C180 110 150 160 160 220 C170 280 200 330 220 360" 
-      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.6"/>
-    {/* Tragus */}
-    <path d="M240 200 C250 210 260 220 255 235 C250 250 240 245 238 235" 
-      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    {/* Ear canal - glowing */}
-    <circle cx="235" cy="230" r="15" fill="url(#canalGrad)" opacity="0.8"/>
-    <circle cx="235" cy="230" r="8" fill="url(#canalInner)" opacity="0.9"/>
-    {/* Sound waves */}
-    <g opacity="0.4">
-      <path d="M100 180 C80 200 80 240 100 260" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
-      <path d="M75 160 C45 195 45 245 75 280" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
-      <path d="M50 140 C10 190 10 250 50 300" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
+    {/* Helix - outer rim of ear */}
+    <path d="M175 140 C175 100 195 65 225 48 C255 32 290 38 318 62 C346 86 358 122 355 165 C352 210 345 265 332 315 C319 365 298 400 268 420 C248 432 228 440 215 442"
+      stroke="url(#earGrad)" strokeWidth="3" fill="none" opacity="0.9" strokeLinecap="round"/>
+    {/* Lobule - earlobe */}
+    <path d="M215 442 C198 448 182 442 178 428 C174 414 178 398 190 388"
+      stroke="url(#earGrad)" strokeWidth="3" fill="none" opacity="0.85" strokeLinecap="round"/>
+    {/* Helix crus - where helix attaches inside */}
+    <path d="M175 140 C180 158 178 180 175 205 C172 225 175 240 182 248"
+      stroke="url(#earGrad)" strokeWidth="2.5" fill="none" opacity="0.75" strokeLinecap="round"/>
+    {/* Antihelix - inner ridge */}
+    <path d="M198 385 C215 345 228 295 232 248 C235 215 230 188 222 168"
+      stroke="url(#earGrad)" strokeWidth="2.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Antihelix superior crus */}
+    <path d="M222 168 C232 145 252 118 275 98 C292 84 308 76 318 74"
+      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.55" strokeLinecap="round"/>
+    {/* Antihelix inferior crus */}
+    <path d="M222 168 C212 148 200 128 192 112 C186 100 186 88 195 78"
+      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.55" strokeLinecap="round"/>
+    {/* Tragus - cartilage flap in front of canal */}
+    <path d="M168 235 C156 228 148 238 150 252 C152 266 162 272 170 265"
+      stroke="url(#earGrad)" strokeWidth="2.5" fill="none" opacity="0.8" strokeLinecap="round"/>
+    {/* Antitragus */}
+    <path d="M202 372 C215 362 220 345 214 332 C208 322 196 328 194 340 C192 352 198 368 202 372"
+      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    {/* Concha bowl */}
+    <path d="M182 248 C200 242 218 252 228 268 C236 284 234 308 224 325 C216 338 206 345 200 342"
+      stroke="url(#earGrad)" strokeWidth="1.8" fill="none" opacity="0.4" strokeLinecap="round"/>
+    {/* Ear canal opening - glowing */}
+    <ellipse cx="192" cy="258" rx="16" ry="20" fill="url(#canalGrad)" opacity="0.7"/>
+    <ellipse cx="192" cy="258" rx="8" ry="11" fill="url(#canalInner)" opacity="0.9"/>
+    {/* Inner ear - Cochlea spiral */}
+    <g opacity="0.35" transform="translate(290, 285)">
+      <path d="M0 0 C22 -5 38 8 40 28 C42 48 28 62 10 64 C-8 66 -22 52 -22 38 C-22 24 -12 14 2 16 C16 18 22 28 18 38"
+        stroke="url(#earGrad)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      <line x1="0" y1="64" x2="-12" y2="92" stroke="url(#earGrad)" strokeWidth="1.5" opacity="0.5"/>
     </g>
-    {/* Cochlea inner detail */}
-    <path d="M250 235 C270 240 290 260 285 285 C280 310 260 315 250 305 C240 295 250 280 260 275 C270 270 268 260 258 258" 
-      stroke="url(#earGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    {/* Dashed connector from canal to cochlea */}
+    <path d="M208 260 C240 265 270 278 290 285"
+      stroke="url(#earGrad)" strokeWidth="1" fill="none" opacity="0.2" strokeDasharray="4 4"/>
+    {/* Sound waves entering ear */}
+    <g opacity="0.35">
+      <path d="M95 210 C78 232 78 272 95 294" stroke="url(#waveGrad)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      <path d="M68 188 C42 222 42 282 68 316" stroke="url(#waveGrad)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      <path d="M42 168 C6 212 6 292 42 336" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    </g>
     <defs>
       <linearGradient id="earGrad" x1="0" y1="0" x2="400" y2="500">
         <stop offset="0%" stopColor="#06b6d4"/>
@@ -51,33 +75,73 @@ const EarIllustration = ({ className = '' }: { className?: string }) => (
 
 const NoseIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Nose bridge */}
-    <path d="M200 60 C195 80 185 140 180 200 C175 260 160 300 140 340 C130 360 140 380 160 385 C180 390 195 380 200 370" 
-      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
-    <path d="M200 60 C205 80 215 140 220 200 C225 260 240 300 260 340 C270 360 260 380 240 385 C220 390 205 380 200 370" 
-      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
-    {/* Nostrils */}
-    <ellipse cx="170" cy="360" rx="25" ry="18" stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    <ellipse cx="230" cy="360" rx="25" ry="18" stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    {/* Septum */}
-    <line x1="200" y1="310" x2="200" y2="375" stroke="url(#noseGrad)" strokeWidth="1.5" opacity="0.5"/>
-    {/* Nasal cavity cross-section detail */}
-    <path d="M155 300 C140 280 130 250 135 220 C140 190 155 175 170 175" 
-      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
-    <path d="M245 300 C260 280 270 250 265 220 C260 190 245 175 230 175" 
-      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
-    {/* Turbinate curves */}
-    <path d="M160 220 C145 230 140 250 150 265" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
-    <path d="M165 240 C155 248 153 260 158 272" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
-    <path d="M240 220 C255 230 260 250 250 265" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
-    <path d="M235 240 C245 248 247 260 242 272" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
+    {/* External nose profile - dorsum (bridge) */}
+    <path d="M155 70 C150 100 142 140 132 180 C122 220 108 260 98 290 C88 320 92 342 108 355"
+      stroke="url(#noseGrad)" strokeWidth="3" fill="none" opacity="0.9" strokeLinecap="round"/>
+    {/* Nose tip and alar (wing) */}
+    <path d="M108 355 C120 365 138 372 155 368 C168 364 178 355 182 342"
+      stroke="url(#noseGrad)" strokeWidth="3" fill="none" opacity="0.9" strokeLinecap="round"/>
+    {/* Columella */}
+    <path d="M182 342 C186 358 185 375 180 390"
+      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.85" strokeLinecap="round"/>
+    {/* Nostril opening (profile) */}
+    <path d="M108 355 C115 362 128 370 142 368 C155 366 168 360 175 352"
+      stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    {/* Nasal bone */}
+    <path d="M155 70 C162 68 172 72 178 82 C184 92 182 108 178 125"
+      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Cribriform plate / roof of nasal cavity */}
+    <path d="M178 82 C205 74 235 70 265 72 C295 74 318 82 330 98"
+      stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.55" strokeLinecap="round"/>
+    {/* Hard palate - floor */}
+    <path d="M180 390 C210 395 250 395 290 390 C315 385 332 372 340 355"
+      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.8" strokeLinecap="round"/>
+    {/* Posterior wall - nasopharynx */}
+    <path d="M330 98 C335 128 338 168 340 215 C342 265 342 315 340 355"
+      stroke="url(#noseGrad)" strokeWidth="2.2" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Superior turbinate */}
+    <path d="M185 130 C200 118 225 112 252 118 C278 124 302 140 318 162"
+      stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.5" strokeLinecap="round"/>
+    <path d="M185 130 C208 128 228 126 248 130"
+      stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.25" strokeLinecap="round"/>
+    {/* Middle turbinate */}
+    <path d="M182 215 C202 198 232 190 265 196 C295 202 318 218 328 240"
+      stroke="url(#noseGrad)" strokeWidth="2.2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    <path d="M182 215 C210 212 238 210 260 214"
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.3" strokeLinecap="round"/>
+    {/* Inferior turbinate */}
+    <path d="M184 310 C205 292 238 284 272 290 C302 296 325 312 335 334"
+      stroke="url(#noseGrad)" strokeWidth="2.2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    <path d="M184 310 C215 306 245 304 268 308"
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.3" strokeLinecap="round"/>
+    {/* Frontal sinus */}
+    <path d="M155 70 C148 52 155 34 172 26 C189 18 210 22 218 35 C226 48 220 66 212 78"
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.35" strokeLinecap="round" strokeDasharray="4 3"/>
+    {/* Sphenoid sinus */}
+    <path d="M320 105 C332 98 348 105 352 122 C356 139 348 158 335 165 C322 172 310 165 308 150 C306 135 312 118 320 108"
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.3" strokeLinecap="round" strokeDasharray="4 3"/>
+    {/* Olfactory epithelium markers */}
+    <g opacity="0.3">
+      <circle cx="198" cy="92" r="2.5" fill="#10b981"/>
+      <circle cx="218" cy="86" r="2" fill="#06b6d4"/>
+      <circle cx="238" cy="82" r="2" fill="#10b981"/>
+      <circle cx="258" cy="80" r="2.5" fill="#06b6d4"/>
+      <circle cx="278" cy="82" r="2" fill="#10b981"/>
+    </g>
+    {/* Airflow arrows entering nostril */}
+    <g opacity="0.3">
+      <path d="M72 330 C82 312 100 296 120 285" stroke="#10b981" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      <path d="M116 290 L120 285 L122 293" stroke="#10b981" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+      <path d="M58 350 C72 332 92 318 112 308" stroke="#06b6d4" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      <path d="M108 313 L112 308 L114 316" stroke="#06b6d4" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    </g>
     {/* Airflow particles */}
     <g opacity="0.3">
-      <circle cx="170" cy="400" r="3" fill="#10b981"/>
-      <circle cx="185" cy="410" r="2" fill="#06b6d4"/>
-      <circle cx="215" cy="410" r="2" fill="#06b6d4"/>
-      <circle cx="230" cy="400" r="3" fill="#10b981"/>
-      <circle cx="200" cy="420" r="2.5" fill="#8b5cf6"/>
+      <circle cx="60" cy="345" r="3" fill="#10b981"/>
+      <circle cx="48" cy="332" r="2" fill="#06b6d4"/>
+      <circle cx="42" cy="352" r="2.5" fill="#10b981"/>
+      <circle cx="55" cy="360" r="2" fill="#8b5cf6"/>
+      <circle cx="75" cy="355" r="1.5" fill="#06b6d4"/>
     </g>
     <defs>
       <linearGradient id="noseGrad" x1="100" y1="60" x2="300" y2="500">
@@ -91,41 +155,77 @@ const NoseIllustration = ({ className = '' }: { className?: string }) => (
 
 const ThroatIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 400 600" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Pharynx walls */}
-    <path d="M140 40 C130 60 120 120 115 180 C110 240 100 300 95 360 C90 420 100 480 120 540" 
-      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
-    <path d="M260 40 C270 60 280 120 285 180 C290 240 300 300 305 360 C310 420 300 480 280 540" 
-      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    {/* Tongue - dorsal surface */}
+    <path d="M60 155 C90 148 130 142 170 142 C210 142 245 150 265 168"
+      stroke="url(#throatGrad)" strokeWidth="3" fill="none" opacity="0.85" strokeLinecap="round"/>
+    {/* Tongue root descending */}
+    <path d="M265 168 C275 185 280 210 278 240 C276 265 268 285 255 298"
+      stroke="url(#throatGrad)" strokeWidth="2.8" fill="none" opacity="0.8" strokeLinecap="round"/>
+    {/* Hard palate */}
+    <path d="M60 68 C100 52 150 44 210 48 C260 52 295 62 315 78"
+      stroke="url(#throatGrad)" strokeWidth="3" fill="none" opacity="0.85" strokeLinecap="round"/>
+    {/* Soft palate */}
+    <path d="M315 78 C320 95 318 118 308 138 C298 155 285 168 275 172"
+      stroke="url(#throatGrad)" strokeWidth="2.8" fill="none" opacity="0.8" strokeLinecap="round"/>
     {/* Uvula */}
-    <path d="M185 60 C190 80 200 100 200 115 C200 100 210 80 215 60" 
-      stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    <ellipse cx="200" cy="120" rx="8" ry="12" fill="url(#uvulaGrad)" opacity="0.6"/>
-    {/* Tonsils */}
-    <ellipse cx="145" cy="100" rx="20" ry="30" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    <ellipse cx="255" cy="100" rx="20" ry="30" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    {/* Epiglottis */}
-    <path d="M175 200 C180 180 190 170 200 168 C210 170 220 180 225 200" 
-      stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.6"/>
-    {/* Vocal cords */}
-    <path d="M150 280 C170 290 190 295 200 296" stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    <path d="M250 280 C230 290 210 295 200 296" stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
-    {/* Vocal cord vibration lines */}
-    <g opacity="0.3">
-      <path d="M160 270 L240 270" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
-      <path d="M155 285 L245 285" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
-      <path d="M150 300 L250 300" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
+    <path d="M275 172 C270 182 268 198 272 210 C276 222 284 228 288 220 C292 212 288 198 282 185 C276 174 275 172 275 172"
+      stroke="url(#throatGrad)" strokeWidth="2.2" fill="url(#uvulaGrad)" opacity="0.75" strokeLinecap="round"/>
+    {/* Nasopharynx posterior wall */}
+    <path d="M315 78 C325 100 330 135 332 175 C334 215 332 255 328 290"
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Oropharynx */}
+    <path d="M328 290 C325 320 320 348 316 370"
+      stroke="url(#throatGrad)" strokeWidth="2.2" fill="none" opacity="0.65" strokeLinecap="round"/>
+    {/* Vallecula */}
+    <path d="M255 298 C262 308 272 315 278 312"
+      stroke="url(#throatGrad)" strokeWidth="1.8" fill="none" opacity="0.5" strokeLinecap="round"/>
+    {/* Epiglottis - leaf-shaped */}
+    <path d="M278 312 C295 295 308 275 312 255 C316 235 308 222 296 222 C284 222 275 235 275 255 C275 275 278 298 278 312"
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.75" strokeLinecap="round"/>
+    {/* Hyoid bone */}
+    <path d="M238 305 C250 300 265 298 278 300"
+      stroke="url(#throatGrad)" strokeWidth="3" fill="none" opacity="0.5" strokeLinecap="round"/>
+    {/* Thyroid cartilage - anterior wall of larynx */}
+    <path d="M238 305 C228 325 218 355 214 385 C210 415 212 440 218 462"
+      stroke="url(#throatGrad)" strokeWidth="3" fill="none" opacity="0.85" strokeLinecap="round"/>
+    {/* Posterior larynx wall */}
+    <path d="M316 370 C312 395 308 418 304 440 C300 462 298 478 300 495"
+      stroke="url(#throatGrad)" strokeWidth="2.2" fill="none" opacity="0.65" strokeLinecap="round"/>
+    {/* Vocal folds */}
+    <path d="M224 398 C242 408 265 412 282 408 C298 404 310 396 315 388"
+      stroke="url(#vocalGrad)" strokeWidth="3" fill="none" opacity="0.85" strokeLinecap="round"/>
+    <path d="M226 410 C244 418 268 422 284 418 C300 414 310 408 314 400"
+      stroke="url(#vocalGrad)" strokeWidth="2.2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    {/* Glottic opening */}
+    <ellipse cx="270" cy="404" rx="20" ry="7" stroke="url(#vocalGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    {/* Sound waves from vocal folds */}
+    <g opacity="0.2">
+      <circle cx="270" cy="404" r="28" stroke="#f59e0b" strokeWidth="1.2" fill="none"/>
+      <circle cx="270" cy="404" r="45" stroke="#f59e0b" strokeWidth="0.9" fill="none"/>
+      <circle cx="270" cy="404" r="62" stroke="#f59e0b" strokeWidth="0.6" fill="none"/>
     </g>
-    {/* Trachea rings */}
-    {[360, 395, 430, 465, 500].map((y, i) => (
-      <path key={i} d={`M120 ${y} C120 ${y+15} 200 ${y+20} 200 ${y+15} C200 ${y+20} 280 ${y+15} 280 ${y}`} 
-        stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity={0.5 - i * 0.07}/>
+    {/* Cricoid cartilage */}
+    <path d="M218 462 C225 472 242 478 262 478 C282 478 296 474 302 466"
+      stroke="url(#throatGrad)" strokeWidth="2.2" fill="none" opacity="0.6" strokeLinecap="round"/>
+    {/* Trachea anterior wall */}
+    <path d="M218 462 C216 482 215 505 215 528 C215 548 216 565 218 580"
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Trachea posterior wall */}
+    <path d="M300 495 C300 515 299 535 298 555 C297 572 297 582 298 590"
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.7" strokeLinecap="round"/>
+    {/* Tracheal cartilage rings */}
+    {[488, 512, 536, 560].map((y, i) => (
+      <path key={i} d={`M218 ${y} C228 ${y+10} 255 ${y+14} 268 ${y+12} C280 ${y+10} 295 ${y+5} 300 ${y-2}`}
+        stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity={0.5 - i * 0.08} strokeLinecap="round"/>
     ))}
-    {/* Sound/vibration emanating from vocal cords */}
-    <g opacity="0.25">
-      <circle cx="200" cy="290" r="30" stroke="#f59e0b" strokeWidth="1" fill="none"/>
-      <circle cx="200" cy="290" r="50" stroke="#f59e0b" strokeWidth="0.8" fill="none"/>
-      <circle cx="200" cy="290" r="70" stroke="#f59e0b" strokeWidth="0.5" fill="none"/>
-    </g>
+    {/* Esophagus (behind trachea, dashed) */}
+    <path d="M316 370 C322 400 325 440 324 480 C323 520 320 555 318 585"
+      stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.25" strokeDasharray="6 4" strokeLinecap="round"/>
+    <path d="M336 375 C340 405 342 445 340 485 C338 525 335 558 333 588"
+      stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.25" strokeDasharray="6 4" strokeLinecap="round"/>
+    {/* Palatine tonsils */}
+    <ellipse cx="268" cy="192" rx="14" ry="25" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.35"/>
+    <ellipse cx="310" cy="202" rx="12" ry="22" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.35"/>
     <defs>
       <linearGradient id="throatGrad" x1="100" y1="0" x2="300" y2="600">
         <stop offset="0%" stopColor="#f59e0b"/>
@@ -133,13 +233,13 @@ const ThroatIllustration = ({ className = '' }: { className?: string }) => (
         <stop offset="100%" stopColor="#f59e0b"/>
       </linearGradient>
       <radialGradient id="uvulaGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#ef4444" stopOpacity="0.7"/>
-        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2"/>
+        <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3"/>
+        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.05"/>
       </radialGradient>
       <linearGradient id="vocalGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="#f59e0b" stopOpacity="0"/>
+        <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.2"/>
         <stop offset="50%" stopColor="#f59e0b" stopOpacity="1"/>
-        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0"/>
+        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2"/>
       </linearGradient>
     </defs>
   </svg>
