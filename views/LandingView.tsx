@@ -263,24 +263,6 @@ const LandingView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#050a15] text-white overflow-x-hidden" dir={isAr ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Plus Jakarta Sans', sans-serif" }}>
       
-      {/* ════════════════ FLOATING BUTTONS (Login + Language) ════════════════ */}
-      <div className="fixed top-5 z-[60] flex items-center gap-2" style={{ [isAr ? 'left' : 'right']: 20, [isAr ? 'right' : 'left']: 'auto' }}>
-        <button
-          onClick={toggleLanguage}
-          className="px-4 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-bold text-primary hover:text-white hover:bg-primary/20 hover:border-primary/30 transition-all duration-300"
-        >
-          <i className="fa-solid fa-globe mr-1.5 ml-1.5 opacity-70"></i>
-          {language === 'en' ? 'عربي' : 'EN'}
-        </button>
-        <a
-          href="/login"
-          className="px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(232,150,31,0.2)]"
-        >
-          <i className="fa-solid fa-right-to-bracket ml-2 mr-2 opacity-70"></i>
-          {isAr ? 'تسجيل الدخول' : 'Login'}
-        </a>
-      </div>
-
       {/* ════════════════ NAVBAR ════════════════ */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#050a15]/80 backdrop-blur-2xl shadow-2xl shadow-black/30 border-b border-white/[0.04]' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -295,20 +277,38 @@ const LandingView: React.FC = () => {
               </span>
             </div>
           </a>
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(l => (
-              <a
-                key={l.href}
-                href={l.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  activeSection === l.id
-                    ? 'text-primary bg-primary/10'
-                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-                }`}
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-1">
+              {navLinks.map(l => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    activeSection === l.id
+                      ? 'text-primary bg-primary/10'
+                      : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  }`}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-bold text-primary hover:text-white hover:bg-primary/20 hover:border-primary/30 transition-all duration-300"
               >
-                {l.label}
+                <i className="fa-solid fa-globe opacity-70" style={{ marginInlineEnd: 6 }}></i>
+                {language === 'en' ? 'عربي' : 'EN'}
+              </button>
+              <a
+                href="/login"
+                className="px-4 py-2 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(232,150,31,0.2)]"
+              >
+                <i className="fa-solid fa-right-to-bracket opacity-70" style={{ marginInlineEnd: 6 }}></i>
+                {isAr ? 'تسجيل الدخول' : 'Login'}
               </a>
-            ))}
+            </div>
           </div>
         </div>
       </nav>
