@@ -147,8 +147,7 @@ const AppointmentsView: React.FC = () => {
       if (cleanPhone.startsWith('07')) cleanPhone = '962' + cleanPhone.substring(1);
       if (cleanPhone.startsWith('06')) cleanPhone = '962' + cleanPhone.substring(1);
       
-      const clientSlug = client?.slug || localStorage.getItem('currentClientSlug') || '';
-      const loginUrl = clientSlug ? `https://med.loopjo.com/${clientSlug}` : 'https://med.loopjo.com';
+      const loginUrl = window.location.origin;
       const clinicName = client?.name || t('the_clinic');
       
       const message = [

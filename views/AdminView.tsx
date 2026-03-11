@@ -344,13 +344,13 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 <i className="fa-solid fa-gear mr-2"></i> {t('system_settings')}
             </button>
             <button 
-                onClick={() => { const slug = window.location.pathname.split('/')[1]; window.location.href = `/${slug}/catalog`; }} 
+                onClick={() => { window.location.href = '/catalog'; }} 
                 className="px-6 py-2 rounded-xl font-bold transition-all bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
             >
                 <i className="fa-solid fa-book-medical mr-2"></i> {t('catalog')}
             </button>
             <button 
-                onClick={() => { const slug = window.location.pathname.split('/')[1]; window.location.href = `/${slug}/accounting`; }} 
+                onClick={() => { window.location.href = '/accounting'; }} 
                 className="px-6 py-2 rounded-xl font-bold transition-all bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
             >
                 <i className="fa-solid fa-calculator mr-2"></i> {t('accounting')}
@@ -403,13 +403,11 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm ${
                                       u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
                                       u.role === 'doctor' ? 'bg-amber-100 text-amber-600' :
-                                      u.role === 'lab_tech' ? 'bg-amber-100 text-amber-600' :
                                       'bg-green-100 text-green-600'
                                   }`}>
                                       <i className={`fa-solid ${
                                           u.role === 'admin' ? 'fa-shield-halved' :
                                           u.role === 'doctor' ? 'fa-user-doctor' :
-                                          u.role === 'lab_tech' ? 'fa-tooth' :
                                           'fa-user'
                                       }`}></i>
                                   </div>
@@ -723,8 +721,6 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border transition-transform ${
                                         user.role === 'admin' ? 'bg-purple-100 text-purple-600 border-purple-200' :
                                         user.role === 'doctor' ? 'bg-amber-100 text-amber-600 border-amber-200' :
-                                        user.role === 'lab_tech' ? 'bg-amber-100 text-amber-600 border-amber-200' :
-                                        user.role === 'implant_manager' ? 'bg-sky-100 text-sky-600 border-sky-200' :
                                         'bg-emerald-100 text-emerald-600 border-emerald-200'
                                     }`}>
                                         {(user?.name || user?.email || "U").charAt(0)}
@@ -742,8 +738,6 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                                     <span className={`w-fit px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase tracking-tighter shadow-sm border ${
                                         user.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-100' :
                                         user.role === 'doctor' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                        user.role === 'lab_tech' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                        user.role === 'implant_manager' ? 'bg-sky-50 text-sky-700 border-sky-100' :
                                         'bg-emerald-50 text-emerald-700 border-emerald-100'
                                     }`}>
                                         {user.role}

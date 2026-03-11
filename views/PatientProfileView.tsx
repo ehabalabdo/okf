@@ -212,8 +212,7 @@ const PatientProfileView: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-800 mb-2">{t('access_denied')}</h2>
             <p className="text-slate-500 mb-6">{error}</p>
             <button onClick={() => {
-                const slug = localStorage.getItem('currentClientSlug');
-                navigate(slug ? `/${slug}/patients` : '/patients');
+                navigate('/patients');
             }} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">
                 Back to Registry
             </button>

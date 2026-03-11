@@ -25,5 +25,24 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "src",
+    "components",
+    "context",
+    "hooks",
+    "services",
+    "types",
+    "utils",
+    "views",
+    "App.tsx",
+    "main.tsx",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "server",
+    "bridge-agent",
+    "temp_reception.tsx",
+    "services/testDb.ts"
+  ]
 }

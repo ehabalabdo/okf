@@ -1171,15 +1171,15 @@ const DoctorView: React.FC = () => {
                           </h3>
                           {/* Doctor can create tests directly */}
                           <div className="flex gap-2">
-                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/audiogram`, '_blank'); }}
+                            <button onClick={() => { window.open('/ent/audiogram', '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200 transition">
                               <i className="fa-solid fa-ear-listen"></i> {t('new_hearing_test')}
                             </button>
-                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/balance`, '_blank'); }}
+                            <button onClick={() => { window.open('/ent/balance', '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200 transition">
                               <i className="fa-solid fa-compass"></i> {t('new_balance_test')}
                             </button>
-                            <button onClick={() => { const slug = window.location.pathname.split('/').filter(Boolean)[0]; window.open(`/${slug}/ent/referral`, '_blank'); }}
+                            <button onClick={() => { window.open('/ent/referral', '_blank'); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200 transition">
                               <i className="fa-solid fa-share-from-square"></i> {t('medical_referral_btn')}
                             </button>

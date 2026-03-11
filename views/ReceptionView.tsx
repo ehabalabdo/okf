@@ -165,9 +165,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
             cleanPhone = '962' + cleanPhone.substring(1);
         }
         
-        // Build client-specific login URL
-        const clientSlug = client?.slug || localStorage.getItem('currentClientSlug') || '';
-        const loginUrl = clientSlug ? `https://okf-nine.vercel.app/${clientSlug}` : 'https://okf-nine.vercel.app';
+        const loginUrl = window.location.origin;
         const clinicName = client?.name || t('rcpt_clinic_fallback');
         
         const message = [
@@ -245,9 +243,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
             }
 
             // Navigate to ENT New Patient Questionnaire with patient pre-selected
-            const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
             if (confirm('✅ ' + t('patient_added_success') + '\n\n' + t('fill_ent_questionnaire'))) {
-                window.location.href = `/${slug}/ent/new-patient?patientId=${patientId}`;
+                window.location.href = `/ent/new-patient?patientId=${patientId}`;
             }
         } catch (e: any) {
             alert(t('error_prefix') + (e.message || t('add_patient_failed')));
@@ -795,9 +792,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                         { path: 'ent/new-patient', icon: 'fa-file-medical', label: t('new_patient_questionnaire'), color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
                         { path: 'ent/follow-up', icon: 'fa-file-lines', label: t('follow_up_patient'), color: 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' },
                     ].map(item => {
-                        const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
                         return (
-                            <a key={item.path} href={`/${slug}/${item.path}`}
+                            <a key={item.path} href={`/${item.path}`}
                                 className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all text-center ${item.color}`}>
                                 <i className={`fa-solid ${item.icon} text-2xl`}></i>
                                 <span className="text-xs font-bold leading-tight">{item.label}</span>

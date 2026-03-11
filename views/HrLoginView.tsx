@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { hrAuthService } from '../services/hrApiServices';
 import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 
 const HrLoginView: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
   const { client } = useClient();
   const { language } = useLanguage();
   const isAr = language === 'ar';
@@ -30,7 +29,7 @@ const HrLoginView: React.FC = () => {
       // Clear any existing staff session
       localStorage.removeItem('user');
       localStorage.removeItem('patientUser');
-      navigate(`/${slug}/hr/me`, { replace: true });
+      navigate('/hr/me', { replace: true });
     } catch (err: any) {
       setError(err.message || (isAr ? 'فشل تسجيل الدخول' : 'Login failed'));
     } finally {
@@ -101,7 +100,7 @@ const HrLoginView: React.FC = () => {
         {/* Back to staff login */}
         <div className="text-center mt-4">
           <button
-            onClick={() => navigate(`/${slug}/login`)}
+            onClick={() => navigate('/login')}
             className="text-sm text-slate-400 hover:text-amber-500 transition-colors"
           >
             <i className="fa-solid fa-arrow-left me-1"></i> {isAr ? 'تسجيل دخول الموظفين (نظام)' : 'Staff Login'}

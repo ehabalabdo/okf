@@ -148,7 +148,7 @@ const ENTFollowUpFormView: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{t('ent_compliance_level')}</label>
                 <div className="flex gap-3 flex-wrap">
                   {([['full', t('ent_full_compliance')], ['partial', t('ent_partial_compliance')], ['none', t('ent_no_compliance')]] as [string, string][]).map(([val, label]) => (
-                    <button key={val} onClick={() => setForm(f => ({ ...f, treatmentCompliance: val }))}
+                    <button key={val} onClick={() => setForm(f => ({ ...f, treatmentCompliance: val as typeof f.treatmentCompliance }))}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.treatmentCompliance === val ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
                       {label}
                     </button>
@@ -176,7 +176,7 @@ const ENTFollowUpFormView: React.FC = () => {
                       ['same', t('ent_same_label'), 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30'], 
                       ['worsened', t('ent_worsened_label'), 'text-red-600 bg-red-100 dark:bg-red-900/30'],
                       ['new_symptoms', t('ent_new_symptoms_label'), 'text-purple-600 bg-purple-100 dark:bg-purple-900/30']] as [string, string, string][]).map(([val, label, colors]) => (
-                    <button key={val} onClick={() => setForm(f => ({ ...f, symptomChange: val }))}
+                    <button key={val} onClick={() => setForm(f => ({ ...f, symptomChange: val as typeof f.symptomChange }))}
                       className={`p-3 rounded-xl text-sm font-medium transition border-2 ${form.symptomChange === val ? colors + ' border-current' : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-transparent'}`}>
                       {label}
                     </button>
@@ -206,7 +206,7 @@ const ENTFollowUpFormView: React.FC = () => {
             <div className="space-y-4">
               <div className="flex gap-3 flex-wrap">
                 {([['effective', t('ent_med_effective')], ['partially', t('ent_med_partial')], ['not_effective', t('ent_med_not_effective')]] as [string, string][]).map(([val, label]) => (
-                  <button key={val} onClick={() => setForm(f => ({ ...f, medicationEffectiveness: val }))}
+                  <button key={val} onClick={() => setForm(f => ({ ...f, medicationEffectiveness: val as typeof f.medicationEffectiveness }))}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.medicationEffectiveness === val ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
                     {label}
                   </button>
@@ -254,7 +254,7 @@ const ENTFollowUpFormView: React.FC = () => {
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{t('ent_healing_assessment')}</label>
                     <div className="flex gap-3">
                       {([['good', t('ent_healing_good')], ['moderate', t('ent_healing_moderate')], ['poor', t('ent_healing_poor')]] as [string, string][]).map(([val, label]) => (
-                        <button key={val} onClick={() => setForm(f => ({ ...f, healingAssessment: val }))}
+                        <button key={val} onClick={() => setForm(f => ({ ...f, healingAssessment: val as typeof f.healingAssessment }))}
                           className={`px-4 py-2 rounded-xl text-sm font-medium transition ${form.healingAssessment === val ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
                           {label}
                         </button>

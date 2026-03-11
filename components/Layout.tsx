@@ -9,7 +9,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   hideTitle?: boolean;
   titleExtra?: React.ReactNode;
 }
@@ -22,13 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
 
-  // Detect slug from URL to prefix nav links
-  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments',
-    'clinic-history', 'device-results', 'device-management',
-    'queue-display', 'patient', 'super-admin'];
-  const pathParts = location.pathname.split('/').filter(Boolean);
-  const slug = pathParts[0] && !knownTopRoutes.includes(pathParts[0]) ? pathParts[0] : null;
-  const prefix = slug ? `/${slug}` : '';
+  const prefix = '';
 
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {

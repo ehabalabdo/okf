@@ -1,7 +1,7 @@
 
 
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -13,7 +13,6 @@ const LoginView: React.FC = () => {
   const { t, toggleLanguage, language } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const { slug } = useParams<{ slug: string }>();
   const clientCtx = useClientSafe();
   const client = clientCtx?.client;
   const [identifier, setIdentifier] = useState('');
@@ -34,7 +33,7 @@ const LoginView: React.FC = () => {
         localStorage.setItem('hrEmployee', JSON.stringify(result.employee));
         localStorage.removeItem('user');
         localStorage.removeItem('patientUser');
-        navigate(slug ? `/${slug}/hr/me` : '/hr/me', { replace: true });
+        navigate('/hr/me', { replace: true });
         return;
       }
 
@@ -44,21 +43,20 @@ const LoginView: React.FC = () => {
       const savedPatient = localStorage.getItem('patientUser');
       
       if (savedPatient) {
-        navigate(slug ? `/${slug}/patient/dashboard` : '/patient/dashboard', { replace: true });
+        navigate('/patient/dashboard', { replace: true });
       } else {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           try {
             const parsed = JSON.parse(savedUser);
             const role = parsed.role;
-            const prefix = slug ? `/${slug}` : '';
-            if (role === 'admin') navigate(`${prefix}/admin`, { replace: true });
-            else if (role === 'secretary') navigate(`${prefix}/reception`, { replace: true });
-            else if (role === 'doctor') navigate(`${prefix}/doctor`, { replace: true });
-            else if (role === 'technician') navigate(`${prefix}/technician`, { replace: true });
-            else navigate(`${prefix}/`, { replace: true });
+            if (role === 'admin') navigate('/admin', { replace: true });
+            else if (role === 'secretary') navigate('/reception', { replace: true });
+            else if (role === 'doctor') navigate('/doctor', { replace: true });
+            else if (role === 'technician') navigate('/technician', { replace: true });
+            else navigate('/', { replace: true });
           } catch {
-            navigate(slug ? `/${slug}/` : '/', { replace: true });
+            navigate('/', { replace: true });
           }
         }
       }

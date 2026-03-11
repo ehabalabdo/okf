@@ -10,7 +10,7 @@ export function fmtTime(ts: string | null): string {
 }
 
 /** Format a date string/number to DD/MM/YYYY (e.g., "23/02/2026") */
-export function fmtDate(d: string | number): string {
+export function fmtDate(d: string | number | Date): string {
   if (!d) return '—';
   const date = new Date(d);
   if (isNaN(date.getTime())) return '—';

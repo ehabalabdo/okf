@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, MemoryRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ClientProvider, useClient } from './context/ClientContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -108,7 +108,7 @@ const ExpiredBlockScreen: React.FC = () => {
           <p className="text-slate-400 text-xs mb-1">{t('app_contact_management')}</p>
           <p className="text-white font-bold text-lg">0790904030</p>
         </div>
-        <button onClick={() => { const s = localStorage.getItem('currentClientSlug'); localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('patientUser'); window.location.href = s ? `/${s}/login` : '/login'; }}
+        <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('patientUser'); window.location.href = '/login'; }}
           className="text-slate-500 hover:text-white text-sm transition">
           <i className="fa-solid fa-arrow-right-from-bracket ml-1"></i> {t('app_logout')}
         </button>
@@ -119,13 +119,6 @@ const ExpiredBlockScreen: React.FC = () => {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
-  // Detect slug from current URL for proper redirect
-  const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const knownTopRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments', 
-    'clinic-history', 'device-results', 'device-management', 
-    'queue-display', 'patient', 'super-admin', 'hr', 'ent'];
-  const currentSlug = pathParts[0] && !knownTopRoutes.includes(pathParts[0]) ? pathParts[0] : null;
-  const loginPath = currentSlug ? `/${currentSlug}/login` : '/login';
 
   if (loading) {
     return (
@@ -136,16 +129,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   }
 
   if (!user) {
-    return <RedirectHandler to={loginPath} />;
+    return <RedirectHandler to="/login" />;
   }
 
   if (!allowedRoles.includes(user.role)) {
-    const prefix = currentSlug ? `/${currentSlug}` : '';
-    if (user.role === UserRole.ADMIN) return <RedirectHandler to={`${prefix}/admin`} />;
-    if (user.role === UserRole.SECRETARY) return <RedirectHandler to={`${prefix}/reception`} />;
-    if (user.role === UserRole.DOCTOR) return <RedirectHandler to={`${prefix}/doctor`} />;
-    if (user.role === UserRole.TECHNICIAN) return <RedirectHandler to={`${prefix}/technician`} />;
-    return <RedirectHandler to={loginPath} />;
+    if (user.role === UserRole.ADMIN) return <RedirectHandler to="/admin" />;
+    if (user.role === UserRole.SECRETARY) return <RedirectHandler to="/reception" />;
+    if (user.role === UserRole.DOCTOR) return <RedirectHandler to="/doctor" />;
+    if (user.role === UserRole.TECHNICIAN) return <RedirectHandler to="/technician" />;
+    return <RedirectHandler to="/login" />;
   }
 
   return <>{children}</>;
@@ -153,49 +145,23 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
 // --- HR Employee Route Guard (separate from staff auth) ---
 const HrEmployeeGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const slug = pathParts[0] || '';
   const hrData = localStorage.getItem('hrEmployee');
-  if (!hrData) return <RedirectHandler to={`/${slug}/login`} />;
+  if (!hrData) return <RedirectHandler to="/login" />;
   try {
     const parsed = JSON.parse(hrData);
-    if (!parsed.id) return <RedirectHandler to={`/${slug}/login`} />;
+    if (!parsed.id) return <RedirectHandler to="/login" />;
   } catch {
-    return <RedirectHandler to={`/${slug}/hr/login`} />;
+    return <RedirectHandler to="/login" />;
   }
   return <>{children}</>;
 };
 
 // --- Helper to Determine Home Page ---
 const getHomeRoute = (user: User): string => {
-  const slug = localStorage.getItem('currentClientSlug') || 'tarek';
-  const prefix = `/${slug}`;
-  if (user.role === UserRole.ADMIN) return `${prefix}/admin`;
-  if (user.role === UserRole.SECRETARY) return `${prefix}/reception`;
-  if (user.role === UserRole.DOCTOR) return `${prefix}/doctor`;
-  return `/${slug}/login`;
-};
-
-// --- Slug Redirect: redirects bare /path to /{slug}/path ---
-const SlugRedirect: React.FC<{ path: string }> = ({ path }) => {
-  const slug = localStorage.getItem('currentClientSlug') || 'tarek';
-  if (path === '/login') {
-    return <RedirectHandler to={`/${slug}/login`} />;
-  }
-  return <RedirectHandler to={`/${slug}${path}`} />;
-};
-
-// --- Slug Redirect with ID param (e.g. /patients/:id → /:slug/patients/:id) ---
-const SlugRedirectWithId: React.FC<{ basePath: string }> = ({ basePath }) => {
-  const { id } = useParams<{ id: string }>();
-  const slug = localStorage.getItem('currentClientSlug');
-  if (slug && id) {
-    return <RedirectHandler to={`/${slug}${basePath}/${id}`} />;
-  }
-  if (slug) {
-    return <RedirectHandler to={`/${slug}${basePath}`} />;
-  }
-  return <RedirectHandler to="/login" />;
+  if (user.role === UserRole.ADMIN) return '/admin';
+  if (user.role === UserRole.SECRETARY) return '/reception';
+  if (user.role === UserRole.DOCTOR) return '/doctor';
+  return '/login';
 };
 
 // --- App Router ---
@@ -203,70 +169,21 @@ const AppRoutes: React.FC = () => {
   const { user, patientUser } = useAuth();
 
   return (
-    <Routes>
-      {/* Super Admin - YOUR control panel */}
-      <Route path="/super-admin" element={<SuperAdminView />} />
-
-      {/* Staff Login — redirect to slug login if slug saved */}
-      <Route path="/login" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <SlugRedirect path="/login" />} />
-
-      {/* Patient Portal Routes */}
-      <Route 
-        path="/patient/login" 
-        element={patientUser ? <RedirectHandler to="/patient/dashboard" /> : <PatientLoginView />} 
-      />
-      <Route 
-        path="/patient/dashboard" 
-        element={patientUser ? <PatientDashboardView /> : <RedirectHandler to="/patient/login" />} 
-      />
-
-      {/* Legacy bare routes → redirect to slug versions */}
-      <Route path="/admin" element={<SlugRedirect path="/admin" />} />
-      <Route path="/reception" element={<SlugRedirect path="/reception" />} />
-      <Route path="/doctor" element={<SlugRedirect path="/doctor" />} />
-      <Route path="/technician" element={<SlugRedirect path="/technician" />} />
-      <Route path="/patients/:id" element={<SlugRedirectWithId basePath="/patients" />} />
-      <Route path="/patients" element={<SlugRedirect path="/patients" />} />
-      <Route path="/appointments" element={<SlugRedirect path="/appointments" />} />
-
-      <Route path="/clinic-history" element={<SlugRedirect path="/clinic-history" />} />
-      <Route path="/device-results" element={<SlugRedirect path="/device-results" />} />
-      <Route path="/device-management" element={<SlugRedirect path="/device-management" />} />
-      <Route path="/queue-display" element={<SlugRedirect path="/queue-display" />} />
-
-      {/* Root - Redirect to /tarek/login for single-clinic deployment */}
-      <Route 
-        path="/" 
-        element={<RedirectHandler to="/tarek/login" />} 
-      />
-
-      {/* Slug-based routes: /:slug/login, /:slug/admin, etc. */}
-      <Route path="/:slug/*" element={<ClientSlugRoutes />} />
-
-      <Route path="*" element={<RedirectHandler to="/" />} />
-    </Routes>
-  );
-};
-
-// --- Client Slug Routes (/:slug/...) ---
-const ClientSlugRoutes: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const { user, patientUser } = useAuth();
-
-  // Don't treat known routes as slugs
-  const knownRoutes = ['login', 'admin', 'reception', 'doctor', 'technician', 'patients', 'appointments', 
-    'clinic-history', 'device-results', 'device-management', 'queue-display', 
-    'patient', 'super-admin', 'hr', 'ent'];
-  if (slug && knownRoutes.includes(slug)) {
-    return <RedirectHandler to={`/${slug}`} />;
-  }
-
-  return (
-    <ClientProvider slug={slug}>
+    <ClientProvider slug="tarek">
       <ClientGate>
         <ExpiredBlockScreen />
         <Routes>
-          <Route path="/login" element={user ? <RedirectHandler to={`/${slug}/admin`} /> : <LoginView />} />
+          {/* Super Admin */}
+          <Route path="/super-admin" element={<SuperAdminView />} />
+
+          {/* Login */}
+          <Route path="/login" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <LoginView />} />
+
+          {/* Patient Portal */}
+          <Route path="/patient/login" element={patientUser ? <RedirectHandler to="/patient/dashboard" /> : <PatientLoginView />} />
+          <Route path="/patient/dashboard" element={patientUser ? <PatientDashboardView /> : <RedirectHandler to="/patient/login" />} />
+
+          {/* Staff Routes */}
           <Route path="/admin" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminView /></ProtectedRoute>} />
           <Route path="/reception" element={<ProtectedRoute allowedRoles={[UserRole.SECRETARY]}><ReceptionView /></ProtectedRoute>} />
           <Route path="/doctor" element={<ProtectedRoute allowedRoles={[UserRole.DOCTOR]}><DoctorView /></ProtectedRoute>} />
@@ -274,35 +191,33 @@ const ClientSlugRoutes: React.FC = () => {
           <Route path="/patients" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientsRegistryView /></ProtectedRoute>} />
           <Route path="/patients/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientProfileView /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AppointmentsView /></ProtectedRoute>} />
-
           <Route path="/clinic-history" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DOCTOR]}><ClinicHistoryView /></ProtectedRoute>} />
           <Route path="/device-results" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><DeviceResultsView /></ProtectedRoute>} />
           <Route path="/device-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><DeviceManagementView /></ProtectedRoute>} />
           <Route path="/catalog" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><CatalogView /></ProtectedRoute>} />
           <Route path="/accounting" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AccountingView /></ProtectedRoute>} />
           <Route path="/queue-display" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY]}><QueueDisplayView /></ProtectedRoute>} />
-          
+
           {/* ENT Medical Forms */}
           <Route path="/ent/new-patient" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ENTNewPatientFormView /></ProtectedRoute>} />
           <Route path="/ent/follow-up" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ENTFollowUpFormView /></ProtectedRoute>} />
           <Route path="/ent/audiogram" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><AudiogramFormView /></ProtectedRoute>} />
           <Route path="/ent/balance" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><BalanceAssessmentFormView /></ProtectedRoute>} />
           <Route path="/ent/referral" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR, UserRole.TECHNICIAN]}><ReferralFormView /></ProtectedRoute>} />
-          
-          {/* HR Admin Routes (admin only) */}
+
+          {/* HR Admin Routes */}
           <Route path="/hr/employees" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrEmployeesView /></ProtectedRoute>} />
           <Route path="/hr/attendance" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrAttendanceView /></ProtectedRoute>} />
           <Route path="/hr/reports" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrReportsView /></ProtectedRoute>} />
           <Route path="/hr/payroll" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrPayrollView /></ProtectedRoute>} />
           <Route path="/hr/actions" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><HrManagerActionsView /></ProtectedRoute>} />
-          
+
           {/* HR Employee Portal */}
           <Route path="/hr/me" element={<HrEmployeeGuard><HrEmployeeMeView /></HrEmployeeGuard>} />
-          
-          <Route path="/patient/login" element={patientUser ? <RedirectHandler to={`/${slug}/patient/dashboard`} /> : <PatientLoginView />} />
-          <Route path="/patient/dashboard" element={patientUser ? <PatientDashboardView /> : <RedirectHandler to={`/${slug}/patient/login`} />} />
-          <Route path="/" element={user ? <RedirectHandler to={`/${slug}/admin`} /> : <RedirectHandler to={`/${slug}/login`} />} />
-          <Route path="*" element={<RedirectHandler to={`/${slug}/login`} />} />
+
+          {/* Root & Catch-all */}
+          <Route path="/" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <RedirectHandler to="/login" />} />
+          <Route path="*" element={<RedirectHandler to="/login" />} />
         </Routes>
       </ClientGate>
     </ClientProvider>

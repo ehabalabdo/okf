@@ -330,7 +330,7 @@ const ReferralFormView: React.FC = () => {
                 ['urgent', t('ref_urgent_urgency'), 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300'],
                 ['emergency', t('ref_emergency'), 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-300'],
               ] as [string, string, string][]).map(([val, label, colors]) => (
-                <button key={val} onClick={() => setForm(f => ({ ...f, urgency: val }))}
+                <button key={val} onClick={() => setForm(f => ({ ...f, urgency: val as typeof f.urgency }))}
                   className={`px-6 py-3 rounded-xl text-sm font-bold transition border-2 ${form.urgency === val ? colors : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-transparent'}`}>
                   {label}
                 </button>

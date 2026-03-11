@@ -36,13 +36,12 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   handleFullReset = () => {
-    const slug = localStorage.getItem('currentClientSlug');
     localStorage.removeItem('user');
     localStorage.removeItem('patientUser');
     localStorage.removeItem('superAdmin');
     localStorage.removeItem('currentClientId');
     localStorage.removeItem('token');
-    window.location.href = slug ? `/${slug}/login` : '/login';
+    window.location.href = '/login';
   };
 
   render() {

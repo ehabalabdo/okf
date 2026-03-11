@@ -237,9 +237,8 @@ const TechnicianView: React.FC = () => {
                   { path: 'ent/balance', icon: 'fa-person-walking', label: t('ent_balance_form'), color: 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' },
                   { path: 'ent/referral', icon: 'fa-share-from-square', label: t('ent_referral_form'), color: 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' },
                 ].map(item => {
-                  const slug = client?.slug || localStorage.getItem('currentClientSlug') || '';
                   return (
-                    <a key={item.path} href={`/${slug}/${item.path}`}
+                    <a key={item.path} href={`/${item.path}`}
                       className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all text-center ${item.color}`}>
                       <i className={`fa-solid ${item.icon} text-2xl`}></i>
                       <span className="text-xs font-bold">{item.label}</span>
