@@ -6,28 +6,33 @@ import { useLanguage } from '../context/LanguageContext';
 
 const EarIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Minimalist Ear Line Art */}
+    {/* Ear Outline - Clear human ear shape with lobe */}
     <path 
-      d="M120 40 C60 40 40 80 40 130 C40 150 50 170 70 175 C85 180 100 160 110 145 C120 130 110 100 125 90 C140 80 160 90 165 110 C170 140 140 170 110 180" 
+      d="M100 30 C 150 30 180 70 170 125 C 160 175 120 190 95 170 C 75 150 85 125 95 105 C 105 85 100 50 100 30 Z" 
       stroke="url(#earGrad)" 
-      strokeWidth="4" 
+      strokeWidth="6" 
       strokeLinecap="round" 
       strokeLinejoin="round" 
-      opacity="0.9" 
     />
-    {/* Inner detail */}
+    {/* Inner Helix / Concha - creates the unmistakable internal ear folds */}
     <path 
-      d="M125 90 C110 100 100 120 110 140" 
+      d="M105 65 C 135 65 150 90 140 125 C 135 145 115 150 100 140" 
       stroke="url(#earGrad)" 
-      strokeWidth="3" 
+      strokeWidth="5" 
       strokeLinecap="round" 
-      opacity="0.6" 
+    />
+    {/* Tragus bump */}
+    <path 
+      d="M95 105 C 80 105 75 120 85 130" 
+      stroke="url(#earGrad)" 
+      strokeWidth="5" 
+      strokeLinecap="round" 
     />
     
-    {/* Minimal Sound Wave Animation Components */}
-    <g className="sound-waves" opacity="0.8">
-      <path d="M50 115 A20 20 0 0 1 50 145" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M35 100 A40 40 0 0 1 35 160" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Sound Waves smoothly entering the ear */}
+    <g className="sound-waves">
+      <path d="M40 85 A 30 30 0 0 1 40 155" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
+      <path d="M20 70 A 50 50 0 0 1 20 170" stroke="#06b6d4" strokeWidth="4" strokeLinecap="round" opacity="0.6"/>
     </g>
 
     <defs>
@@ -41,29 +46,26 @@ const EarIllustration = ({ className = '' }: { className?: string }) => (
 
 const NoseIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Minimalist Nose Line Art */}
+    {/* Side Profile of Face and Nose */}
     <path 
-      d="M110 40 C100 80 90 120 70 140 C60 150 50 155 70 160 C90 165 110 155 120 145 C130 135 140 120 140 105" 
+      d="M 100 20 C 100 50 90 70 145 130 C 160 145 155 165 130 165 C 105 165 95 150 85 150 C 70 150 60 165 60 185" 
       stroke="url(#noseGrad)" 
-      strokeWidth="4" 
+      strokeWidth="6" 
       strokeLinecap="round" 
       strokeLinejoin="round" 
-      opacity="0.9" 
     />
-    {/* Nostril Minimal Curve */}
+    {/* Nostril Arch */}
     <path 
-      d="M85 155 C90 145 105 140 115 145" 
+      d="M 105 140 C 120 135 135 150 115 160" 
       stroke="url(#noseGrad)" 
-      strokeWidth="3" 
+      strokeWidth="5" 
       strokeLinecap="round" 
-      opacity="0.7" 
     />
 
-    {/* Minimal Airflow Leaves/Dots */}
-    <g className="airflow" opacity="0.8">
-      <circle cx="60" cy="170" r="3" fill="#10b981" />
-      <circle cx="80" cy="180" r="2" fill="#0ea5e9" />
-      <circle cx="45" cy="185" r="2.5" fill="#10b981" />
+    {/* Dynamic Breath/Airflow */}
+    <g className="airflow">
+      <path d="M 30 160 C 60 150 80 165 100 165" stroke="#10b981" strokeWidth="4" strokeLinecap="round" strokeDasharray="6 8" opacity="0.9" />
+      <path d="M 40 140 C 70 135 85 150 100 155" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 6" opacity="0.6" />
     </g>
 
     <defs>
@@ -77,38 +79,23 @@ const NoseIllustration = ({ className = '' }: { className?: string }) => (
 
 const ThroatIllustration = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Minimalist Throat/Neck Curve */}
-    <path 
-      d="M70 50 C80 90 80 120 70 160" 
-      stroke="url(#throatGrad)" 
-      strokeWidth="4" 
-      strokeLinecap="round" 
-      opacity="0.9" 
-    />
-    <path 
-      d="M130 50 C120 90 120 120 130 160" 
-      stroke="url(#throatGrad)" 
-      strokeWidth="4" 
-      strokeLinecap="round" 
-      opacity="0.9" 
-    />
+    {/* Recognizable Anatomical Larynx / Trachea (Front View) */}
+    {/* Hyoid Bone (U-shape block at top) */}
+    <path d="M 50 60 Q 100 90 150 60" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.7"/>
     
-    {/* Simple Vocal Folds Center */}
-    <path 
-      d="M85 105 L100 120 L115 105" 
-      stroke="url(#throatGrad)" 
-      strokeWidth="3" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      opacity="0.8" 
-    />
-    
-    <circle cx="100" cy="120" r="3" fill="#ef4444" />
+    {/* Thyroid Cartilage (Adam's Apple Shield) */}
+    <path d="M 55 85 L 145 85 L 120 140 L 80 140 Z" stroke="url(#throatGrad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <path d="M 100 85 L 100 140" stroke="url(#throatGrad)" strokeWidth="4" strokeLinecap="round" opacity="0.5"/>
 
-    {/* Minimal Voice Waves */}
-    <g className="throat-waves" opacity="0.8">
-      <path d="M85 85 Q100 70 115 85" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>
-      <path d="M75 65 Q100 40 125 65" stroke="#f97316" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5"/>
+    {/* Tracheal Rings */}
+    <path d="M 80 155 L 120 155" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
+    <path d="M 80 170 L 120 170" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
+    <path d="M 80 185 L 120 185" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
+
+    {/* Voice Waves emitting from vocal fold area */}
+    <g className="throat-waves">
+      <path d="M 60 40 Q 100 15 140 40" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.9"/>
+      <path d="M 75 25 Q 100 5 125 25" stroke="#f97316" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6"/>
     </g>
 
     <defs>
