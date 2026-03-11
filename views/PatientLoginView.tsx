@@ -35,7 +35,7 @@ const PatientLoginView: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Logo Section */}
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="MED LOOP" className="w-20 h-20 object-contain mx-auto mb-4" />
+          <img src="/logo.png" alt="TKC" className="w-20 h-20 object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-slate-800 mb-2">{t('patient_portal')}</h1>
           <p className="text-slate-500 text-sm">{t('patient_portal_subtitle')}</p>
         </div>

@@ -581,7 +581,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                      <div className="absolute inset-4 border border-amber-500/50 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
                      <div className="absolute inset-8 border-4 border-t-amber-400 border-r-transparent border-b-amber-400 border-l-transparent rounded-full animate-[spin_10s_linear_infinite]"></div>
                      <div className="absolute inset-0 flex items-center justify-center">
-                         <img src="/logo.png" alt="MedLoop Logo" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] animate-pulse" />
+                         <img src="/logo.png" alt="TKC" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] animate-pulse" />
                      </div>
                  </div>
 
@@ -642,7 +642,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                      <div className="flex items-center gap-3 mb-6 justify-end">
                          <div className="flex flex-col text-right">
                              <span className="text-white font-bold text-sm md:text-base tracking-widest uppercase drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
-                                 {client?.name || 'MEDLOOP CLINIC'}
+                                 {client?.name || 'TKC'}
                              </span>
                              <span className="text-amber-500/70 text-[10px] font-mono tracking-[0.3em] uppercase">
                                  Reception System // Active

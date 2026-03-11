@@ -267,7 +267,7 @@ const LandingView: React.FC = () => {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#050a15]/80 backdrop-blur-2xl shadow-2xl shadow-black/30 border-b border-white/[0.04]' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a href="#hero" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="MED LOOP" className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300" />
+            <img src="/logo.png" alt="TKC" className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300" />
             <div>
               <span className="text-lg font-bold text-white block leading-tight">
                 {isAr ? 'د. طارق خريس' : 'Dr. Tarek Khrais'}
@@ -916,9 +916,9 @@ const LandingView: React.FC = () => {
       <footer className="border-t border-white/[0.04] bg-[#030710] py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="MED LOOP" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="TKC" className="w-8 h-8 object-contain" />
             <span className="text-sm font-semibold text-white/80">
-              {isAr ? 'عيادة د. طارق خريس' : 'Dr. Tarek Khrais Clinic'}
+              {isAr ? 'مركز د. طارق خريس' : 'Dr. Tarek Khrais Center'}
             </span>
           </div>
           <p className="text-xs text-slate-500">
@@ -926,7 +926,7 @@ const LandingView: React.FC = () => {
             {' '}
             <span className="text-slate-600">
               {isAr ? 'من تطوير' : 'Developed by'}{' '}
-              <span className="text-primary/60">MED LOOP</span>
+              <span className="text-primary/60">TKC</span>
             </span>
           </p>
         </div>

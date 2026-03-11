@@ -8,7 +8,7 @@ import { Device, DeviceType, DeviceConnectionType, Clinic } from '../types';
 import { ClinicService } from '../services/services';
 import { fmtDate, fmtDateTime } from '../utils/formatters';
 
-const SAMPLE_HL7 = 'MSH|^~\\&|DEVICE|CLINIC|EMR|MEDLOOP|20240101120000||ORU^R01|MSG001|P|2.5\rPID|1||PAT001||Doe^John||19900101|M\rOBR|1||ORD001|LAB001^CBC\rOBX|1|NM|WBC||7.5|10*3/uL|4.5-11.0|N|||F';
+const SAMPLE_HL7 = 'MSH|^~\\&|DEVICE|CLINIC|EMR|TKC|20240101120000||ORU^R01|MSG001|P|2.5\rPID|1||PAT001||Doe^John||19900101|M\rOBR|1||ORD001|LAB001^CBC\rOBX|1|NM|WBC||7.5|10*3/uL|4.5-11.0|N|||F';
 
 interface ApiKey {
   id: string;

@@ -92,7 +92,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             
             <p className="text-xs text-slate-400 mt-6">
-              MED LOOP Medical System &copy; 2026
+              TKC Medical System &copy; 2026
             </p>
           </div>
         </div>

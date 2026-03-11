@@ -15,7 +15,7 @@ const ReferralFormView: React.FC = () => {
   const [saved, setSaved] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const defaultClinicName = language === 'ar' ? 'عيادة الدكتور طارق خريس - أنف أذن حنجرة' : 'Dr. Tarek Khrais Clinic - ENT';
+  const defaultClinicName = language === 'ar' ? 'مركز الدكتور طارق خريس - أنف أذن حنجرة' : 'Dr. Tarek Khrais Center - ENT';
 
   const [form, setForm] = useState({
     referringDoctorName: 'Dr. Tarek Khrais',

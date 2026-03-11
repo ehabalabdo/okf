@@ -204,7 +204,7 @@ tr:nth-child(even) { background: #f8fafc; }
 </head>
 <body>
 <div class="header">
-  <h1>MED LOOP</h1>
+  <h1>TKC</h1>
   <div class="clinic">${t('pdf_clinic')}</div>
   <div class="subtitle">${t('pdf_subtitle')} - ${rangeLabel} (${fromDate} - ${toDate})</div>
 </div>

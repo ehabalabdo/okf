@@ -1,5 +1,5 @@
 /**
- * MedLoop Server Entry Point
+ * TKC Server Entry Point
  * 
  * Express + Socket.io server with device integration routes.
  * Existing patient/visit/auth routes remain untouched.
@@ -62,7 +62,7 @@ app.use('/api', deviceRouter);
 // Start server
 const PORT = parseInt(process.env.PORT || '3001');
 server.listen(PORT, () => {
-  console.log(`🏥 MedLoop Server running on port ${PORT}`);
+  console.log(`🏥 TKC Server running on port ${PORT}`);
   console.log(`📡 Socket.IO ready at ws://localhost:${PORT}/ws`);
   console.log(`🔌 Device API at http://localhost:${PORT}/api/device-results`);
 });

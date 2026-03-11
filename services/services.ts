@@ -28,7 +28,7 @@ const createMeta = (user: User | null, existing?: AuditMetadata): AuditMetadata 
 };
 
 const DEFAULT_SETTINGS: SystemSettings = {
-  clinicName: 'MED LOOP Clinic',
+  clinicName: 'TKC',
   logoUrl: '',
   address: 'Medical Plaza',
   phone: '000-000-0000'

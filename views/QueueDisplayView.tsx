@@ -278,7 +278,7 @@ const QueueDisplayView: React.FC = () => {
         <div className="flex items-center gap-6">
            <div className="relative">
                <div className="absolute inset-0 bg-sky-500/20 blur-xl rounded-full"></div>
-               <img src="/logo.png" alt="MED LOOP" className="w-16 h-16 object-contain relative z-10 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
+               <img src="/logo.png" alt="TKC" className="w-16 h-16 object-contain relative z-10 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
            </div>
            <div>
              <h1 className="text-3xl font-bold tracking-widest text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] uppercase">{t('system_name')}</h1>
