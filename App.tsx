@@ -222,7 +222,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/hr/me" element={<HrEmployeeGuard><HrEmployeeMeView /></HrEmployeeGuard>} />
 
           {/* Logged-in user on "/" → redirect to home */}
-          <Route path="/" element={<RedirectHandler to={getHomeRoute(user!)} />} />
+          <Route path="/" element={<RedirectHandler to={user ? getHomeRoute(user) : '/login'} />} />
           <Route path="*" element={<RedirectHandler to="/" />} />
         </Routes>
       </ClientGate>
