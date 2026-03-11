@@ -215,9 +215,9 @@ const AppRoutes: React.FC = () => {
           {/* HR Employee Portal */}
           <Route path="/hr/me" element={<HrEmployeeGuard><HrEmployeeMeView /></HrEmployeeGuard>} />
 
-          {/* Root & Catch-all */}
-          <Route path="/" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <RedirectHandler to="/login" />} />
-          <Route path="*" element={<RedirectHandler to="/login" />} />
+          {/* Landing Page */}
+          <Route path="/" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <LandingView />} />
+          <Route path="*" element={<RedirectHandler to="/" />} />
         </Routes>
       </ClientGate>
     </ClientProvider>
