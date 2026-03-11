@@ -4,106 +4,83 @@ import { useLanguage } from '../context/LanguageContext';
 
 /* ═══════════════════════ SVG ILLUSTRATIONS ═══════════════════════ */
 
-const EarIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Ear Outline - Clear human ear shape with lobe */}
-    <path 
-      d="M100 30 C 150 30 180 70 170 125 C 160 175 120 190 95 170 C 75 150 85 125 95 105 C 105 85 100 50 100 30 Z" 
-      stroke="url(#earGrad)" 
-      strokeWidth="6" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-    />
-    {/* Inner Helix / Concha - creates the unmistakable internal ear folds */}
-    <path 
-      d="M105 65 C 135 65 150 90 140 125 C 135 145 115 150 100 140" 
-      stroke="url(#earGrad)" 
-      strokeWidth="5" 
-      strokeLinecap="round" 
-    />
-    {/* Tragus bump */}
-    <path 
-      d="M95 105 C 80 105 75 120 85 130" 
-      stroke="url(#earGrad)" 
-      strokeWidth="5" 
-      strokeLinecap="round" 
-    />
-    
-    {/* Sound Waves smoothly entering the ear */}
-    <g className="sound-waves">
-      <path d="M40 85 A 30 30 0 0 1 40 155" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-      <path d="M20 70 A 50 50 0 0 1 20 170" stroke="#06b6d4" strokeWidth="4" strokeLinecap="round" opacity="0.6"/>
-    </g>
+// Infographic flat icon style based on clean simple information templates
 
-    <defs>
-      <linearGradient id="earGrad" x1="0" y1="0" x2="200" y2="200">
-        <stop offset="0%" stopColor="#06b6d4"/>
-        <stop offset="100%" stopColor="#3b82f6"/>
-      </linearGradient>
-    </defs>
+const EarIllustration = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 64 64" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Soft Infographic Background with Pulse Animation */}
+    <circle cx="32" cy="32" r="30" fill="#E0F2FE">
+      <animate attributeName="r" values="30;31;30" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0.85;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="32" cy="32" r="22" fill="#FFFFFF" />
+    
+    {/* Clean Infographic Ear Path */}
+    <g stroke="#0284C7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M 28 22 C 28 12, 44 12, 44 26 C 44 36, 38 40, 38 46 C 38 52, 28 52, 28 46 C 28 40, 34 40, 34 34 C 34 28, 28 28, 28 26" />
+      <path d="M 34 26 C 38 26, 38 32, 34 36" />
+      
+      {/* Animated Sound Waves */}
+      <path d="M 20 26 A 12 12 0 0 0 20 40" strokeWidth="2" opacity="0">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 15 22 A 18 18 0 0 0 15 44" strokeWidth="2" opacity="0">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+      </path>
+    </g>
   </svg>
 );
 
 const NoseIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Side Profile of Face and Nose */}
-    <path 
-      d="M 100 20 C 100 50 90 70 145 130 C 160 145 155 165 130 165 C 105 165 95 150 85 150 C 70 150 60 165 60 185" 
-      stroke="url(#noseGrad)" 
-      strokeWidth="6" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-    />
-    {/* Nostril Arch */}
-    <path 
-      d="M 105 140 C 120 135 135 150 115 160" 
-      stroke="url(#noseGrad)" 
-      strokeWidth="5" 
-      strokeLinecap="round" 
-    />
-
-    {/* Dynamic Breath/Airflow */}
-    <g className="airflow">
-      <path d="M 30 160 C 60 150 80 165 100 165" stroke="#10b981" strokeWidth="4" strokeLinecap="round" strokeDasharray="6 8" opacity="0.9" />
-      <path d="M 40 140 C 70 135 85 150 100 155" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 6" opacity="0.6" />
+  <svg viewBox="0 0 64 64" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="30" fill="#D1FAE5">
+      <animate attributeName="r" values="30;31;30" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0.85;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="32" cy="32" r="22" fill="#FFFFFF" />
+    
+    <g stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M 32 18 L 24 38 Q 22 44 32 44 Q 42 44 40 38 L 32 18 Z" />
+      <path d="M 20 38 Q 16 44 24 44" />
+      <path d="M 44 38 Q 48 44 40 44" />
+      
+      {/* Animated Airflow */}
+      <path d="M 30 52 L 30 46" opacity="0" strokeWidth="2" strokeDasharray="2 3">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="translate" values="0 4; 0 0" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 34 52 L 34 46" opacity="0" strokeWidth="2" strokeDasharray="2 3">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="translate" values="0 4; 0 0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+      </path>
     </g>
-
-    <defs>
-      <linearGradient id="noseGrad" x1="0" y1="0" x2="200" y2="200">
-        <stop offset="0%" stopColor="#10b981"/>
-        <stop offset="100%" stopColor="#0ea5e9"/>
-      </linearGradient>
-    </defs>
   </svg>
 );
 
 const ThroatIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Recognizable Anatomical Larynx / Trachea (Front View) */}
-    {/* Hyoid Bone (U-shape block at top) */}
-    <path d="M 50 60 Q 100 90 150 60" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.7"/>
+  <svg viewBox="0 0 64 64" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="30" fill="#FEF3C7">
+      <animate attributeName="r" values="30;31;30" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0.85;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="32" cy="32" r="22" fill="#FFFFFF" />
     
-    {/* Thyroid Cartilage (Adam's Apple Shield) */}
-    <path d="M 55 85 L 145 85 L 120 140 L 80 140 Z" stroke="url(#throatGrad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-    <path d="M 100 85 L 100 140" stroke="url(#throatGrad)" strokeWidth="4" strokeLinecap="round" opacity="0.5"/>
-
-    {/* Tracheal Rings */}
-    <path d="M 80 155 L 120 155" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
-    <path d="M 80 170 L 120 170" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
-    <path d="M 80 185 L 120 185" stroke="url(#throatGrad)" strokeWidth="5" strokeLinecap="round" />
-
-    {/* Voice Waves emitting from vocal fold area */}
-    <g className="throat-waves">
-      <path d="M 60 40 Q 100 15 140 40" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.9"/>
-      <path d="M 75 25 Q 100 5 125 25" stroke="#f97316" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.6"/>
+    <g stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M 26 26 L 38 26 L 34 38 L 30 38 Z" />
+      <line x1="30" y1="42" x2="34" y2="42" />
+      <line x1="30" y1="46" x2="34" y2="46" />
+      <line x1="32" y1="26" x2="32" y2="22" />
+      <line x1="32" y1="38" x2="32" y2="52" />
+      <path d="M 24 20 Q 32 24 40 20" />
+      
+      {/* Animated Voice Waves */}
+      <path d="M 18 20 A 12 12 0 0 0 18 32" strokeWidth="2" opacity="0">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 46 20 A 12 12 0 0 1 46 32" strokeWidth="2" opacity="0">
+        <animate attributeName="opacity" values="0;1;0" dur="2s" begin="0s" repeatCount="indefinite"/>
+      </path>
     </g>
-
-    <defs>
-      <linearGradient id="throatGrad" x1="0" y1="0" x2="200" y2="200">
-        <stop offset="0%" stopColor="#f59e0b"/>
-        <stop offset="100%" stopColor="#ef4444"/>
-      </linearGradient>
-    </defs>
   </svg>
 );
 
