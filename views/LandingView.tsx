@@ -5,140 +5,118 @@ import { useLanguage } from '../context/LanguageContext';
 /* ═══════════════════════ SVG ILLUSTRATIONS ═══════════════════════ */
 
 const EarIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="earGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#06b6d4" />
-        <stop offset="50%" stopColor="#3b82f6" />
-        <stop offset="100%" stopColor="#8b5cf6" />
-      </linearGradient>
-      <filter id="glowEar" x="-20%" y="-20%" width="140%" height="140%">
-         <feGaussianBlur stdDeviation="20" />
-      </filter>
-    </defs>
-
-    {/* Ambient Glow */}
-    <circle cx="200" cy="250" r="90" fill="#3b82f6" opacity="0.25" filter="url(#glowEar)"/>
-
-    {/* Outer Ear perfectly smooth continuous profile */}
-    <path d="M 170 70 
-             C 280 70, 330 140, 330 230 
-             C 330 340, 260 430, 200 430 
-             C 150 430, 120 380, 130 330 
-             C 140 280, 190 280, 190 250" 
-          stroke="url(#earGrad)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.95"/>
-          
-    {/* Inner Helix Fold Accent */}
-    <path d="M 200 120 
-             C 260 120, 280 170, 280 230
-             C 280 290, 250 330, 210 350"
-          stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.35"/>
-          
-    {/* Ear Canal Geometric Core */}
-    <circle cx="160" cy="250" r="30" stroke="url(#earGrad)" strokeWidth="8" opacity="0.8"/>
-    <circle cx="160" cy="250" r="10" fill="#06b6d4" opacity="0.9"/>
+  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Minimalist Ear Line Art */}
+    <path 
+      d="M120 40 C60 40 40 80 40 130 C40 150 50 170 70 175 C85 180 100 160 110 145 C120 130 110 100 125 90 C140 80 160 90 165 110 C170 140 140 170 110 180" 
+      stroke="url(#earGrad)" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      opacity="0.9" 
+    />
+    {/* Inner detail */}
+    <path 
+      d="M125 90 C110 100 100 120 110 140" 
+      stroke="url(#earGrad)" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      opacity="0.6" 
+    />
     
-    {/* Sound waves (growing arcs) */}
-    <path d="M 100 180 A 80 80 0 0 0 100 320" stroke="#06b6d4" strokeWidth="6" strokeLinecap="round" opacity="0.8"/>
-    <path d="M 60 140 A 130 130 0 0 0 60 360" stroke="#3b82f6" strokeWidth="6" strokeLinecap="round" opacity="0.5"/>
-    <path d="M 20 100 A 180 180 0 0 0 20 400" stroke="#8b5cf6" strokeWidth="6" strokeLinecap="round" opacity="0.3"/>
+    {/* Minimal Sound Wave Animation Components */}
+    <g className="sound-waves" opacity="0.8">
+      <path d="M50 115 A20 20 0 0 1 50 145" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M35 100 A40 40 0 0 1 35 160" stroke="#06b6d4" strokeWidth="2.5" strokeLinecap="round" />
+    </g>
 
-    {/* Floating tech dots */}
-    <circle cx="120" cy="150" r="4" fill="#06b6d4" />
-    <circle cx="80" cy="280" r="3" fill="#8b5cf6" />
-    <circle cx="280" cy="140" r="5" fill="#3b82f6" />
+    <defs>
+      <linearGradient id="earGrad" x1="0" y1="0" x2="200" y2="200">
+        <stop offset="0%" stopColor="#06b6d4"/>
+        <stop offset="100%" stopColor="#3b82f6"/>
+      </linearGradient>
+    </defs>
   </svg>
 );
 
 const NoseIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Minimalist Nose Line Art */}
+    <path 
+      d="M110 40 C100 80 90 120 70 140 C60 150 50 155 70 160 C90 165 110 155 120 145 C130 135 140 120 140 105" 
+      stroke="url(#noseGrad)" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      opacity="0.9" 
+    />
+    {/* Nostril Minimal Curve */}
+    <path 
+      d="M85 155 C90 145 105 140 115 145" 
+      stroke="url(#noseGrad)" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      opacity="0.7" 
+    />
+
+    {/* Minimal Airflow Leaves/Dots */}
+    <g className="airflow" opacity="0.8">
+      <circle cx="60" cy="170" r="3" fill="#10b981" />
+      <circle cx="80" cy="180" r="2" fill="#0ea5e9" />
+      <circle cx="45" cy="185" r="2.5" fill="#10b981" />
+    </g>
+
     <defs>
-      <linearGradient id="noseGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#10b981" />
-        <stop offset="50%" stopColor="#0ea5e9" />
-        <stop offset="100%" stopColor="#06b6d4" />
+      <linearGradient id="noseGrad" x1="0" y1="0" x2="200" y2="200">
+        <stop offset="0%" stopColor="#10b981"/>
+        <stop offset="100%" stopColor="#0ea5e9"/>
       </linearGradient>
-      <filter id="glowNose" x="-20%" y="-20%" width="140%" height="140%">
-         <feGaussianBlur stdDeviation="20" />
-      </filter>
     </defs>
-
-    {/* Ambient Glow */}
-    <circle cx="160" cy="280" r="80" fill="#10b981" opacity="0.2" filter="url(#glowNose)"/>
-
-    {/* Dynamic Breath Stream (Hero visual) */}
-    <path d="M 20 420 C 60 420, 120 440, 160 350 C 180 300, 150 200, 240 180" 
-          stroke="url(#noseGrad)" strokeWidth="18" strokeLinecap="round" fill="none" opacity="0.25"/>
-    <path d="M 50 390 C 90 390, 140 410, 170 330 C 185 280, 165 220, 220 200" 
-          stroke="#06b6d4" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.6"/>
-    <path d="M 80 360 C 110 360, 150 380, 175 310" 
-          stroke="#10b981" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.9"/>
-
-    {/* Face / Nose continuous elegant profile line */}
-    <path d="M 220 60 
-             C 200 100, 190 130, 200 160 
-             C 210 190, 130 250, 100 300 
-             C 70 350, 160 360, 160 320 
-             C 160 300, 180 350, 190 400 
-             C 195 425, 210 460, 210 460" 
-          stroke="url(#noseGrad)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.95"/>
-          
-    {/* Profile interior shadow / structural accent */}
-    <path d="M 120 305 Q 140 290, 160 310" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.35"/>
-    
-    {/* Floating geometric tech dots */}
-    <circle cx="60" cy="385" r="5" fill="#06b6d4" />
-    <circle cx="120" cy="405" r="3" fill="#10b981" />
-    <circle cx="190" cy="240" r="4" fill="#0ea5e9" opacity="0.8"/>
   </svg>
 );
 
 const ThroatIllustration = ({ className = '' }: { className?: string }) => (
-  <svg viewBox="0 0 400 600" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Minimalist Throat/Neck Curve */}
+    <path 
+      d="M70 50 C80 90 80 120 70 160" 
+      stroke="url(#throatGrad)" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      opacity="0.9" 
+    />
+    <path 
+      d="M130 50 C120 90 120 120 130 160" 
+      stroke="url(#throatGrad)" 
+      strokeWidth="4" 
+      strokeLinecap="round" 
+      opacity="0.9" 
+    />
+    
+    {/* Simple Vocal Folds Center */}
+    <path 
+      d="M85 105 L100 120 L115 105" 
+      stroke="url(#throatGrad)" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      opacity="0.8" 
+    />
+    
+    <circle cx="100" cy="120" r="3" fill="#ef4444" />
+
+    {/* Minimal Voice Waves */}
+    <g className="throat-waves" opacity="0.8">
+      <path d="M85 85 Q100 70 115 85" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>
+      <path d="M75 65 Q100 40 125 65" stroke="#f97316" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5"/>
+    </g>
+
     <defs>
-      <linearGradient id="throatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#f59e0b" />
-        <stop offset="50%" stopColor="#f97316" />
-        <stop offset="100%" stopColor="#ef4444" />
+      <linearGradient id="throatGrad" x1="0" y1="0" x2="200" y2="200">
+        <stop offset="0%" stopColor="#f59e0b"/>
+        <stop offset="100%" stopColor="#ef4444"/>
       </linearGradient>
-      <filter id="glowThroat" x="-20%" y="-20%" width="140%" height="140%">
-         <feGaussianBlur stdDeviation="20" />
-      </filter>
     </defs>
-
-    {/* Ambient Glow */}
-    <circle cx="200" cy="320" r="90" fill="#f59e0b" opacity="0.2" filter="url(#glowThroat)"/>
-
-    {/* Elegant structural Neck/Trachea Frame (Left & Right) */}
-    <path d="M 110 100 C 160 150, 140 250, 140 350 C 140 450, 110 500, 110 550" 
-          stroke="url(#throatGrad)" strokeWidth="12" strokeLinecap="round" fill="none" opacity="0.8"/>
-          
-    <path d="M 290 100 C 240 150, 260 250, 260 350 C 260 450, 290 500, 290 550" 
-          stroke="url(#throatGrad)" strokeWidth="12" strokeLinecap="round" fill="none" opacity="0.8"/>
-
-    {/* Larynx / Vocal Folds Hero Motifs */}
-    {/* Outer glowing chevron */}
-    <path d="M 150 280 L 200 340 L 250 280" stroke="url(#throatGrad)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.95"/>
-    {/* Inner vocal cord accent */}
-    <path d="M 170 340 L 200 370 L 230 340" stroke="#ef4444" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.9"/>
-    
-    {/* Cartilage ring representations */}
-    <path d="M 145 420 Q 200 450, 255 420" stroke="#f97316" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.5"/>
-    <path d="M 140 470 Q 200 500, 260 470" stroke="#f59e0b" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.3"/>
-
-    {/* Circular functional nodes */}
-    <circle cx="150" cy="280" r="8" fill="#f59e0b" />
-    <circle cx="250" cy="280" r="8" fill="#f59e0b" />
-    <circle cx="200" cy="370" r="6" fill="#ef4444" />
-
-    {/* Dynamic Sound Waves radiating Upwards */}
-    <path d="M 160 220 Q 200 180, 240 220" stroke="#f59e0b" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.8"/>
-    <path d="M 140 170 Q 200 110, 260 170" stroke="#f97316" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.5"/>
-    <path d="M 120 120 Q 200 40, 280 120" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.3"/>
-    
-    {/* Floating geometric tech dots */}
-    <circle cx="200" cy="200" r="5" fill="#f59e0b" opacity="0.8"/>
-    <circle cx="200" cy="260" r="3" fill="#ef4444" opacity="0.6"/>
   </svg>
 );
 
