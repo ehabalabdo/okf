@@ -1,198 +1,231 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
-/* ═══════════════════════════ TYPES ═══════════════════════════════ */
-interface Feature {
-  icon: string;
-  title: string;
-  titleEn: string;
-  desc: string;
-  descEn: string;
-  color: string;
-  details: string[];
-  detailsEn: string[];
-}
-interface FeatureCategory {
-  id: string;
-  label: string;
-  labelEn: string;
-  icon: string;
-  gradient: string;
-  features: Feature[];
-}
+/* ═══════════════════════ SVG ILLUSTRATIONS ═══════════════════════ */
 
-/* ═══════════════════════ SPOTLIGHT CARD ══════════════════════════ */
-const SpotlightCard = ({ children, className = '', spotColor = 'rgba(45,212,191,0.15)' }: { children: React.ReactNode, className?: string, spotColor?: string }) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+const EarIllustration = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Outer ear (pinna) */}
+    <path d="M200 50 C120 50 60 120 60 220 C60 340 120 420 200 450 C250 430 280 380 290 320 C300 260 280 220 260 200 C240 180 250 150 270 140 C290 130 300 110 290 90 C280 70 250 50 200 50Z" 
+      stroke="url(#earGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    {/* Anti-helix */}
+    <path d="M220 100 C180 110 150 160 160 220 C170 280 200 330 220 360" 
+      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.6"/>
+    {/* Tragus */}
+    <path d="M240 200 C250 210 260 220 255 235 C250 250 240 245 238 235" 
+      stroke="url(#earGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    {/* Ear canal - glowing */}
+    <circle cx="235" cy="230" r="15" fill="url(#canalGrad)" opacity="0.8"/>
+    <circle cx="235" cy="230" r="8" fill="url(#canalInner)" opacity="0.9"/>
+    {/* Sound waves */}
+    <g opacity="0.4">
+      <path d="M100 180 C80 200 80 240 100 260" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
+      <path d="M75 160 C45 195 45 245 75 280" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
+      <path d="M50 140 C10 190 10 250 50 300" stroke="url(#waveGrad)" strokeWidth="1.5" fill="none"/>
+    </g>
+    {/* Cochlea inner detail */}
+    <path d="M250 235 C270 240 290 260 285 285 C280 310 260 315 250 305 C240 295 250 280 260 275 C270 270 268 260 258 258" 
+      stroke="url(#earGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    <defs>
+      <linearGradient id="earGrad" x1="0" y1="0" x2="400" y2="500">
+        <stop offset="0%" stopColor="#06b6d4"/>
+        <stop offset="50%" stopColor="#8b5cf6"/>
+        <stop offset="100%" stopColor="#06b6d4"/>
+      </linearGradient>
+      <radialGradient id="canalGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.6"/>
+        <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.1"/>
+      </radialGradient>
+      <radialGradient id="canalInner" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#c084fc" stopOpacity="0.8"/>
+        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.2"/>
+      </radialGradient>
+      <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.8"/>
+        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.3"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current || isFocused) return;
-    const div = divRef.current;
-    const rect = div.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+const NoseIllustration = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 400 500" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Nose bridge */}
+    <path d="M200 60 C195 80 185 140 180 200 C175 260 160 300 140 340 C130 360 140 380 160 385 C180 390 195 380 200 370" 
+      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    <path d="M200 60 C205 80 215 140 220 200 C225 260 240 300 260 340 C270 360 260 380 240 385 C220 390 205 380 200 370" 
+      stroke="url(#noseGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    {/* Nostrils */}
+    <ellipse cx="170" cy="360" rx="25" ry="18" stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    <ellipse cx="230" cy="360" rx="25" ry="18" stroke="url(#noseGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    {/* Septum */}
+    <line x1="200" y1="310" x2="200" y2="375" stroke="url(#noseGrad)" strokeWidth="1.5" opacity="0.5"/>
+    {/* Nasal cavity cross-section detail */}
+    <path d="M155 300 C140 280 130 250 135 220 C140 190 155 175 170 175" 
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    <path d="M245 300 C260 280 270 250 265 220 C260 190 245 175 230 175" 
+      stroke="url(#noseGrad)" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    {/* Turbinate curves */}
+    <path d="M160 220 C145 230 140 250 150 265" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
+    <path d="M165 240 C155 248 153 260 158 272" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
+    <path d="M240 220 C255 230 260 250 250 265" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
+    <path d="M235 240 C245 248 247 260 242 272" stroke="url(#noseGrad)" strokeWidth="1.2" fill="none" opacity="0.3"/>
+    {/* Airflow particles */}
+    <g opacity="0.3">
+      <circle cx="170" cy="400" r="3" fill="#10b981"/>
+      <circle cx="185" cy="410" r="2" fill="#06b6d4"/>
+      <circle cx="215" cy="410" r="2" fill="#06b6d4"/>
+      <circle cx="230" cy="400" r="3" fill="#10b981"/>
+      <circle cx="200" cy="420" r="2.5" fill="#8b5cf6"/>
+    </g>
+    <defs>
+      <linearGradient id="noseGrad" x1="100" y1="60" x2="300" y2="500">
+        <stop offset="0%" stopColor="#10b981"/>
+        <stop offset="50%" stopColor="#06b6d4"/>
+        <stop offset="100%" stopColor="#10b981"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const ThroatIllustration = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 400 600" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Pharynx walls */}
+    <path d="M140 40 C130 60 120 120 115 180 C110 240 100 300 95 360 C90 420 100 480 120 540" 
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    <path d="M260 40 C270 60 280 120 285 180 C290 240 300 300 305 360 C310 420 300 480 280 540" 
+      stroke="url(#throatGrad)" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    {/* Uvula */}
+    <path d="M185 60 C190 80 200 100 200 115 C200 100 210 80 215 60" 
+      stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    <ellipse cx="200" cy="120" rx="8" ry="12" fill="url(#uvulaGrad)" opacity="0.6"/>
+    {/* Tonsils */}
+    <ellipse cx="145" cy="100" rx="20" ry="30" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <ellipse cx="255" cy="100" rx="20" ry="30" stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    {/* Epiglottis */}
+    <path d="M175 200 C180 180 190 170 200 168 C210 170 220 180 225 200" 
+      stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.6"/>
+    {/* Vocal cords */}
+    <path d="M150 280 C170 290 190 295 200 296" stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    <path d="M250 280 C230 290 210 295 200 296" stroke="url(#throatGrad)" strokeWidth="2" fill="none" opacity="0.7"/>
+    {/* Vocal cord vibration lines */}
+    <g opacity="0.3">
+      <path d="M160 270 L240 270" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
+      <path d="M155 285 L245 285" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
+      <path d="M150 300 L250 300" stroke="url(#vocalGrad)" strokeWidth="1" strokeDasharray="4 4"/>
+    </g>
+    {/* Trachea rings */}
+    {[360, 395, 430, 465, 500].map((y, i) => (
+      <path key={i} d={`M120 ${y} C120 ${y+15} 200 ${y+20} 200 ${y+15} C200 ${y+20} 280 ${y+15} 280 ${y}`} 
+        stroke="url(#throatGrad)" strokeWidth="1.5" fill="none" opacity={0.5 - i * 0.07}/>
+    ))}
+    {/* Sound/vibration emanating from vocal cords */}
+    <g opacity="0.25">
+      <circle cx="200" cy="290" r="30" stroke="#f59e0b" strokeWidth="1" fill="none"/>
+      <circle cx="200" cy="290" r="50" stroke="#f59e0b" strokeWidth="0.8" fill="none"/>
+      <circle cx="200" cy="290" r="70" stroke="#f59e0b" strokeWidth="0.5" fill="none"/>
+    </g>
+    <defs>
+      <linearGradient id="throatGrad" x1="100" y1="0" x2="300" y2="600">
+        <stop offset="0%" stopColor="#f59e0b"/>
+        <stop offset="50%" stopColor="#ef4444"/>
+        <stop offset="100%" stopColor="#f59e0b"/>
+      </linearGradient>
+      <radialGradient id="uvulaGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#ef4444" stopOpacity="0.7"/>
+        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2"/>
+      </radialGradient>
+      <linearGradient id="vocalGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="#f59e0b" stopOpacity="0"/>
+        <stop offset="50%" stopColor="#f59e0b" stopOpacity="1"/>
+        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+/* ═══════════════════════ ANIMATED PARTICLES ═══════════════════════ */
+const FloatingParticles = ({ color, count = 20 }: { color: string; count?: number }) => {
+  const particles = useRef(
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 4 + 1,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+    }))
+  ).current;
 
   return (
-    <div
-      ref={divRef}
-      onMouseMove={handleMouseMove}
-      onFocus={() => { setIsFocused(true); setOpacity(1); }}
-      onBlur={() => { setIsFocused(false); setOpacity(0); }}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-      className={`relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition-colors duration-500 hover:bg-white/[0.04] ${className}`}
-    >
-      <div
-        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300"
-        style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotColor}, transparent 40%)`,
-        }}
-      />
-      {children}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map(p => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            backgroundColor: color,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.1, 0.6, 0.1],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
     </div>
   );
 };
 
-/* ═══════════════════════ GLOWING LINES ═══════════════════════════ */
-const GlowingLines = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-sky-500/20 to-transparent opacity-30" />
-    <div className="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent opacity-30" />
-    <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-sky-500/20 to-transparent opacity-30" />
-    
-    <motion.div 
-      animate={{ top: ['-10%', '110%'] }} 
-      transition={{ duration: 5, repeat: Infinity, ease: 'linear' }} 
-      className="absolute left-1/4 w-[2px] h-32 bg-gradient-to-b from-transparent via-sky-400 to-transparent -translate-x-1/2 blur-[2px]" 
-    />
-    <motion.div 
-      animate={{ top: ['-10%', '110%'] }} 
-      transition={{ duration: 7, repeat: Infinity, ease: 'linear', delay: 2 }} 
-      className="absolute left-2/4 w-[2px] h-40 bg-gradient-to-b from-transparent via-primary to-transparent -translate-x-1/2 blur-[2px]" 
-    />
+/* ═══════════════════════ SECTION DIVIDER ═══════════════════════ */
+const WaveDivider = ({ flip = false, color = '#0f172a' }: { flip?: boolean; color?: string }) => (
+  <div className={`w-full overflow-hidden leading-[0] ${flip ? 'rotate-180' : ''}`} style={{ marginTop: flip ? 0 : -1, marginBottom: flip ? -1 : 0 }}>
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="w-full h-16 md:h-24">
+      <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,30 1440,60 L1440,120 L0,120Z" fill={color} />
+    </svg>
   </div>
 );
 
-/* ═══════════════════════ COUNT-UP HOOK ═══════════════════════════ */
-const useCountUp = (end: number, duration = 2200, start = 0) => {
-  const [value, setValue] = useState(start);
-  const ref = useRef<HTMLDivElement>(null);
-  const counted = useRef(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && !counted.current) {
-          counted.current = true;
-          const t0 = performance.now();
-          const tick = (now: number) => {
-            const p = Math.min((now - t0) / duration, 1);
-            const ease = 1 - Math.pow(1 - p, 4);
-            setValue(Math.round(start + (end - start) * ease));
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [end, duration, start]);
-  return { value, ref };
-};
+/* ═══════════════════════ SERVICE CARD ═══════════════════════ */
+const ServiceCard = ({ icon, title, desc, delay }: { icon: string; title: string; desc: string; delay: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, delay }}
+    whileHover={{ y: -8, scale: 1.02 }}
+    className="group relative p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-500"
+  >
+    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative z-10">
+      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+        <i className={`fa-solid ${icon} text-xl text-cyan-400`}></i>
+      </div>
+      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+    </div>
+  </motion.div>
+);
 
-/* ═══════════════════════ FEATURE DATA ═══════════════════════════ */
-const featureCategories: FeatureCategory[] = [
-  {
-    id: 'clinic', label: 'إدارة العيادة', labelEn: 'Clinic Ops', icon: 'fa-hospital', gradient: 'from-sky-500 to-sky-600',
-    features: [
-      { icon: 'fa-hospital-user', title: 'إدارة العيادات المتعددة', titleEn: 'Multi-Clinic', desc: 'عيادات وأقسام غير محدودة من لوحة تحكم واحدة.', descEn: 'Unlimited clinics and departments from a single dashboard.', color: 'cyan', details: ['إنشاء عيادات وأقسام غير محدودة','تعيين كوادر بصلاحيات منفصلة','لوحة تحكم مركزية','تقارير مقارنة بين الفروع','إعدادات مستقلة لكل عيادة'], detailsEn: ['Create unlimited clinics and departments','Assign staff with separate permissions','Central dashboard','Comparative reports across branches','Independent settings per clinic'] },
-      { icon: 'fa-user-nurse', title: 'الاستقبال الذكي', titleEn: 'Smart Reception', desc: 'تسجيل المرضى وإدارة الانتظار بنقرة واحدة.', descEn: 'Register patients and manage the queue with one click.', color: 'cyan', details: ['تسجيل دخول بنقرة واحدة','إدارة قائمة الانتظار','تحويل فوري للعيادة','إشعارات فورية للطبيب','بحث بالاسم أو الهاتف أو الرقم الوطني','عرض حالة المريض لحظياً'], detailsEn: ['One-click check-in','Queue management','Instant clinic transfer','Real-time doctor notifications','Search by name, phone, or national ID','Live patient status view'] },
-      { icon: 'fa-calendar-check', title: 'نظام المواعيد', titleEn: 'Appointments', desc: 'حجز وتأكيد وتذكير تلقائي بدون تضارب.', descEn: 'Book, confirm, and auto-remind without conflicts.', color: 'cyan', details: ['عرض يومي/أسبوعي/شهري','حالات: مؤكد، معلق، ملغي، مكتمل','منع التضارب التلقائي','ملاحظات وسبب الزيارة','ربط مع شاشة الانتظار','تذكير عبر واتساب'], detailsEn: ['Daily/weekly/monthly view','Statuses: confirmed, pending, cancelled, completed','Auto conflict prevention','Notes and visit reason','Queue display integration','WhatsApp reminders'] },
-      { icon: 'fa-tv', title: 'شاشة الانتظار', titleEn: 'Queue Display', desc: 'شاشة حية بنداء صوتي تلقائي.', descEn: 'Live display with automatic voice calling.', color: 'cyan', details: ['تصميم احترافي للـ TV','نداء صوتي باسم المريض','تحديث Real-time','رقم الدور والطبيب والعيادة','دعم عربي/إنجليزي','بدون تحديث يدوي للصفحة'], detailsEn: ['Professional TV design','Voice call by patient name','Real-time updates','Queue number, doctor, and clinic','Arabic/English support','No manual page refresh'] },
-    ]
-  },
-  {
-    id: 'medical', label: 'الملف الطبي', labelEn: 'Medical', icon: 'fa-stethoscope', gradient: 'from-amber-500 to-amber-600',
-    features: [
-      { icon: 'fa-user-doctor', title: 'لوحة الطبيب', titleEn: 'Doctor Dashboard', desc: 'تشخيص، وصفات، خطط علاجية، مرفقات.', descEn: 'Diagnosis, prescriptions, treatment plans, attachments.', color: 'teal', details: ['ملف طبي شامل لكل مريض','تشخيصات وملاحظات تفصيلية','وصفات طبية قابلة للطباعة','رفع صور وأشعة وتحاليل','خطط علاجية متعددة الجلسات','قوالب جاهزة للتشخيصات الشائعة'], detailsEn: ['Comprehensive patient file','Detailed diagnoses and notes','Printable prescriptions','Upload images, X-rays, and labs','Multi-session treatment plans','Ready templates for common diagnoses'] },
-      { icon: 'fa-clipboard-list', title: 'السجل السريري', titleEn: 'Clinical History', desc: 'تاريخ كامل لكل زيارة وعلاج.', descEn: 'Complete history of every visit and treatment.', color: 'teal', details: ['عرض زمني للزيارات','تصفية حسب التاريخ أو النوع','ملاحظات ومرفقات لكل زيارة','طباعة ملخص السجل','مشاركة مع طبيب آخر','أرشيف كامل قابل للبحث'], detailsEn: ['Timeline view of visits','Filter by date or type','Notes and attachments per visit','Print record summary','Share with another doctor','Fully searchable archive'] },
-      { icon: 'fa-address-book', title: 'سجل المرضى', titleEn: 'Patient Registry', desc: 'قاعدة بيانات شاملة مع بحث متقدم.', descEn: 'Comprehensive database with advanced search.', color: 'teal', details: ['بيانات ديموغرافية كاملة','بحث متقدم وفلترة','تصدير إلى Excel','إحصائيات جدد وعائدين','تاريخ أول وآخر زيارة','أرقام التواصل والرقم الوطني'], detailsEn: ['Full demographic data','Advanced search and filtering','Export to Excel','New and returning patient stats','First and last visit dates','Contact numbers and national ID'] },
-      { icon: 'fa-mobile-screen', title: 'بوابة المريض', titleEn: 'Patient Portal', desc: 'المريض يحجز ويتابع ملفه بنفسه.', descEn: 'Patients book and track their own records.', color: 'teal', details: ['تسجيل دخول بالجوال','عرض السجل الطبي الكامل','حجز وإلغاء المواعيد','عرض الوصفات والتعليمات','متابعة الطلبات والحجوزات','واجهة بسيطة للمريض'], detailsEn: ['Mobile login','View complete medical record','Book and cancel appointments','View prescriptions and instructions','Track requests and bookings','Simple patient interface'] },
-    ]
-  },
-  {
-    id: 'financial', label: 'المالية', labelEn: 'Finance', icon: 'fa-coins', gradient: 'from-sky-500 to-amber-600',
-    features: [
-      { icon: 'fa-file-invoice-dollar', title: 'الفواتير والمحاسبة', titleEn: 'Billing', desc: 'فواتير تفصيلية ودفعات جزئية وتقارير مالية.', descEn: 'Detailed invoices, partial payments, and financial reports.', color: 'cyan', details: ['فواتير تفصيلية مع بنود','دفعات جزئية ومتابعة المتبقي','تقارير يومية وشهرية وسنوية','طباعة احترافية','خصومات مرنة','ربط مع ملف المريض'], detailsEn: ['Itemized invoices','Partial payments and balance tracking','Daily, monthly, and annual reports','Professional printing','Flexible discounts','Linked to patient file'] },
-      { icon: 'fa-tags', title: 'كتالوج الخدمات', titleEn: 'Service Catalog', desc: 'إدارة الخدمات والأسعار بمرونة تامة.', descEn: 'Manage services and pricing with full flexibility.', color: 'cyan', details: ['قائمة خدمات شاملة','تصنيف حسب القسم','تعديل أسعار مع حفظ التاريخ','ربط مع الفواتير','تصدير إلى Excel','دعم العملات المختلفة'], detailsEn: ['Comprehensive service list','Categorize by department','Price editing with history','Link to invoices','Export to Excel','Multi-currency support'] },
-      { icon: 'fa-chart-pie', title: 'التقارير والـ KPI', titleEn: 'Reports & KPI', desc: 'لوحة مؤشرات أداء ورسوم بيانية تفاعلية.', descEn: 'Performance dashboard with interactive charts.', color: 'cyan', details: ['إيرادات ومصروفات','إحصائيات المرضى','أداء الأطباء','رسوم بيانية تفاعلية','مقارنة بين الفترات','لوحة KPI للإدارة'], detailsEn: ['Revenue and expenses','Patient statistics','Doctor performance','Interactive charts','Period comparisons','Management KPI dashboard'] },
-    ]
-  },
-  {
-    id: 'hr', label: 'الموارد البشرية', labelEn: 'HR', icon: 'fa-people-group', gradient: 'from-sky-500 to-sky-600',
-    features: [
-      { icon: 'fa-id-card', title: 'إدارة الموظفين', titleEn: 'Employees', desc: 'ملفات كاملة، هيكل تنظيمي، صلاحيات.', descEn: 'Complete profiles, org chart, permissions.', color: 'cyan', details: ['ملف شامل لكل موظف','تحديد القسم والراتب','بدلات وخصومات','هيكل تنظيمي شجري','تاريخ التوظيف والترقيات','صلاحيات حسب الدور'], detailsEn: ['Comprehensive employee profile','Set department and salary','Allowances and deductions','Tree org chart','Employment and promotion history','Role-based permissions'] },
-      { icon: 'fa-fingerprint', title: 'الحضور والبصمة', titleEn: 'Biometric', desc: 'ربط مع أجهزة البصمة وحساب الساعات آلياً.', descEn: 'Biometric device integration with auto hour calculation.', color: 'cyan', details: ['ربط أجهزة البصمة','تسجيل يدوي بديل','حساب ساعات العمل والتأخير','تقارير حضور مفصلة','إشعارات تأخير وغياب','دعم الورديات المرنة'], detailsEn: ['Biometric device integration','Manual backup entry','Work hours and lateness calculation','Detailed attendance reports','Late and absence alerts','Flexible shift support'] },
-      { icon: 'fa-money-check-dollar', title: 'الرواتب و PDF', titleEn: 'Payroll', desc: 'معالجة رواتب وكشف PDF يحمله الموظف.', descEn: 'Salary processing with downloadable PDF payslips.', color: 'cyan', details: ['حساب الراتب آلياً بناءً على الحضور','بدلات وخصومات مرنة','كشف راتب PDF احترافي','الموظف يحمّل كشفه','تقارير رواتب للإدارة','دعم العملات المحلية'], detailsEn: ['Auto salary calculation based on attendance','Flexible allowances and deductions','Professional PDF payslip','Employee downloads their payslip','Payroll reports for management','Local currency support'] },
-      { icon: 'fa-chart-bar', title: 'تقارير HR', titleEn: 'HR Reports', desc: 'تقارير حضور ورواتب وأداء.', descEn: 'Attendance, payroll, and performance reports.', color: 'cyan', details: ['تقارير حضور وغياب','تكلفة رواتب شهرية','إحصائيات إنتاجية','تقارير إجازات','تصدير Excel و PDF','مقارنة أداء الأقسام'], detailsEn: ['Attendance and absence reports','Monthly payroll cost','Productivity stats','Leave reports','Export to Excel and PDF','Department performance comparison'] },
-    ]
-  },
-  {
-    id: 'specialty', label: 'وحدات متخصصة', labelEn: 'Specialty', icon: 'fa-puzzle-piece', gradient: 'from-amber-500 to-amber-600',
-    features: [
-      { icon: 'fa-microchip', title: 'ربط الأجهزة الطبية', titleEn: 'Device Integration', desc: 'استقبال نتائج HL7 تلقائياً في الملف الطبي.', descEn: 'Auto-receive HL7 results directly in the medical record.', color: 'teal', details: ['بروتوكول HL7','نتائج مباشرة في الملف','Serial Port و MLLP','تنبيهات القيم غير الطبيعية','أرشفة تلقائية','Bridge Agent سحابي'], detailsEn: ['HL7 protocol','Results directly in file','Serial Port and MLLP','Abnormal value alerts','Auto archiving','Cloud Bridge Agent'] },
-    ]
-  },
-  {
-    id: 'platform', label: 'المنصة', labelEn: 'Platform', icon: 'fa-shield-halved', gradient: 'from-amber-500 to-sky-600',
-    features: [
-      { icon: 'fa-shield-halved', title: 'الأمان والخصوصية', titleEn: 'Security', desc: 'تشفير، صلاحيات، حماية متقدمة.', descEn: 'Encryption, permissions, advanced protection.', color: 'teal', details: ['تشفير SSL/TLS','صلاحيات متعددة المستويات','Rate Limiting + Helmet + CORS','JWT Token','تسجيل أنشطة','فصل بيانات العملاء'], detailsEn: ['SSL/TLS encryption','Multi-level permissions','Rate Limiting + Helmet + CORS','JWT Token','Activity logging','Client data isolation'] },
-      { icon: 'fa-language', title: 'عربي وإنجليزي', titleEn: 'Multi-Language', desc: 'تبديل فوري بين اللغتين.', descEn: 'Instant switch between languages.', color: 'teal', details: ['واجهة عربية RTL كاملة','تبديل فوري للإنجليزية','تقارير وفواتير بكلتا اللغتين','تذكر اللغة المفضلة','خدمات وتشخيصات بكلتا اللغتين','قابل لإضافة لغات مستقبلاً'], detailsEn: ['Full Arabic RTL interface','Instant English toggle','Reports and invoices in both languages','Remember language preference','Services and diagnoses in both languages','Extensible for future languages'] },
-      { icon: 'fa-moon', title: 'الوضع الليلي', titleEn: 'Dark Mode', desc: 'وضع ليلي مريح مع تبديل فوري.', descEn: 'Comfortable dark mode with instant toggle.', color: 'teal', details: ['وضع ليلي مريح للعين','وضع نهاري واضح','تبديل فوري','حفظ تفضيل المستخدم','تصميم متجاوب','ألوان احترافية لكلا الوضعين'], detailsEn: ['Eye-friendly dark mode','Clear light mode','Instant toggle','Save user preference','Responsive design','Professional colors for both modes'] },
-      { icon: 'fa-building', title: 'SaaS متعددة العملاء', titleEn: 'Multi-Tenant', desc: 'كل مركز برابطه وبياناته المستقلة.', descEn: 'Each center gets its own URL and isolated data.', color: 'teal', details: ['رابط مخصص لكل عميل','بيانات منفصلة تماماً','لوحة Super Admin','إنشاء عميل بدقائق','خطط اشتراك مرنة','نسخ احتياطي تلقائي'], detailsEn: ['Custom URL per client','Fully separate data','Super Admin panel','Create client in minutes','Flexible subscription plans','Auto backup'] },
-      { icon: 'fa-brands fa-whatsapp', title: 'تكامل واتساب', titleEn: 'WhatsApp', desc: 'تأكيد مواعيد وتذكيرات عبر واتساب.', descEn: 'Appointment confirmation and reminders via WhatsApp.', color: 'green', details: ['تأكيد موعد تلقائي','تذكير قبل الموعد','رابط حجز للمريض','رد سريع على استفسارات','زر واتساب في ملف المريض','إشعارات مخصصة'], detailsEn: ['Auto appointment confirmation','Pre-appointment reminder','Booking link for patient','Quick reply to inquiries','WhatsApp button in patient file','Custom notifications'] },
-    ]
-  },
-];
-
-const allFeatures = featureCategories.flatMap(c => c.features);
-
-/* ═══════════════════════ AUTOMATION FLOW ════════════════════════ */
-const automationSteps = [
-  { icon: 'fa-calendar-plus', label: 'مريض يحجز موعد', labelEn: 'Patient books appointment', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-bell', label: 'إشعار للطبيب', labelEn: 'Doctor notification', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-user-check', label: 'تسجيل الحضور', labelEn: 'Check-in', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-stethoscope', label: 'فحص وتشخيص', labelEn: 'Exam & diagnosis', color: 'from-sky-500 to-sky-500' },
-  { icon: 'fa-file-invoice-dollar', label: 'فاتورة تلقائية', labelEn: 'Auto invoice', color: 'from-sky-500 to-amber-500' },
-  { icon: 'fa-chart-line', label: 'تقرير KPI', labelEn: 'KPI report', color: 'from-amber-500 to-amber-500' },
-];
-
-/* ═══════════════════════ COMPONENT ══════════════════════════════ */
-const rotatingWords = ['ذكية', 'مؤتمتة', 'دقيقة', 'متكاملة', 'بلا أخطاء'];
-const rotatingWordsEn = ['smart', 'automated', 'precise', 'integrated', 'error-free'];
-
+/* ═══════════════════════ MAIN COMPONENT ═══════════════════════ */
 const LandingView: React.FC = () => {
-  const { t, language, dir } = useLanguage();
+  const { t, language } = useLanguage();
   const isAr = language === 'ar';
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('clinic');
-  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
-  const [activeFlowStep, setActiveFlowStep] = useState(0);
-  const [wordIndex, setWordIndex] = useState(0);
-
-  useEffect(() => {
-    const iv = setInterval(() => setWordIndex(i => (i + 1) % rotatingWords.length), 2000);
-    return () => clearInterval(iv);
-  }, []);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 50);
@@ -200,1133 +233,700 @@ const LandingView: React.FC = () => {
     return () => window.removeEventListener('scroll', h);
   }, []);
 
+  /* Active section tracking for nav highlight */
+  const [activeSection, setActiveSection] = useState('hero');
   useEffect(() => {
+    const sections = ['hero', 'ear', 'nose', 'throat', 'services', 'contact'];
     const obs = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); }),
-      { threshold: 0.1 },
+      entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) setActiveSection(e.target.id);
+        });
+      },
+      { threshold: 0.3 }
     );
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => obs.observe(el));
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
     return () => obs.disconnect();
-  }, [activeCategory]);
-
-  useEffect(() => {
-    const iv = setInterval(() => setActiveFlowStep(s => (s + 1) % automationSteps.length), 2200);
-    return () => clearInterval(iv);
   }, []);
 
-  const closeModal = useCallback(() => setSelectedFeature(null), []);
-
-  const patientsToday = useCountUp(47, 2000);
-  const revenue = useCountUp(3850, 2500);
-  const occupancy = useCountUp(89, 2000);
-  const appointmentsCount = useCountUp(24, 1800);
-
-  const colorMap: Record<string, { bg: string; text: string; border: string; glow: string }> = {
-    cyan:    { bg: 'bg-sky-500/10',    text: 'text-sky-400',    border: 'border-sky-500/20',    glow: 'shadow-sky-500/20' },
-    teal:    { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   glow: 'shadow-amber-500/20' },
-    emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', glow: 'shadow-emerald-500/20' },
-    amber:   { bg: 'bg-amber-500/10',   text: 'text-amber-400',   border: 'border-amber-500/20',   glow: 'shadow-amber-500/20' },
-    violet:  { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  glow: 'shadow-amber-500/20' },
-    rose:    { bg: 'bg-amber-500/10',    text: 'text-amber-400',    border: 'border-amber-500/20',    glow: 'shadow-amber-500/20' },
-    sky:     { bg: 'bg-sky-500/10',     text: 'text-sky-400',     border: 'border-sky-500/20',     glow: 'shadow-sky-500/20' },
-    green:   { bg: 'bg-green-500/10',   text: 'text-green-400',   border: 'border-green-500/20',   glow: 'shadow-green-500/20' },
-  };
-
-  const currentCategory = featureCategories.find(c => c.id === activeCategory)!;
+  const navLinks = [
+    { href: '#ear', id: 'ear', label: isAr ? 'الأذن' : 'Ear' },
+    { href: '#nose', id: 'nose', label: isAr ? 'الأنف' : 'Nose' },
+    { href: '#throat', id: 'throat', label: isAr ? 'الحنجرة' : 'Throat' },
+    { href: '#services', id: 'services', label: isAr ? 'الخدمات' : 'Services' },
+    { href: '#contact', id: 'contact', label: isAr ? 'تواصل معنا' : 'Contact' },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden" style={{ fontFamily: "'Cairo', 'Plus Jakarta Sans', sans-serif" }}>
+    <div className="min-h-screen bg-[#050a15] text-white overflow-x-hidden" dir={isAr ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Plus Jakarta Sans', sans-serif" }}>
+      
+      {/* ════════════════ FLOATING LOGIN BUTTON ════════════════ */}
+      <a
+        href="/login"
+        className="fixed top-5 left-5 z-[60] px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+        style={{ [isAr ? 'left' : 'right']: 20, [isAr ? 'right' : 'left']: 'auto' }}
+      >
+        <i className="fa-solid fa-right-to-bracket ml-2 mr-2 opacity-70"></i>
+        {isAr ? 'تسجيل الدخول' : 'Login'}
+      </a>
 
       {/* ════════════════ NAVBAR ════════════════ */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-950/90 backdrop-blur-xl shadow-2xl shadow-black/20 border-b border-white/5' : 'bg-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#050a15]/80 backdrop-blur-2xl shadow-2xl shadow-black/30 border-b border-white/[0.04]' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <i className="fa-solid fa-stethoscope text-amber-400 text-2xl"></i>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Dr. Tarek Khrais</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { href: '#command-center', label: t('lp_nav_platform') },
-              { href: '#features', label: t('lp_nav_features') },
-              { href: '#transform', label: t('lp_nav_transform') },
-              { href: '#tech', label: t('lp_nav_infrastructure') },
-              { href: '#contact', label: t('lp_nav_contact') },
-            ].map(l => (
-              <a key={l.href} href={l.href} className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">{l.label}</a>
-            ))}
-          </div>
-          <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden text-slate-400 hover:text-white text-xl">
-            <i className={`fa-solid ${mobileMenu ? 'fa-xmark' : 'fa-bars'}`}></i>
-          </button>
-        </div>
-        {mobileMenu && (
-          <div className="md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-white/5 px-6 py-4 space-y-3">
-            {['#command-center', '#features', '#transform', '#tech', '#contact'].map((h, i) => (
-              <a key={h} href={h} onClick={() => setMobileMenu(false)} className="block text-slate-300 hover:text-primary py-2">
-                {[t('lp_nav_platform'), t('lp_nav_features'), t('lp_nav_transform'), t('lp_nav_infrastructure'), t('lp_nav_contact')][i]}
+          <a href="#hero" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow duration-300">
+              <i className="fa-solid fa-stethoscope text-white text-lg"></i>
+            </div>
+            <div>
+              <span className="text-lg font-bold text-white block leading-tight">
+                {isAr ? 'د. طارق خريس' : 'Dr. Tarek Khrais'}
+              </span>
+              <span className="text-[10px] text-cyan-400/70 font-medium tracking-wider uppercase">
+                {isAr ? 'أذن · أنف · حنجرة' : 'ENT Specialist'}
+              </span>
+            </div>
+          </a>
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map(l => (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  activeSection === l.id
+                    ? 'text-cyan-400 bg-cyan-500/10'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                }`}
+              >
+                {l.label}
               </a>
             ))}
           </div>
-        )}
+        </div>
       </nav>
 
-      {/* ════════════════ HERO — ROTATING HEADLINE (V4: Ultra-Futuristic) ════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#060a13]">
-        {/* Animated Background Lines */}
-        <GlowingLines />
-
-        {/* Deep Space Radial Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(14,22,40,0.8)_0%,rgba(6,10,19,1)_100%)] pointer-events-none" />
-
-        {/* Floating Orbs */}
+      {/* ════════════════ HERO SECTION ════════════════ */}
+      <motion.section
+        id="hero"
+        ref={heroRef}
+        style={{ opacity: heroOpacity, scale: heroScale }}
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      >
+        {/* Deep gradient background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08)_0%,rgba(5,10,21,1)_70%)]" />
+        
+        {/* Ambient orbital rings */}
         <motion.div
-          animate={{ y: [0, -20, 0], x: [0, 10, 0], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[15%] w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-[800px] h-[800px] rounded-full border border-cyan-500/[0.04]"
+          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
         />
         <motion.div
-          animate={{ y: [0, 30, 0], x: [0, -15, 0], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-[10%] left-[10%] w-[30rem] h-[30rem] bg-sky-600/10 rounded-full blur-[150px] pointer-events-none"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-[1100px] h-[1100px] rounded-full border border-violet-500/[0.03]"
+          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
         />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-32 md:py-40">
-          <div className="grid lg:grid-cols-[1fr_0.85fr] gap-16 xl:gap-28 items-center">
+        <FloatingParticles color="rgba(6,182,212,0.3)" count={15} />
 
-            {/* ── Text Column ── */}
-            <div className="text-right hero-text-enter">
-              {/* Futuristic Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md mb-8"
-              >
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                </span>
-                <span className="text-xs font-medium text-amber-300 tracking-wider uppercase" style={{ fontFamily: "'Cairo', sans-serif" }}>
-                  {t('lp_badge')}
-                </span>
-              </motion.div>
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] backdrop-blur-md mb-10"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span className="text-xs font-semibold text-cyan-300 tracking-widest uppercase">
+              {isAr ? 'أخصائي أذن · أنف · حنجرة' : 'Ear · Nose · Throat Specialist'}
+            </span>
+          </motion.div>
 
-              {/* Main headline */}
-              <h1 className="mb-8 relative">
-                <motion.span
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  className="block text-[clamp(2.5rem,5vw,4.5rem)] font-black text-white leading-[1.1] mb-2 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-                  style={{ fontFamily: "'Cairo', sans-serif" }}
-                >
-                  {t('lp_headline')}
-                </motion.span>
+          {/* Doctor Name */}
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 leading-[1.1]"
+          >
+            <span className="block text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+              {isAr ? 'د. طارق' : 'Dr. Tarek'}
+            </span>
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-violet-400 to-cyan-400 drop-shadow-[0_0_60px_rgba(6,182,212,0.3)]">
+              {isAr ? 'خريس' : 'Khrais'}
+            </span>
+          </motion.h1>
 
-                {/* Rotating word container */}
-                <span className="block relative" style={{ height: 'clamp(4rem, 8vw, 6.5rem)' }}>
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={rotatingWords[wordIndex]}
-                      initial={{ opacity: 0, y: 40, filter: 'blur(12px)', scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
-                      exit={{ opacity: 0, y: -40, filter: 'blur(12px)', scale: 1.1 }}
-                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                      className="absolute right-0 top-0 text-[clamp(3rem,6vw,5.5rem)] font-black leading-[1.2]"
-                      style={{ 
-                        fontFamily: "'Cairo', sans-serif", 
-                        WebkitBackgroundClip: 'text', 
-                        WebkitTextFillColor: 'transparent', 
-                        backgroundImage: 'linear-gradient(to right, #38bdf8, #818cf8, #c084fc)',
-                        textShadow: '0 0 40px rgba(129, 140, 248, 0.3)'
-                      }}
-                    >
-                      {isAr ? rotatingWords[wordIndex] : rotatingWordsEn[wordIndex]}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
-              </h1>
+          {/* Specialty line */}
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="text-xl md:text-2xl text-slate-300 font-light mb-4 tracking-wide"
+          >
+            {isAr ? 'أخصائي أمراض وجراحة الأذن والأنف والحنجرة' : 'Otolaryngology — Head & Neck Surgery'}
+          </motion.p>
 
-              {/* Subheading */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-xl mr-0 ml-auto lg:ml-0 mb-10 font-light"
-                style={{ fontFamily: "'Cairo', sans-serif" }}
-              >
-                {t('lp_subheading')}
-              </motion.p>
+          {/* Location */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="text-base text-slate-500 mb-12 flex items-center justify-center gap-2"
+          >
+            <i className="fa-solid fa-location-dot text-cyan-500/60"></i>
+            {isAr ? 'عمّان، الأردن' : 'Amman, Jordan'}
+          </motion.p>
 
-              {/* CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-col sm:flex-row gap-5 justify-end lg:justify-start"
-              >
-                <a href="#contact" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl text-[16px] text-center overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(45,212,191,0.4)]">
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                  <span className="relative z-10 flex items-center justify-center gap-3">
-                    {t('lp_cta_demo')}
-                    <i className="fa-solid fa-rocket text-sm group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform duration-300"></i>
-                  </span>
-                </a>
-                <a href="#demo-video" className="group px-8 py-4 border border-white/10 bg-white/[0.02] backdrop-blur-sm text-white/80 font-bold rounded-2xl text-[16px] text-center transition-all duration-300 hover:bg-white/[0.08] hover:border-white/20 hover:text-white">
-                  <span className="flex items-center justify-center gap-3">
-                    {t('lp_cta_watch')}
-                    <i className="fa-solid fa-play text-xs opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"></i>
-                  </span>
-                </a>
-              </motion.div>
-            </div>
-
-            {/* ── Dashboard Mockup (Control Center) ── */}
-            <div className="hidden lg:block relative perspective-1000">
-              <motion.div
-                initial={{ opacity: 0, rotateY: -15, rotateX: 5, z: -100 }}
-                animate={{ opacity: 1, rotateY: 0, rotateX: 0, z: 0 }}
-                transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="relative transform-style-3d"
-              >
-                <SpotlightCard className="p-1 rounded-[2rem] bg-gradient-to-b from-white/[0.08] to-transparent border border-white/[0.05]">
-                  <div className="relative bg-[#0a0f1c]/90 backdrop-blur-2xl rounded-[1.8rem] p-6 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-                    
-                    {/* Top bar */}
-                    <div className="flex items-center justify-between mb-8 border-b border-white/[0.05] pb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
-                        <div className="w-3 h-3 rounded-full bg-sky-500/80 shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
-                        <div className="w-3 h-3 rounded-full bg-amber-500/80 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
-                      </div>
-                      <div className="flex items-center gap-3 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/[0.05]">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_10px_rgba(45,212,191,0.8)]"></span>
-                        <span className="text-[10px] text-amber-300 font-mono tracking-widest uppercase">System Active</span>
-                      </div>
-                    </div>
-
-                    {/* Holographic Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      {[
-                        { label: t('lp_active_patients'), val: '124', icon: 'fa-users', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
-                        { label: t('lp_occupancy_rate'), val: '92%', icon: 'fa-chart-pie', color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
-                      ].map((stat, i) => (
-                        <div key={i} className={`relative p-4 rounded-2xl border ${stat.border} ${stat.bg} overflow-hidden group`}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                          <div className="flex justify-between items-start mb-2 relative z-10">
-                            <i className={`fa-solid ${stat.icon} ${stat.color} text-lg opacity-80`}></i>
-                            <span className="text-[10px] text-white/40 font-medium">{stat.label}</span>
-                          </div>
-                          <div className={`text-3xl font-black ${stat.color} tracking-tight relative z-10 drop-shadow-[0_0_15px_currentColor]`}>
-                            {stat.val}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Animated Activity Stream */}
-                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
-                      <div className="text-[11px] text-white/40 mb-4 font-medium flex justify-between items-center">
-                        <span>{t('lp_live_stream')}</span>
-                        <i className="fa-solid fa-satellite-dish text-amber-400/50 animate-pulse"></i>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {[
-                          { action: t('lp_action_new_patient'), time: t('lp_time_now'), color: 'teal' },
-                          { action: t('lp_action_medical_update'), time: t('lp_time_2min'), color: 'teal' },
-                          { action: t('lp_action_lab_complete'), time: t('lp_time_5min'), color: 'cyan' }
-                        ].map((item, i) => (
-                          <motion.div 
-                            key={i}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 1 + (i * 0.2) }}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors"
-                          >
-                            <div className={`w-1.5 h-1.5 rounded-full bg-${item.color}-400 shadow-[0_0_8px_rgba(var(--${item.color}-400),0.8)]`} />
-                            <span className="text-xs text-white/70 flex-1 text-right">{item.action}</span>
-                            <span className="text-[9px] text-white/30 font-mono">{item.time}</span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            </div>
-          </div>
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <a
+              href="#contact"
+              className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-bold rounded-2xl text-base overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_50px_rgba(6,182,212,0.4)]"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                <i className="fa-solid fa-calendar-check"></i>
+                {isAr ? 'احجز موعدك الآن' : 'Book Your Appointment'}
+              </span>
+            </a>
+            <a
+              href="#services"
+              className="group px-8 py-4 border border-white/10 bg-white/[0.02] backdrop-blur-sm text-white/80 font-bold rounded-2xl text-base transition-all duration-300 hover:bg-white/[0.06] hover:border-white/15 hover:text-white"
+            >
+              <span className="flex items-center justify-center gap-3">
+                <i className="fa-solid fa-stethoscope opacity-60"></i>
+                {isAr ? 'خدماتنا' : 'Our Services'}
+              </span>
+            </a>
+          </motion.div>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-            <div className="w-6 h-10 rounded-full border-2 border-white/10 flex items-start justify-center pt-2 backdrop-blur-sm bg-white/[0.02]">
-              <div className="w-1 h-2 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]" />
+          <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
+            <div className="w-6 h-10 rounded-full border-2 border-white/10 flex items-start justify-center pt-2">
+              <div className="w-1 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
             </div>
           </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ════════════════ AUTOMATION FLOW (V4: Holographic Pipeline) ════════════════ */}
-      <section id="command-center" className="py-32 px-6 relative overflow-hidden bg-[#060a13]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(45,212,191,0.05)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
+      {/* ════════════════════════════════════════════════════════════════
+           JOURNEY 1: THE EAR — Hearing the World
+           ════════════════════════════════════════════════════════════════ */}
+      <section id="ear" className="relative py-32 md:py-40 overflow-hidden bg-gradient-to-b from-[#050a15] via-[#0a1628] to-[#050a15]">
+        <FloatingParticles color="rgba(139,92,246,0.3)" count={12} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(6,182,212,0.06)_0%,transparent_60%)] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Illustration side */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: isAr ? 60 : -60 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex justify-center order-2 lg:order-1"
             >
-              <i className="fa-solid fa-microchip animate-pulse"></i> {t('lp_automated_badge')}
-            </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-            >
-              {t('lp_patient_journey')} — <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_patient_journey_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_patient_journey_desc')}
-            </motion.p>
-          </div>
-
-          <div className="relative flex flex-wrap justify-center items-center gap-4 md:gap-0">
-            {/* Connecting Line Background */}
-            <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-0.5 bg-white/[0.05] -translate-y-1/2 z-0" />
-            
-            {automationSteps.map((step, i) => (
-              <React.Fragment key={i}>
+              <div className="relative">
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, type: "spring", stiffness: 200 }}
-                  className={`relative z-10 flex flex-col items-center transition-all duration-500 cursor-pointer group
-                    ${activeFlowStep === i ? 'scale-110' : 'scale-100 opacity-50 hover:opacity-100'}`}
-                  onClick={() => setActiveFlowStep(i)}
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <SpotlightCard className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl p-0.5 transition-all duration-500 ${activeFlowStep === i ? 'bg-gradient-to-br from-amber-400 to-sky-500 shadow-[0_0_30px_rgba(45,212,191,0.3)]' : 'bg-white/[0.05]'}`}>
-                    <div className="w-full h-full bg-[#0a0f1c] rounded-[14px] flex items-center justify-center relative overflow-hidden">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-20 group-hover:opacity-40 transition-opacity duration-500`} />
-                      <i className={`fa-solid ${step.icon} text-2xl md:text-3xl relative z-10 ${activeFlowStep === i ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'text-slate-400'}`}></i>
-                    </div>
-                  </SpotlightCard>
-                  
-                  <span className={`mt-6 text-sm font-bold text-center max-w-[100px] transition-colors duration-300
-                    ${activeFlowStep === i ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'text-slate-500'}`}>
-                    {isAr ? step.label : step.labelEn}
-                  </span>
-                  
-                  {activeFlowStep === i && (
-                    <motion.div 
-                      layoutId="activeStepIndicator"
-                      className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-amber-400 to-sky-400 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.8)]" 
-                    />
-                  )}
+                  <EarIllustration className="w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(6,182,212,0.15)]" />
                 </motion.div>
+                {/* Sound wave animation overlay */}
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-40 h-40 rounded-full border border-cyan-500/20"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0, 0.2] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
+                  className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-60 h-60 rounded-full border border-violet-500/15"
+                />
+              </div>
+            </motion.div>
 
-                {i < automationSteps.length - 1 && (
-                  <div className="hidden md:flex items-center mx-2 relative z-10">
-                    <div className={`w-12 h-0.5 transition-all duration-500 relative overflow-hidden ${activeFlowStep >= i ? 'bg-amber-500/30' : 'bg-transparent'}`}>
-                      {activeFlowStep >= i && (
-                        <motion.div 
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '100%' }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400 to-transparent"
-                        />
-                      )}
-                    </div>
-                    <i className={`fa-solid fa-chevron-left text-[10px] -ml-1 transition-colors duration-500 ${activeFlowStep >= i ? 'text-amber-400 drop-shadow-[0_0_5px_rgba(45,212,191,0.8)]' : 'text-white/[0.05]'}`}></i>
-                  </div>
+            {/* Text side */}
+            <motion.div
+              initial={{ opacity: 0, x: isAr ? -60 : 60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="order-1 lg:order-2"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold mb-6">
+                <i className="fa-solid fa-ear-listen"></i>
+                {isAr ? 'الأذن' : 'The Ear'}
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+                {isAr ? (
+                  <>اسمع العالم <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">بوضوح</span></>
+                ) : (
+                  <>Hear the World <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Clearly</span></>
                 )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════ IMAGINE YOUR CENTER (V4: The Future Reality) ════════════════ */}
-      <section id="transform" className="py-32 px-6 relative overflow-hidden bg-[#060a13]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(20,184,166,0.05)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
-            >
-              <i className="fa-solid fa-eye animate-pulse"></i> {t('lp_transform_badge')}
+              </h2>
+              <p className="text-lg text-slate-400 leading-relaxed mb-8">
+                {isAr
+                  ? 'نقدم رعاية متخصصة لجميع أمراض الأذن من التهابات الأذن الوسطى والخارجية إلى مشاكل السمع والدوار. باستخدام أحدث تقنيات التشخيص مثل فحص السمع (Audiometry) وتخطيط طبلة الأذن (Tympanometry) وتقييم التوازن.'
+                  : 'We provide specialized care for all ear conditions — from middle and outer ear infections to hearing loss and vertigo. Using advanced diagnostics including Audiometry, Tympanometry, and Balance Assessment.'}
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {(isAr
+                  ? [
+                      { icon: 'fa-ear-deaf', text: 'فقدان السمع والصمم' },
+                      { icon: 'fa-head-side-virus', text: 'التهابات الأذن' },
+                      { icon: 'fa-rotate', text: 'الدوار واختلال التوازن' },
+                      { icon: 'fa-wave-square', text: 'طنين الأذن' },
+                    ]
+                  : [
+                      { icon: 'fa-ear-deaf', text: 'Hearing Loss' },
+                      { icon: 'fa-head-side-virus', text: 'Ear Infections' },
+                      { icon: 'fa-rotate', text: 'Vertigo & Balance' },
+                      { icon: 'fa-wave-square', text: 'Tinnitus' },
+                    ]
+                ).map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i }}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]"
+                  >
+                    <i className={`fa-solid ${item.icon} text-cyan-400/80`}></i>
+                    <span className="text-sm text-slate-300">{item.text}</span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_transform_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_transform_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_transform_desc')}
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: 'fa-file-circle-xmark', text: t('lp_transform_1'), desc: t('lp_transform_1d'), color: 'teal' },
-              { icon: 'fa-calculator', text: t('lp_transform_2'), desc: t('lp_transform_2d'), color: 'teal' },
-              { icon: 'fa-calendar-check', text: t('lp_transform_3'), desc: t('lp_transform_3d'), color: 'cyan' },
-              { icon: 'fa-chart-pie', text: t('lp_transform_4'), desc: t('lp_transform_4d'), color: 'cyan' },
-              { icon: 'fa-user-doctor', text: t('lp_transform_5'), desc: t('lp_transform_5d'), color: 'teal' },
-              { icon: 'fa-building-shield', text: t('lp_transform_6'), desc: t('lp_transform_6d'), color: 'cyan' },
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent">
-                  <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-8 relative overflow-hidden group">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-${item.color}-500/10 rounded-full blur-[50px] group-hover:bg-${item.color}-500/20 transition-colors duration-500`} />
-                    
-                    <div className={`w-14 h-14 rounded-2xl bg-${item.color}-500/10 border border-${item.color}-500/20 flex items-center justify-center text-${item.color}-400 text-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                      <i className={`fa-solid ${item.icon}`}></i>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold text-white mb-3">{item.text}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ════════════════ TRADITIONAL VS MED LOOP (V4: The Paradigm Shift) ════════════════ */}
-      <section className="py-32 px-6 bg-[#060a13] relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-[40rem] h-[40rem] bg-red-500/5 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-amber-500/5 rounded-full blur-[150px] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_why_fail_title_pre')} <span className="text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.3)]">{t('lp_why_fail_highlight')}</span> {t('lp_why_fail_title_post')}
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_why_fail_desc')}
-            </motion.p>
-          </div>
+      {/* ════════════════════════════════════════════════════════════════
+           JOURNEY 2: THE NOSE — Breathe Freely  
+           ════════════════════════════════════════════════════════════════ */}
+      <section id="nose" className="relative py-32 md:py-40 overflow-hidden bg-gradient-to-b from-[#050a15] via-[#081a1a] to-[#050a15]">
+        <FloatingParticles color="rgba(16,185,129,0.3)" count={12} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(16,185,129,0.06)_0%,transparent_60%)] pointer-events-none" />
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Legacy System */}
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Text side */}
+            <motion.div
+              initial={{ opacity: 0, x: isAr ? 60 : -60 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-red-500/20 to-transparent">
-                <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-10 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-amber-500 opacity-50" />
-                  
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-xl">
-                      <i className="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <h3 className="text-2xl font-bold text-red-400">{t('lp_traditional_title')}</h3>
-                  </div>
-                  
-                  <div className="space-y-5">
-                    {[t('lp_trad_1'),t('lp_trad_2'),t('lp_trad_3'),t('lp_trad_4'),t('lp_trad_5'),t('lp_trad_6'),t('lp_trad_7')].map((txt, i) => (
-                      <div key={i} className="flex items-start gap-4">
-                        <div className="w-6 h-6 rounded-full bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <i className="fa-solid fa-xmark text-red-400 text-xs"></i>
-                        </div>
-                        <span className="text-slate-400 text-base leading-relaxed">{txt}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </SpotlightCard>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-6">
+                <i className="fa-solid fa-lungs"></i>
+                {isAr ? 'الأنف' : 'The Nose'}
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+                {isAr ? (
+                  <>تنفّس <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">بحرية</span></>
+                ) : (
+                  <>Breathe <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">Freely</span></>
+                )}
+              </h2>
+              <p className="text-lg text-slate-400 leading-relaxed mb-8">
+                {isAr
+                  ? 'علاج متكامل لجميع مشاكل الأنف والجيوب الأنفية — من الحساسية والتهابات الجيوب المزمنة إلى انحراف الوتيرة والزوائد اللحمية. نستخدم المنظار لتشخيص دقيق وعلاج جراحي بأقل تدخل ممكن.'
+                  : 'Comprehensive treatment for all nasal and sinus conditions — from allergies and chronic sinusitis to deviated septum and nasal polyps. We use endoscopy for precise diagnosis and minimally invasive surgical treatment.'}
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {(isAr
+                  ? [
+                      { icon: 'fa-wind', text: 'حساسية الأنف' },
+                      { icon: 'fa-virus', text: 'التهاب الجيوب الأنفية' },
+                      { icon: 'fa-arrows-left-right', text: 'انحراف الوتيرة' },
+                      { icon: 'fa-microscope', text: 'تنظير الأنف والجيوب' },
+                    ]
+                  : [
+                      { icon: 'fa-wind', text: 'Nasal Allergies' },
+                      { icon: 'fa-virus', text: 'Sinusitis' },
+                      { icon: 'fa-arrows-left-right', text: 'Deviated Septum' },
+                      { icon: 'fa-microscope', text: 'Nasal Endoscopy' },
+                    ]
+                ).map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i }}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]"
+                  >
+                    <i className={`fa-solid ${item.icon} text-emerald-400/80`}></i>
+                    <span className="text-sm text-slate-300">{item.text}</span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
 
-            {/* Dr. Tarek Khrais ENT System */}
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
+            {/* Illustration side */}
+            <motion.div
+              initial={{ opacity: 0, x: isAr ? -60 : 60 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex justify-center"
             >
-              <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-amber-400 to-sky-500 shadow-[0_0_40px_rgba(45,212,191,0.15)]">
-                <div className="h-full bg-[#0a0f1c]/95 backdrop-blur-xl rounded-[23px] p-10 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-sky-500" />
-                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[60px] pointer-events-none" />
-                  
-                  <div className="flex items-center gap-4 mb-10 relative z-10">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-sky-500 flex items-center justify-center text-white text-xl shadow-[0_0_20px_rgba(45,212,191,0.4)]">
-                      <i className="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_modern_title')}</h3>
-                  </div>
-                  
-                  <div className="space-y-5 relative z-10">
-                    {[t('lp_mod_1'),t('lp_mod_2'),t('lp_mod_3'),t('lp_mod_4'),t('lp_mod_5'),t('lp_mod_6'),t('lp_mod_7')].map((txt, i) => (
-                      <div key={i} className="flex items-start gap-4">
-                        <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(45,212,191,0.3)]">
-                          <i className="fa-solid fa-check text-amber-400 text-xs"></i>
-                        </div>
-                        <span className="text-white/90 text-base font-medium leading-relaxed">{txt}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </SpotlightCard>
+              <div className="relative">
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <NoseIllustration className="w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(16,185,129,0.15)]" />
+                </motion.div>
+                {/* Breathing animation */}
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute bottom-10 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-emerald-500/10 blur-2xl"
+                />
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
-      {/* ════════════════ MULTI-TENANT (V4: Enterprise Architecture) ════════════════ */}
-      <section className="py-32 px-6 relative overflow-hidden bg-[#060a13]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.05)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
+
+      {/* ════════════════════════════════════════════════════════════════
+           JOURNEY 3: THE THROAT — Find Your Voice
+           ════════════════════════════════════════════════════════════════ */}
+      <section id="throat" className="relative py-32 md:py-40 overflow-hidden bg-gradient-to-b from-[#050a15] via-[#1a0f0a] to-[#050a15]">
+        <FloatingParticles color="rgba(245,158,11,0.3)" count={12} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(245,158,11,0.05)_0%,transparent_60%)] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Illustration side */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: isAr ? 60 : -60 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold mb-6"
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex justify-center order-2 lg:order-1"
             >
-              <i className="fa-solid fa-server animate-pulse"></i> {t('lp_saas_badge')}
+              <div className="relative">
+                <motion.div
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <ThroatIllustration className="w-64 md:w-80 h-auto drop-shadow-[0_0_60px_rgba(245,158,11,0.12)]" />
+                </motion.div>
+                {/* Voice vibration rings */}
+                {[0, 0.7, 1.4].map((delay, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ scale: [1, 2, 2.5], opacity: [0.3, 0.1, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeOut', delay }}
+                    className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-amber-500/20"
+                  />
+                ))}
+              </div>
             </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_saas_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-sky-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">{t('lp_saas_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_saas_desc')}
-            </motion.p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: 'fa-globe', title: t('lp_saas_1'), desc: t('lp_saas_1d'), color: 'cyan' },
-              { icon: 'fa-database', title: t('lp_saas_2'), desc: t('lp_saas_2d'), color: 'cyan' },
-              { icon: 'fa-shield-halved', title: t('lp_saas_3'), desc: t('lp_saas_3d'), color: 'cyan' },
-              { icon: 'fa-sliders', title: t('lp_saas_4'), desc: t('lp_saas_4d'), color: 'cyan' },
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent">
-                  <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-8 text-center relative overflow-hidden group">
-                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 bg-${item.color}-500/10 rounded-full blur-[40px] group-hover:bg-${item.color}-500/20 transition-colors duration-500`} />
-                    
-                    <div className={`w-16 h-16 mx-auto rounded-2xl bg-${item.color}-500/10 border border-${item.color}-500/20 flex items-center justify-center text-${item.color}-400 text-2xl mb-6 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(var(--${item.color}-500),0.3)] transition-all duration-500 relative z-10`}>
-                      <i className={`fa-solid ${item.icon}`}></i>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold text-white mb-3 relative z-10">{item.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed relative z-10">{item.desc}</p>
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            ))}
+            {/* Text side */}
+            <motion.div
+              initial={{ opacity: 0, x: isAr ? -60 : 60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="order-1 lg:order-2"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6">
+                <i className="fa-solid fa-comment-dots"></i>
+                {isAr ? 'الحنجرة' : 'The Throat'}
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+                {isAr ? (
+                  <>أطلق <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-red-400">صوتك</span></>
+                ) : (
+                  <>Find Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-red-400">Voice</span></>
+                )}
+              </h2>
+              <p className="text-lg text-slate-400 leading-relaxed mb-8">
+                {isAr
+                  ? 'تشخيص وعلاج أمراض الحنجرة والبلعوم والحبال الصوتية — من التهاب اللوزتين المزمن وصعوبات البلع إلى بحة الصوت والارتجاع الحنجري البلعومي. فحص بالمنظار الحنجري المرن لتقييم دقيق.'
+                  : 'Diagnosis and treatment of throat and laryngeal conditions — from chronic tonsillitis and swallowing difficulties to hoarseness and laryngopharyngeal reflux. Flexible laryngoscopy for precise evaluation.'}
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {(isAr
+                  ? [
+                      { icon: 'fa-head-side-cough', text: 'التهاب اللوزتين' },
+                      { icon: 'fa-volume-xmark', text: 'بحة الصوت' },
+                      { icon: 'fa-utensils', text: 'صعوبات البلع' },
+                      { icon: 'fa-bed', text: 'الشخير وتوقف التنفس' },
+                    ]
+                  : [
+                      { icon: 'fa-head-side-cough', text: 'Tonsillitis' },
+                      { icon: 'fa-volume-xmark', text: 'Hoarseness' },
+                      { icon: 'fa-utensils', text: 'Swallowing Issues' },
+                      { icon: 'fa-bed', text: 'Snoring & Sleep Apnea' },
+                    ]
+                ).map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i }}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]"
+                  >
+                    <i className={`fa-solid ${item.icon} text-amber-400/80`}></i>
+                    <span className="text-sm text-slate-300">{item.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
+        </div>
+      </section>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+      {/* ════════════════════════════════════════════════════════════════
+           SERVICES
+           ════════════════════════════════════════════════════════════════ */}
+      <section id="services" className="relative py-32 overflow-hidden bg-[#050a15]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.04)_0%,transparent_50%)] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="text-center mt-16"
+            className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl backdrop-blur-sm shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_10px_rgba(20,184,166,0.8)]"></div>
-              <span className="text-slate-400 font-mono tracking-wide">
-                https://<strong className="text-white font-bold">your-clinic</strong>.medloop.com
-              </span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-bold mb-6">
+              <i className="fa-solid fa-hand-holding-medical"></i>
+              {isAr ? 'خدماتنا الطبية' : 'Our Medical Services'}
             </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+              {isAr ? (
+                <>رعاية <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">شاملة</span> ومتخصصة</>
+              ) : (
+                <><span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Comprehensive</span> Specialized Care</>
+              )}
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              {isAr
+                ? 'نوفر مجموعة واسعة من الخدمات التشخيصية والعلاجية في مجال طب الأذن والأنف والحنجرة'
+                : 'We offer a wide range of diagnostic and therapeutic ENT services'}
+            </p>
           </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(isAr
+              ? [
+                  { icon: 'fa-ear-listen', title: 'فحص السمع', desc: 'تخطيط السمع الشامل وفحص طبلة الأذن باستخدام أحدث الأجهزة الطبية' },
+                  { icon: 'fa-microscope', title: 'التنظير التشخيصي', desc: 'تنظير الأنف والحنجرة المرن والصلب للتشخيص الدقيق' },
+                  { icon: 'fa-syringe', title: 'العلاج الجراحي', desc: 'عمليات اللوزتين واللحمية وترقيع طبلة الأذن وجراحة الجيوب' },
+                  { icon: 'fa-child', title: 'طب أطفال ENT', desc: 'رعاية متخصصة لأمراض الأذن والأنف والحنجرة لدى الأطفال' },
+                  { icon: 'fa-head-side-virus', title: 'علاج الحساسية', desc: 'تشخيص وعلاج حساسية الأنف والجيوب الأنفية المزمنة' },
+                  { icon: 'fa-rotate', title: 'تقييم التوازن', desc: 'فحص وعلاج اضطرابات الدوار والتوازن بأحدث التقنيات' },
+                ]
+              : [
+                  { icon: 'fa-ear-listen', title: 'Hearing Assessment', desc: 'Comprehensive audiometry and tympanometry using the latest medical devices' },
+                  { icon: 'fa-microscope', title: 'Diagnostic Endoscopy', desc: 'Flexible and rigid nasal & laryngeal endoscopy for precise diagnosis' },
+                  { icon: 'fa-syringe', title: 'Surgical Treatment', desc: 'Tonsillectomy, adenoidectomy, tympanoplasty, and sinus surgery' },
+                  { icon: 'fa-child', title: 'Pediatric ENT', desc: 'Specialized care for ear, nose, and throat conditions in children' },
+                  { icon: 'fa-head-side-virus', title: 'Allergy Treatment', desc: 'Diagnosis and management of nasal allergies and chronic sinusitis' },
+                  { icon: 'fa-rotate', title: 'Balance Assessment', desc: 'Evaluation and treatment of vertigo and balance disorders' },
+                ]
+            ).map((s, i) => (
+              <ServiceCard key={i} icon={s.icon} title={s.title} desc={s.desc} delay={i * 0.1} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ════════════════ FEATURES (V4: Holographic Grid) ════════════════ */}
-      <section id="features" className="py-32 px-6 bg-[#060a13] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.03)_0%,transparent_100%)] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
-            >
-              <i className="fa-solid fa-cubes animate-pulse"></i> {allFeatures.length}+ {t('lp_features_badge_suffix')}
-            </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_features_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">{t('lp_features_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_features_desc')}
-            </motion.p>
-          </div>
-
-          {/* Category Selector */}
-          <div className="flex flex-wrap justify-center gap-3 mb-16">
-            {featureCategories.map((cat, i) => (
-              <motion.button 
-                key={cat.id} 
-                onClick={() => setActiveCategory(cat.id)}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className={`relative px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-500 flex items-center gap-2 overflow-hidden group
-                  ${activeCategory === cat.id
-                    ? `text-white shadow-[0_0_20px_rgba(255,255,255,0.1)]`
-                    : 'bg-white/[0.02] text-slate-400 border border-white/[0.05] hover:border-white/[0.1] hover:text-white hover:bg-white/[0.05]'}`}
-              >
-                {activeCategory === cat.id && (
-                  <motion.div 
-                    layoutId="activeCategoryBg"
-                    className={`absolute inset-0 bg-gradient-to-r ${cat.gradient} opacity-80`}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <i className={`fa-solid ${cat.icon} relative z-10 ${activeCategory === cat.id ? 'animate-bounce' : ''}`}></i>
-                <span className="relative z-10">{isAr ? cat.label : cat.labelEn}</span>
-              </motion.button>
-            ))}
-          </div>
-
-          <div className="text-center mb-10">
-            <motion.span 
-              key={activeCategory}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-block px-4 py-1 bg-white/[0.03] border border-white/[0.05] rounded-full text-[10px] font-bold text-slate-500 tracking-[0.3em] uppercase"
-            >
-              {currentCategory.labelEn} MODULE
-            </motion.span>
-          </div>
-
-          {/* Features Grid */}
-          <motion.div 
-            key={activeCategory}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6"
+      {/* ════════════════════════════════════════════════════════════════
+           WHY CHOOSE US
+           ════════════════════════════════════════════════════════════════ */}
+      <section className="relative py-32 overflow-hidden bg-gradient-to-b from-[#050a15] via-[#0a1020] to-[#050a15]">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
           >
-            {currentCategory.features.map((f, idx) => {
-              const c = colorMap[f.color] || colorMap.cyan;
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+              {isAr ? (
+                <>لماذا <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">تختارنا</span>؟</>
+              ) : (
+                <>Why <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-emerald-400">Choose Us</span>?</>
+              )}
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {(isAr
+              ? [
+                  { icon: 'fa-user-doctor', title: 'خبرة واسعة', desc: 'سنوات من الخبرة في تشخيص وعلاج أمراض الأذن والأنف والحنجرة', color: 'cyan' },
+                  { icon: 'fa-microchip', title: 'أجهزة حديثة', desc: 'مناظير وأجهزة فحص سمع متطورة لتشخيص دقيق', color: 'violet' },
+                  { icon: 'fa-heart-pulse', title: 'رعاية شاملة', desc: 'متابعة مستمرة من التشخيص حتى التعافي الكامل', color: 'emerald' },
+                  { icon: 'fa-clock', title: 'مواعيد مرنة', desc: 'نظام حجز إلكتروني متطور لتنظيم مواعيدك بسهولة', color: 'amber' },
+                ]
+              : [
+                  { icon: 'fa-user-doctor', title: 'Extensive Experience', desc: 'Years of experience diagnosing and treating ENT conditions', color: 'cyan' },
+                  { icon: 'fa-microchip', title: 'Modern Equipment', desc: 'Advanced endoscopes and audiometry devices for accurate diagnosis', color: 'violet' },
+                  { icon: 'fa-heart-pulse', title: 'Comprehensive Care', desc: 'Continuous follow-up from diagnosis through full recovery', color: 'emerald' },
+                  { icon: 'fa-clock', title: 'Flexible Scheduling', desc: 'Advanced electronic booking system for easy appointment management', color: 'amber' },
+                ]
+            ).map((item, i) => {
+              const colors: Record<string, string> = {
+                cyan: 'from-cyan-500/20 to-cyan-500/5 text-cyan-400 border-cyan-500/20',
+                violet: 'from-violet-500/20 to-violet-500/5 text-violet-400 border-violet-500/20',
+                emerald: 'from-emerald-500/20 to-emerald-500/5 text-emerald-400 border-emerald-500/20',
+                amber: 'from-amber-500/20 to-amber-500/5 text-amber-400 border-amber-500/20',
+              };
+              const c = colors[item.color] || colors.cyan;
               return (
-                <SpotlightCard key={`${activeCategory}-${idx}`} className="h-full p-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent">
-                  <button 
-                    onClick={() => setSelectedFeature(f)}
-                    className="w-full h-full text-right bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-8 relative overflow-hidden group transition-all duration-500 hover:bg-[#0a0f1c]"
-                  >
-                    <div className={`absolute inset-0 ${c.bg} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                    <div className={`absolute -top-20 -right-20 w-40 h-40 ${c.bg} rounded-full blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
-                    
-                    <div className="relative z-10">
-                      <div className={`w-16 h-16 rounded-2xl ${c.bg} border border-${f.color}-500/20 flex items-center justify-center ${c.text} text-3xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_15px_rgba(var(--${f.color}-500),0.2)]`}>
-                        <i className={`${f.icon.startsWith('fa-brands') ? f.icon : `fa-solid ${f.icon}`}`}></i>
-                      </div>
-                      
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-400 transition-all">{isAr ? f.title : f.titleEn}</h3>
-                      <p className={`text-[10px] ${c.text} font-mono tracking-widest uppercase mb-4 opacity-70`}>{f.titleEn}</p>
-                      
-                      <p className="text-slate-400 text-sm leading-relaxed mb-8 font-light">{isAr ? f.desc : f.descEn}</p>
-                      
-                      <div className={`inline-flex items-center gap-2 text-xs font-bold ${c.text} opacity-60 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-[-5px]`}>
-                        <span>{t('lp_explore')}</span>
-                        <i className="fa-solid fa-arrow-left text-[10px]"></i>
-                      </div>
-                    </div>
-                  </button>
-                </SpotlightCard>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-b ${c.split(' ').slice(0, 2).join(' ')} flex items-center justify-center border ${c.split(' ').pop()}`}>
+                    <i className={`fa-solid ${item.icon} text-2xl ${c.split(' ')[2]}`}></i>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
+                </motion.div>
               );
             })}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════ FEATURE MODAL (V4: Holographic Overlay) ════════════════ */}
-      <AnimatePresence>
-        {selectedFeature && (() => {
-          const f = selectedFeature;
-          const c = colorMap[f.color] || colorMap.cyan;
-          const cat = featureCategories.find(cat => cat.features.includes(f));
-          
-          return (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6" 
-              onClick={closeModal}
-            >
-              <div className="absolute inset-0 bg-[#060a13]/80 backdrop-blur-md" />
-              
-              <motion.div 
-                initial={{ scale: 0.95, y: 20, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.95, y: 20, opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="relative w-full max-w-2xl"
-                onClick={e => e.stopPropagation()}
-              >
-                <SpotlightCard className="p-px rounded-[2rem] bg-gradient-to-b from-white/[0.15] to-white/[0.02] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-                  <div className="bg-[#0a0f1c] rounded-[31px] overflow-hidden relative">
-                    {/* Top Gradient Bar */}
-                    <div className={`h-2 w-full bg-gradient-to-r ${cat?.gradient || 'from-amber-400 to-sky-500'}`} />
-                    
-                    {/* Ambient Glow */}
-                    <div className={`absolute top-0 right-0 w-64 h-64 ${c.bg} rounded-full blur-[80px] pointer-events-none`} />
-                    
-                    <div className="p-8 md:p-10 relative z-10">
-                      <button 
-                        onClick={closeModal} 
-                        className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90"
-                      >
-                        <i className="fa-solid fa-xmark"></i>
-                      </button>
-                      
-                      <div className="flex items-start gap-6 mb-8">
-                        <div className={`w-20 h-20 rounded-3xl ${c.bg} border border-${f.color}-500/30 flex items-center justify-center ${c.text} text-4xl shrink-0 shadow-[0_0_30px_rgba(var(--${f.color}-500),0.2)]`}>
-                          <i className={`${f.icon.startsWith('fa-brands') ? f.icon : `fa-solid ${f.icon}`}`}></i>
-                        </div>
-                        <div className="pt-2">
-                          <h3 className="text-2xl md:text-3xl font-black text-white mb-2">{isAr ? f.title : f.titleEn}</h3>
-                          <p className={`text-sm ${c.text} font-mono tracking-widest uppercase opacity-80`}>{isAr ? f.titleEn : f.title}</p>
-                        </div>
-                      </div>
-                      
-                      <p className="text-slate-300 text-lg leading-relaxed mb-10 font-light border-r-2 border-white/[0.1] pr-4">{isAr ? f.desc : f.descEn}</p>
-                      
-                      <div className="grid sm:grid-cols-2 gap-4 mb-10">
-                        {(isAr ? f.details : f.detailsEn).map((d, i) => (
-                          <motion.div 
-                            key={i} 
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.1 + (i * 0.05) }}
-                            className="flex items-start gap-3 bg-white/[0.02] border border-white/[0.05] p-4 rounded-2xl hover:bg-white/[0.04] transition-colors"
-                          >
-                            <div className={`w-6 h-6 rounded-full ${c.bg} flex items-center justify-center ${c.text} shrink-0 mt-0.5 shadow-[0_0_10px_rgba(var(--${f.color}-500),0.3)]`}>
-                              <i className="fa-solid fa-check text-[10px]"></i>
-                            </div>
-                            <p className="text-slate-300 text-sm leading-relaxed font-medium">{d}</p>
-                          </motion.div>
-                        ))}
-                      </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/[0.05]">
-                        <a href="#contact" onClick={closeModal} className={`flex-1 text-center px-8 py-4 bg-gradient-to-r ${cat?.gradient || 'from-amber-400 to-sky-500'} text-white font-bold rounded-2xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-[1.02]`}>
-                          <i className={`fa-solid fa-rocket ${isAr ? 'ml-2' : 'mr-2'}`}></i> {t('lp_start_digital')}
-                        </a>
-                        <button onClick={closeModal} className="px-8 py-4 bg-white/[0.05] border border-white/[0.1] text-white font-bold rounded-2xl hover:bg-white/[0.1] transition-all duration-300">
-                          {t('lp_close_modal')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
-
-      {/* ════════════════ TECH SECTION (V4: Cybernetic Core) ════════════════ */}
-      <section id="tech" className="py-32 px-6 relative overflow-hidden bg-[#060a13]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(45,212,191,0.05)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
-            >
-              <i className="fa-solid fa-microchip animate-pulse"></i> {t('lp_tech_badge')}
-            </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_tech_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.3)]">{t('lp_tech_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_tech_desc')}
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { icon: 'fa-cloud', title: t('lp_tech_item1'), desc: t('lp_tech_item1_desc'), color: 'teal' },
-              { icon: 'fa-lock', title: t('lp_tech_item2'), desc: t('lp_tech_item2_desc'), color: 'cyan' },
-              { icon: 'fa-clock-rotate-left', title: t('lp_tech_item3'), desc: t('lp_tech_item3_desc'), color: 'teal' },
-              { icon: 'fa-bolt', title: t('lp_tech_item4'), desc: t('lp_tech_item4_desc'), color: 'cyan' },
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent">
-                  <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-8 relative overflow-hidden group flex items-start gap-6">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-${item.color}-500/10 rounded-full blur-[40px] group-hover:bg-${item.color}-500/20 transition-colors duration-500`} />
-                    
-                    <div className={`w-16 h-16 rounded-2xl bg-${item.color}-500/10 border border-${item.color}-500/20 flex items-center justify-center text-${item.color}-400 text-2xl shrink-0 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(var(--${item.color}-500),0.2)]`}>
-                      <i className={`fa-solid ${item.icon}`}></i>
-                    </div>
-                    
-                    <div className="relative z-10 pt-2">
-                      <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed font-light">{item.desc}</p>
-                    </div>
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Tech Stack Ticker */}
-          <div className="mt-20 relative overflow-hidden py-4 border-y border-white/[0.05] bg-white/[0.01]">
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#060a13] to-transparent z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#060a13] to-transparent z-10" />
-            
-            <motion.div 
-              animate={{ x: [0, -1000] }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              className="flex items-center gap-12 whitespace-nowrap"
-            >
-              {[...Array(2)].map((_, i) => (
-                <React.Fragment key={i}>
-                  {[
-                    { icon: 'fa-shield-halved', label: 'SSL/TLS 256-bit' },
-                    { icon: 'fa-key', label: 'JWT Authentication' },
-                    { icon: 'fa-helmet-safety', label: 'Helmet Security' },
-                    { icon: 'fa-gauge', label: 'Rate Limiting' },
-                    { icon: 'fa-database', label: 'PostgreSQL' },
-                    { icon: 'fa-cloud', label: 'Neon Serverless' },
-                    { icon: 'fa-server', label: 'Vite Edge' },
-                    { icon: 'fa-code', label: 'TypeScript' },
-                  ].map((tk, j) => (
-                    <div key={`${i}-${j}`} className="flex items-center gap-3 text-slate-500">
-                      <i className={`fa-solid ${tk.icon} text-amber-500/50`}></i>
-                      <span className="font-mono text-sm tracking-wider">{tk.label}</span>
-                    </div>
-                  ))}
-                </React.Fragment>
-              ))}
-            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ════════════════ DEMO VIDEO (V4: Cinematic Showcase) ════════════════ */}
-      <section id="demo-video" className="py-32 px-6 bg-[#060a13] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.05)_0%,transparent_70%)] pointer-events-none" />
+      {/* ════════════════════════════════════════════════════════════════
+           CONTACT
+           ════════════════════════════════════════════════════════════════ */}
+      <section id="contact" className="relative py-32 overflow-hidden bg-[#050a15]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(6,182,212,0.06)_0%,transparent_50%)] pointer-events-none" />
         
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
-            >
-              <i className="fa-solid fa-circle-play animate-pulse"></i> {t('lp_demo_badge')}
-            </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_demo_title_1')} <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_demo_title_2')}</span> {t('lp_demo_title_3')}
-            </motion.h2>
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 40 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="relative group perspective-1000"
+            className="text-center mb-16"
           >
-            <SpotlightCard className="p-1 rounded-[2.5rem] bg-gradient-to-b from-white/[0.1] to-transparent shadow-[0_0_50px_rgba(20,184,166,0.15)]">
-              <div className="aspect-video bg-[#0a0f1c] rounded-[2.3rem] overflow-hidden relative">
-                <video className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700" poster="/logo.png" controls preload="none">
-                  <source src="/demo-video.mp4" type="video/mp4" />
-                </video>
-                
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-colors duration-500 pointer-events-none group-has-[:playing]:hidden">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-amber-500 rounded-full blur-xl opacity-50 animate-pulse" />
-                    <div className="w-24 h-24 rounded-full bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md group-hover:scale-110 transition-transform duration-500 relative z-10">
-                      <i className="fa-solid fa-play text-white text-3xl ml-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SpotlightCard>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold mb-6">
+              <i className="fa-solid fa-paper-plane"></i>
+              {isAr ? 'تواصل معنا' : 'Get In Touch'}
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+              {isAr ? (
+                <>صحتك <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">أولويتنا</span></>
+              ) : (
+                <>Your Health is <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-400">Our Priority</span></>
+              )}
+            </h2>
+            <p className="text-lg text-slate-400 max-w-xl mx-auto">
+              {isAr
+                ? 'لا تتردد في التواصل معنا لحجز موعد أو الاستفسار عن أي من خدماتنا'
+                : "Don't hesitate to reach out to book an appointment or inquire about our services"}
+            </p>
           </motion.div>
-        </div>
-      </section>
 
-      {/* ════════════════ CONTACT (V4: Secure Comms) ════════════════ */}
-      <section id="contact" className="py-32 px-6 bg-[#060a13] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.05)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-6"
-            >
-              <i className="fa-solid fa-headset animate-pulse"></i> {t('lp_contact_badge')}
-            </motion.div>
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black mb-6 text-white"
-            >
-              {t('lp_contact_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">{t('lp_contact_highlight')}</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light"
-            >
-              {t('lp_contact_desc')}
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { 
-                href: "tel:0790904030", 
-                icon: "fa-phone", 
-                title: t('lp_contact_call'), 
-                value: "079 090 4030", 
-                color: "teal",
-                delay: 0
+              {
+                icon: 'fa-phone',
+                label: isAr ? 'اتصل بنا' : 'Call Us',
+                value: '0790904030',
+                href: 'tel:+962790904030',
+                color: 'cyan',
               },
-              { 
-                href: "mailto:dr.tarek.khrais@gmail.com", 
-                icon: "fa-envelope", 
-                title: t('lp_contact_email'), 
-                value: "dr.tarek.khrais@gmail.com", 
-                color: "cyan",
-                delay: 0.1
+              {
+                icon: 'fa-brands fa-whatsapp',
+                label: isAr ? 'واتساب' : 'WhatsApp',
+                value: '0790904030',
+                href: 'https://wa.me/962790904030',
+                color: 'green',
               },
-              { 
-                href: "https://wa.me/962790904030", 
-                icon: "fa-whatsapp", 
-                title: t('lp_contact_whatsapp'), 
-                value: t('lp_contact_chat'), 
-                color: "teal",
-                delay: 0.2,
-                isBrand: true
-              }
-            ].map((item, i) => (
-              <motion.a 
-                key={i}
-                href={item.href}
-                target={item.isBrand ? "_blank" : undefined}
-                rel={item.isBrand ? "noopener noreferrer" : undefined}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: item.delay }}
-                className="block group"
-              >
-                <SpotlightCard className="h-full p-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent">
-                  <div className="h-full bg-[#0a0f1c]/90 backdrop-blur-xl rounded-[23px] p-8 text-center relative overflow-hidden">
-                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-${item.color}-500/10 rounded-full blur-[40px] group-hover:bg-${item.color}-500/20 transition-colors duration-500`} />
-                    
-                    <div className={`w-16 h-16 mx-auto rounded-2xl bg-${item.color}-500/10 border border-${item.color}-500/20 flex items-center justify-center text-${item.color}-400 text-2xl mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(var(--${item.color}-500),0.2)] relative z-10`}>
-                      <i className={`${item.isBrand ? 'fa-brands' : 'fa-solid'} ${item.icon}`}></i>
-                    </div>
-                    
-                    <div className="relative z-10">
-                      <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
-                      <p className={`text-${item.color}-400 font-mono text-lg tracking-wider`} dir="ltr">{item.value}</p>
-                    </div>
-                  </div>
-                </SpotlightCard>
-              </motion.a>
-            ))}
+              {
+                icon: 'fa-location-dot',
+                label: isAr ? 'الموقع' : 'Location',
+                value: isAr ? 'عمّان، الأردن' : 'Amman, Jordan',
+                href: '#',
+                color: 'violet',
+              },
+            ].map((item, i) => {
+              const colorMap: Record<string, string> = {
+                cyan: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20',
+                green: 'bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/20',
+                violet: 'bg-violet-500/10 border-violet-500/20 text-violet-400 hover:bg-violet-500/20',
+              };
+              return (
+                <motion.a
+                  key={i}
+                  href={item.href}
+                  target={item.href.startsWith('http') ? '_blank' : undefined}
+                  rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -4 }}
+                  className={`flex flex-col items-center text-center p-8 rounded-2xl border transition-all duration-300 ${colorMap[item.color]}`}
+                >
+                  <i className={`${item.icon.includes('brands') ? 'fa-brands' : 'fa-solid'} ${item.icon.includes('brands') ? item.icon.split(' ')[1] : item.icon} text-3xl mb-4`}></i>
+                  <span className="text-sm text-slate-400 mb-1">{item.label}</span>
+                  <span className="text-lg font-bold text-white" dir="ltr">{item.value}</span>
+                </motion.a>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ════════════════ FINAL CTA (V4: The Launchpad) ════════════════ */}
-      <section className="py-32 px-6 relative overflow-hidden bg-[#060a13]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(45,212,191,0.1)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 40 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <SpotlightCard className="p-px rounded-[3rem] bg-gradient-to-b from-amber-400 to-sky-500 shadow-[0_0_80px_rgba(45,212,191,0.2)]">
-              <div className="bg-[#0a0f1c]/95 backdrop-blur-2xl rounded-[2.9rem] p-12 md:p-20 relative overflow-hidden">
-                <div className="absolute -top-32 -right-32 w-64 h-64 bg-amber-500/20 rounded-full blur-[80px]" />
-                <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-sky-500/20 rounded-full blur-[80px]" />
-                
-                <div className="relative z-10">
-                  <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-sky-500 rounded-3xl flex items-center justify-center text-white text-4xl mx-auto mb-10 shadow-[0_0_30px_rgba(45,212,191,0.5)]">
-                    <i className="fa-solid fa-rocket"></i>
-                  </div>
-                  
-                  <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight text-white">
-                    {t('lp_final_title')}
-                    <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-sky-400">{t('lp_final_highlight')}</span>
-                  </h2>
-                  
-                  <p className="text-slate-400 mb-12 text-xl max-w-2xl mx-auto font-light">
-                    {t('lp_final_desc')}
-                  </p>
-                  
-                  <a href="#contact" className="inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-amber-500 to-sky-600 text-white font-bold rounded-2xl hover:shadow-[0_0_40px_rgba(45,212,191,0.4)] transition-all duration-300 hover:scale-[1.02] text-lg group">
-                    <span>{t('lp_final_cta')}</span>
-                    <i className={`fa-solid ${isAr ? 'fa-arrow-left group-hover:-translate-x-2' : 'fa-arrow-right group-hover:translate-x-2'} transition-transform duration-300`}></i>
-                  </a>
-                </div>
-              </div>
-            </SpotlightCard>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════ FOOTER (V4: Cybernetic Footer) ════════════════ */}
-      <footer className="border-t border-white/[0.05] py-12 px-6 bg-[#060a13] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(45,212,191,0.03)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center p-2">
-              <i className="fa-solid fa-stethoscope text-amber-400 text-lg"></i>
+      {/* ════════════════════════════════════════════════════════════════
+           FOOTER
+           ════════════════════════════════════════════════════════════════ */}
+      <footer className="border-t border-white/[0.04] bg-[#030710] py-10 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center">
+              <i className="fa-solid fa-stethoscope text-white text-sm"></i>
             </div>
-            <div className="flex flex-col">
-              <span className="text-white font-bold tracking-wider">Dr. Tarek Khrais - ENT</span>
-              <span className="text-slate-500 text-xs">© 2025 {t('lp_copyright')}</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-6 text-slate-500 text-sm">
-            <span className="flex items-center gap-2">
-              {t('lp_developed_by')} 
-              <a href="https://okf.vercel.app" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 transition-colors font-bold flex items-center gap-1 group">
-                OKF Systems
-                <i className="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-50 group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all"></i>
-              </a>
+            <span className="text-sm font-semibold text-white/80">
+              {isAr ? 'عيادة د. طارق خريس' : 'Dr. Tarek Khrais Clinic'}
             </span>
           </div>
+          <p className="text-xs text-slate-500">
+            &copy; {new Date().getFullYear()} {isAr ? 'جميع الحقوق محفوظة' : 'All rights reserved'}.
+            {' '}
+            <span className="text-slate-600">
+              {isAr ? 'من تطوير' : 'Developed by'}{' '}
+              <span className="text-cyan-500/60">MED LOOP</span>
+            </span>
+          </p>
         </div>
       </footer>
-
-      {/* ════════════════ FLOATING WHATSAPP (V4: Holographic Orb) ════════════════ */}
-      <a href="https://wa.me/962790904030" target="_blank" rel="noopener noreferrer"
-         className="fixed bottom-8 left-8 z-50 group">
-        <div className="absolute inset-0 bg-amber-500 rounded-full blur-xl opacity-40 group-hover:opacity-60 animate-pulse transition-opacity duration-500" />
-        <div className="relative w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-3xl shadow-[0_0_30px_rgba(20,184,166,0.5)] group-hover:scale-110 transition-transform duration-500 border border-amber-300/50">
-          <i className="fa-brands fa-whatsapp drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
-        </div>
-      </a>
     </div>
   );
 };
