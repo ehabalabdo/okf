@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ClientProvider, useClient } from './context/ClientContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -167,6 +167,12 @@ const getHomeRoute = (user: User): string => {
 // --- App Router ---
 const AppRoutes: React.FC = () => {
   const { user, patientUser } = useAuth();
+  const location = useLocation();
+
+  // Landing page: render directly without ClientGate (no backend dependency)
+  if (location.pathname === '/' && !user) {
+    return <LandingView />;
+  }
 
   return (
     <ClientProvider slug="tarek">
@@ -215,8 +221,8 @@ const AppRoutes: React.FC = () => {
           {/* HR Employee Portal */}
           <Route path="/hr/me" element={<HrEmployeeGuard><HrEmployeeMeView /></HrEmployeeGuard>} />
 
-          {/* Landing Page */}
-          <Route path="/" element={user ? <RedirectHandler to={getHomeRoute(user)} /> : <LandingView />} />
+          {/* Logged-in user on "/" → redirect to home */}
+          <Route path="/" element={<RedirectHandler to={getHomeRoute(user!)} />} />
           <Route path="*" element={<RedirectHandler to="/" />} />
         </Routes>
       </ClientGate>
