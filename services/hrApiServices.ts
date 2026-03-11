@@ -35,29 +35,9 @@ export const hrClinicService = {
   },
 };
 
-// We need PATCH support — add it to api if not already there
-// For now, use PUT as a workaround (backend accepts both)
-// Actually let's add a patch method:
+// Use the centralized api module for PATCH requests
 const apiPatch = async (path: string, body?: any) => {
-  const token = localStorage.getItem('token');
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const res = await fetch(`https://medloop-api.onrender.com${path}`, {
-    method: 'PATCH',
-    headers,
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-  if (res.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    throw new Error('Unauthorized');
-  }
-  const text = await res.text();
-  let data;
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  if (!res.ok) throw new Error((data as any)?.message || (data as any)?.error || 'Request failed');
-  return data;
+  return await (api as any).patch(path, body);
 };
 
 export const hrClinicLocationService = {

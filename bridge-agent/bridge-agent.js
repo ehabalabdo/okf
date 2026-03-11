@@ -43,7 +43,7 @@ try {
 
 const CONFIG = {
   // MedLoop API endpoint
-  API_URL: process.env.MEDLOOP_API_URL || 'https://medloop-api.onrender.com',
+  API_URL: process.env.MEDLOOP_API_URL || 'https://okb-zg96.onrender.com',
   
   // API key for authentication (generated from MedLoop admin panel)
   API_KEY: process.env.MEDLOOP_API_KEY || '',

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = (import.meta as any).env?.VITE_SOCKET_URL || 'https://medloop-api.onrender.com';
+const SOCKET_URL = (import.meta as any).env?.VITE_SOCKET_URL || 'https://okb-zg96.onrender.com';
 const SOCKET_PATH = '/ws';
 
 interface UseDeviceSocketOptions {
