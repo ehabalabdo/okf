@@ -14,12 +14,20 @@ const AccountingView: React.FC = () => {
   const isRTL = language === 'ar';
 
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  // Date range: default last 30 days
+  // Date range: read from URL query params or default to last 30 days
   const [dateFrom, setDateFrom] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from');
+    if (from) return from;
     const d = new Date(); d.setDate(d.getDate() - 30);
     return d.toISOString().split('T')[0];
   });
-  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split('T')[0]);
+  const [dateTo, setDateTo] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const to = params.get('to');
+    if (to) return to;
+    return new Date().toISOString().split('T')[0];
+  });
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
