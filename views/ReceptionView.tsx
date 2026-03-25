@@ -43,8 +43,74 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
     surgeriesExists: false, surgeriesDetail: '', // NEW: Previous surgeries
     isPregnant: false,
     clinicId: '', priority: 'normal' as Priority, source: 'walk-in', reasonForVisit: '',
-    sendWhatsApp: true // NEW: Send credentials via WhatsApp by default
   });
+
+  // ENT Inline Questionnaire State
+  const [showENTForm, setShowENTForm] = useState(false);
+  const [entPatientId, setEntPatientId] = useState('');
+  const [entPatientName, setEntPatientName] = useState('');
+  const [entSaving, setEntSaving] = useState(false);
+  const [entForm, setEntForm] = useState({
+    chiefComplaint: '',
+    symptomDuration: '',
+    symptomSide: 'none' as 'right' | 'left' | 'both' | 'none',
+    symptoms: {
+      earPain: false, hearingLoss: false, tinnitus: false, earDischarge: false,
+      vertigo: false, nasalObstruction: false, nasalDischarge: false, sneezing: false,
+      soreThroat: false, voiceChange: false, dysphagia: false, snoring: false,
+      sleepApnea: false, facialPain: false, headache: false, nosebleeds: false,
+      lossOfSmell: false, neckMass: false, other: '',
+    },
+    previousENTTreatment: false,
+    previousENTDetails: '',
+    previousENTSurgery: false,
+    previousENTSurgeryDetails: '',
+    notes: '',
+  });
+
+  const entSymptomLabels: Record<string, string> = {
+    earPain: t('ent_ear_pain'), hearingLoss: t('ent_hearing_loss'), tinnitus: t('ent_tinnitus'),
+    earDischarge: t('ent_ear_discharge'), vertigo: t('ent_vertigo'), nasalObstruction: t('ent_nasal_obstruction'),
+    nasalDischarge: t('ent_nasal_discharge'), sneezing: t('ent_sneezing'), soreThroat: t('ent_sore_throat'),
+    voiceChange: t('ent_voice_change'), dysphagia: t('ent_dysphagia'), snoring: t('ent_snoring'),
+    sleepApnea: t('ent_sleep_apnea'), facialPain: t('ent_facial_pain'), headache: t('ent_headache'),
+    nosebleeds: t('ent_nosebleeds'), lossOfSmell: t('ent_loss_of_smell'), neckMass: t('ent_neck_mass'),
+  };
+
+  const resetEntForm = () => {
+    setEntForm({
+      chiefComplaint: '', symptomDuration: '', symptomSide: 'none',
+      symptoms: {
+        earPain: false, hearingLoss: false, tinnitus: false, earDischarge: false,
+        vertigo: false, nasalObstruction: false, nasalDischarge: false, sneezing: false,
+        soreThroat: false, voiceChange: false, dysphagia: false, snoring: false,
+        sleepApnea: false, facialPain: false, headache: false, nosebleeds: false,
+        lossOfSmell: false, neckMass: false, other: '',
+      },
+      previousENTTreatment: false, previousENTDetails: '',
+      previousENTSurgery: false, previousENTSurgeryDetails: '', notes: '',
+    });
+  };
+
+  const handleEntSubmit = async () => {
+    if (!entForm.chiefComplaint) return alert(t('ent_chief_complaint_enter'));
+    setEntSaving(true);
+    try {
+      await api.post('/ent-forms/new-patient', {
+        ...entForm,
+        patientId: entPatientId,
+        clientId: client?.id,
+      });
+      resetEntForm();
+      setShowENTForm(false);
+      setEntPatientId('');
+      setEntPatientName('');
+    } catch (err: any) {
+      alert(err.message || t('ent_error_occurred'));
+    } finally {
+      setEntSaving(false);
+    }
+  };
 
   const loadData = async () => {
     if (!user) return;
@@ -148,48 +214,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
         };
     }, [user]);
 
-    // WhatsApp Integration - Send login credentials via WhatsApp
-    const sendWhatsAppCredentials = (phone: string, name: string, password: string) => {
-        // Clean phone number (remove spaces, dashes, etc.)
-        let cleanPhone = phone.replace(/[^0-9+]/g, '');
-        
-        // Convert local Jordan numbers to international format
-        // Remove leading + if present
-        cleanPhone = cleanPhone.replace(/^\+/, '');
-        // Convert 07x to 9627x (Jordan mobile)
-        if (cleanPhone.startsWith('07')) {
-            cleanPhone = '962' + cleanPhone.substring(1);
-        }
-        // Convert 06x to 9626x (Jordan landline)  
-        if (cleanPhone.startsWith('06')) {
-            cleanPhone = '962' + cleanPhone.substring(1);
-        }
-        
-        const loginUrl = window.location.origin;
-        const clinicName = client?.name || t('rcpt_clinic_fallback');
-        
-        const message = [
-          `${t('rcpt_whatsapp_greeting')} ${name}`,
-          '',
-          `${t('rcpt_whatsapp_registered')} ${clinicName}`,
-          '',
-          t('rcpt_whatsapp_login_data'),
-          `${t('rcpt_whatsapp_username')}: ${phone}`,
-          `${t('rcpt_whatsapp_password')}: ${password}`,
-          '',
-          t('rcpt_whatsapp_login_link'),
-          loginUrl,
-          '',
-          t('rcpt_whatsapp_keep_safe')
-        ].join('\n');
-        
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMessage}`;
-        
-        // Open WhatsApp in new tab
-        window.open(whatsappUrl, '_blank');
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.name || !formData.clinicId || !formData.phone || !user) return;
@@ -228,24 +252,18 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                 }
             });
             
-            // Store patient credentials before clearing form
-            const patientName = formData.name;
-            const patientPhone = formData.phone;
-            const patientPassword = generatedPassword;
+            // Show inline ENT questionnaire after successful registration
+            const registeredName = formData.name;
             
             setFormData(prev => ({ ...prev, name: '', dateOfBirth: '', phone: '', reasonForVisit: '' }));
             setIsFormOpen(false);
             // No need to manually fetch - PatientService.subscribe will auto-update
             
-            // Send via WhatsApp if enabled
-            if (formData.sendWhatsApp && patientPhone) {
-                sendWhatsAppCredentials(patientPhone, patientName, patientPassword);
-            }
-
-            // Navigate to ENT New Patient Questionnaire with patient pre-selected
-            if (confirm('✅ ' + t('patient_added_success') + '\n\n' + t('fill_ent_questionnaire'))) {
-                window.location.href = `/ent/new-patient?patientId=${patientId}`;
-            }
+            // Show inline ENT form with the newly registered patient
+            setEntPatientId(patientId);
+            setEntPatientName(registeredName);
+            resetEntForm();
+            setShowENTForm(true);
         } catch (e: any) {
             alert(t('error_prefix') + (e.message || t('add_patient_failed')));
         }
@@ -758,27 +776,112 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                              ))}
                           </div>
                           
-                          {/* WhatsApp Checkbox */}
-                          <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                             <input 
-                                type="checkbox" 
-                                id="sendWhatsApp" 
-                                checked={formData.sendWhatsApp} 
-                                onChange={e => setFormData({...formData, sendWhatsApp: e.target.checked})} 
-                                className="w-5 h-5 text-green-600 rounded-md"
-                             />
-                             <label htmlFor="sendWhatsApp" className="flex items-center gap-2 text-sm font-semibold text-green-800 cursor-pointer">
-                                <i className="fab fa-whatsapp text-2xl"></i>
-                                <span>{t('send_via_whatsapp')}</span>
-                             </label>
-                          </div>
-                          
                           <button type="submit" className="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-xl transition-all hover:bg-primary transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 text-lg"><i className="fa-solid fa-check-circle"></i> {t('register_patient')}</button>
                       </div>
                     </form>
                 </div>
             )}
         </div>
+
+        {/* Inline ENT New Patient Questionnaire - appears after registration */}
+        {showENTForm && (
+        <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border-2 border-amber-300 overflow-hidden animate-fade-in-down">
+            <div className="p-5 md:p-6 border-b border-amber-200 bg-gradient-to-r from-amber-50 to-sky-50 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-amber-500 to-sky-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"><i className="fa-solid fa-clipboard-list text-xl"></i></div>
+                    <div>
+                        <h2 className="font-bold text-slate-800 text-lg">{t('ent_new_patient_title')}</h2>
+                        <p className="text-sm text-slate-500">{entPatientName}</p>
+                    </div>
+                </div>
+                <button onClick={() => { setShowENTForm(false); resetEntForm(); }} className="text-slate-400 hover:text-red-500 transition p-2 rounded-xl hover:bg-red-50" title={t('skip')}>
+                    <i className="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div className="p-5 md:p-6 space-y-5">
+                {/* Chief Complaint */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2"><i className="fa-solid fa-comment-medical text-red-500"></i> {t('ent_chief_complaint')}</h3>
+                    <textarea value={entForm.chiefComplaint} onChange={e => setEntForm(f => ({ ...f, chiefComplaint: e.target.value }))}
+                        rows={2} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_chief_complaint_placeholder')} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" value={entForm.symptomDuration} onChange={e => setEntForm(f => ({ ...f, symptomDuration: e.target.value }))}
+                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_symptom_duration_placeholder')} />
+                        <div className="flex gap-2 flex-wrap">
+                            {(['right', 'left', 'both', 'none'] as const).map(side => (
+                                <button key={side} type="button" onClick={() => setEntForm(f => ({ ...f, symptomSide: side }))}
+                                    className={`px-3 py-2 rounded-xl text-xs font-medium transition ${entForm.symptomSide === side ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                                    {{ right: t('ent_side_right'), left: t('ent_side_left'), both: t('ent_side_both'), none: t('ent_side_none') }[side]}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Symptoms Checklist */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2"><i className="fa-solid fa-list-check text-amber-500"></i> {t('ent_symptoms_checklist')}</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {Object.entries(entSymptomLabels).map(([key, label]) => (
+                            <button key={key} type="button" onClick={() => setEntForm(f => ({ ...f, symptoms: { ...f.symptoms, [key]: !f.symptoms[key as keyof typeof f.symptoms] } }))}
+                                className={`p-2.5 rounded-xl text-xs font-medium transition flex items-center gap-2 ${
+                                    entForm.symptoms[key as keyof typeof entForm.symptoms]
+                                        ? 'bg-red-100 text-red-700 border-2 border-red-300'
+                                        : 'bg-slate-50 text-slate-600 border border-slate-200'
+                                }`}>
+                                <i className={`fa-solid ${entForm.symptoms[key as keyof typeof entForm.symptoms] ? 'fa-square-check text-red-500' : 'fa-square text-slate-400'}`}></i>
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                    <input type="text" value={entForm.symptoms.other || ''} onChange={e => setEntForm(f => ({ ...f, symptoms: { ...f.symptoms, other: e.target.value } }))}
+                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_other_symptoms_placeholder')} />
+                </div>
+
+                {/* Previous ENT Treatment */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2"><i className="fa-solid fa-clock-rotate-left text-purple-500"></i> {t('ent_previous_treatment')}</h3>
+                    <div className="flex flex-wrap gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={entForm.previousENTTreatment} onChange={e => setEntForm(f => ({ ...f, previousENTTreatment: e.target.checked }))} className="w-5 h-5 rounded text-amber-500" />
+                            <span className="text-sm text-slate-700">{t('ent_prev_ent_treatment')}</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={entForm.previousENTSurgery} onChange={e => setEntForm(f => ({ ...f, previousENTSurgery: e.target.checked }))} className="w-5 h-5 rounded text-amber-500" />
+                            <span className="text-sm text-slate-700">{t('ent_prev_ent_surgery')}</span>
+                        </label>
+                    </div>
+                    {entForm.previousENTTreatment && (
+                        <textarea value={entForm.previousENTDetails} onChange={e => setEntForm(f => ({ ...f, previousENTDetails: e.target.value }))}
+                            rows={2} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_prev_treatment_details')} />
+                    )}
+                    {entForm.previousENTSurgery && (
+                        <textarea value={entForm.previousENTSurgeryDetails} onChange={e => setEntForm(f => ({ ...f, previousENTSurgeryDetails: e.target.value }))}
+                            rows={2} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_prev_surgery_details')} />
+                    )}
+                </div>
+
+                {/* Notes */}
+                <div>
+                    <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2 mb-2"><i className="fa-solid fa-note-sticky text-green-500"></i> {t('ent_additional_notes')}</h3>
+                    <textarea value={entForm.notes || ''} onChange={e => setEntForm(f => ({ ...f, notes: e.target.value }))}
+                        rows={2} className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800" placeholder={t('ent_any_additional_notes')} />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
+                    <button type="button" onClick={handleEntSubmit} disabled={entSaving}
+                        className="flex-1 py-3.5 bg-gradient-to-r from-amber-600 to-sky-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
+                        {entSaving ? <><i className="fa-solid fa-spinner fa-spin"></i> {t('ent_saving')}</> : <><i className="fa-solid fa-save"></i> {t('ent_save_questionnaire')}</>}
+                    </button>
+                    <button type="button" onClick={() => { setShowENTForm(false); resetEntForm(); }}
+                        className="px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition flex items-center justify-center gap-2">
+                        <i className="fa-solid fa-forward"></i> {t('skip')}
+                    </button>
+                </div>
+            </div>
+        </div>
+        )}
 
         {/* ENT Medical Forms Quick Access */}
         <div className="bg-white rounded-[1.5rem] md:rounded-3xl shadow-soft border border-slate-100 overflow-hidden">

@@ -113,7 +113,7 @@ export const pgClientsService = {
   },
 
   update: async (clientId: number, data: Partial<Pick<Client, 'name' | 'phone' | 'email' | 'address' | 'logoUrl'>>): Promise<void> => {
-    await api.put(`/clients/${clientId}`, data);
+    await api.patch(`/clients/${clientId}`, data);
   },
 
   getStats: async (clientId: number) => {

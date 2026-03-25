@@ -1095,6 +1095,7 @@ const translations = {
     ent_prev_ent_surgery: "Has the patient had ENT surgery before?",
     ent_prev_surgery_details: "Previous surgery details...",
     ent_save_questionnaire: "Save Questionnaire",
+    skip: "Skip",
 
     // ENT Follow-Up Form
     ent_followup_type: "Follow-Up Type",
@@ -2729,6 +2730,7 @@ const translations = {
     ent_prev_ent_surgery: "هل أجرى عمليات جراحية في الأنف أو الأذن أو الحنجرة؟",
     ent_prev_surgery_details: "تفاصيل العمليات السابقة...",
     ent_save_questionnaire: "حفظ الاستبيان",
+    skip: "تخطي",
 
     // ENT Follow-Up Form
     ent_followup_type: "نوع المتابعة",
