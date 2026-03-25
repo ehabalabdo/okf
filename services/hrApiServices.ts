@@ -12,6 +12,8 @@ import {
   HrWarning,
   HrNotification,
   HrSocialSecuritySettings,
+  HrLeaveRequest,
+  HrLeaveBalance,
 } from '../types';
 
 /**
@@ -388,5 +390,53 @@ export const hrNotificationsService = {
 
   markRead: async (id: number): Promise<void> => {
     await apiPatch(`/hr/notifications/${id}/read`, {});
+  },
+};
+
+// ==================== LEAVE MANAGEMENT ====================
+
+export const hrLeavesService = {
+  // Employee: submit leave request
+  create: async (data: {
+    leave_type: string;
+    start_date: string;
+    end_date: string;
+    reason?: string;
+  }): Promise<HrLeaveRequest> => {
+    return await api.post('/hr/leaves', data);
+  },
+
+  // Employee: view own requests
+  getMine: async (): Promise<HrLeaveRequest[]> => {
+    return (await api.get('/hr/leaves/me')) || [];
+  },
+
+  // Employee: cancel pending request
+  cancel: async (id: number): Promise<void> => {
+    await api.del(`/hr/leaves/${id}`);
+  },
+
+  // Admin: list all requests
+  getAll: async (params: { status?: string; employee_id?: number }): Promise<HrLeaveRequest[]> => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.employee_id) qs.set('employee_id', String(params.employee_id));
+    const q = qs.toString();
+    return (await api.get(`/hr/leaves${q ? '?' + q : ''}`)) || [];
+  },
+
+  // Admin: approve
+  approve: async (id: number): Promise<void> => {
+    await api.post(`/hr/leaves/${id}/approve`, {});
+  },
+
+  // Admin: reject
+  reject: async (id: number, reason?: string): Promise<void> => {
+    await api.post(`/hr/leaves/${id}/reject`, { reason });
+  },
+
+  // Get leave balance (admin or self)
+  getBalance: async (employeeId: number): Promise<HrLeaveBalance> => {
+    return await api.get(`/hr/leaves/balance/${employeeId}`);
   },
 };

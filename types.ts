@@ -605,6 +605,33 @@ export interface HrNotification {
   createdAt: string;
 }
 
+// ===================== LEAVE MANAGEMENT =====================
+
+export type LeaveType = 'annual' | 'sick';
+export type LeaveStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface HrLeaveRequest {
+  id: number;
+  employeeId: number;
+  employeeName?: string;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  durationDays: number;
+  reason?: string;
+  status: LeaveStatus;
+  rejectionReason?: string;
+  approvedByName?: string;
+  approvedAt?: number | null;
+  createdAt: number;
+}
+
+export interface HrLeaveBalance {
+  year: number;
+  annual: { quota: number; used: number; remaining: number };
+  sick: { quota: number; used: number; remaining: number };
+}
+
 // ===================== CATALOG =====================
 
 export interface CatalogService {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Layout from '../components/Layout';
-import { HrEmployee, HrDeduction, HrWarning, HrNotification } from '../types';
-import { hrEmployeesService, hrDeductionsService, hrWarningsService, hrNotificationsService } from '../services/hrApiServices';
+import { HrEmployee, HrDeduction, HrWarning, HrNotification, HrLeaveRequest } from '../types';
+import { hrEmployeesService, hrDeductionsService, hrWarningsService, hrNotificationsService, hrLeavesService } from '../services/hrApiServices';
 import { useLanguage } from '../context/LanguageContext';
 import { fmtDate, fmtDateTime } from '../utils/formatters';
 
-type Tab = 'deductions' | 'warnings' | 'notifications';
+type Tab = 'leaves' | 'deductions' | 'warnings' | 'notifications';
 
 const WARNING_COLORS: Record<string, string> = {
   verbal: 'bg-yellow-100 text-yellow-700 border-yellow-300',
@@ -22,7 +22,7 @@ const HrManagerActionsView: React.FC = () => {
   const { language } = useLanguage();
   const isAr = language === 'ar';
 
-  const [tab, setTab] = useState<Tab>('deductions');
+  const [tab, setTab] = useState<Tab>('leaves');
   const [employees, setEmployees] = useState<HrEmployee[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<{ text: string; type: 'ok' | 'err' } | null>(null);
@@ -51,12 +51,30 @@ const HrManagerActionsView: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
 
+  // Leaves state
+  const [leaves, setLeaves] = useState<HrLeaveRequest[]>([]);
+  const [leaveStatusFilter, setLeaveStatusFilter] = useState('pending');
+  const [leaveEmpFilter, setLeaveEmpFilter] = useState('');
+  const [rejectId, setRejectId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+
   useEffect(() => {
     hrEmployeesService.getAll().then(e => {
       setEmployees(e);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  // Fetch leaves
+  const fetchLeaves = useCallback(async () => {
+    try {
+      const data = await hrLeavesService.getAll({
+        status: leaveStatusFilter || undefined,
+        employee_id: leaveEmpFilter ? parseInt(leaveEmpFilter) : undefined,
+      });
+      setLeaves(data);
+    } catch { setLeaves([]); }
+  }, [leaveStatusFilter, leaveEmpFilter]);
 
   // Fetch deductions
   const fetchDeductions = useCallback(async () => {
@@ -90,10 +108,35 @@ const HrManagerActionsView: React.FC = () => {
   }, [notifEmpFilter]);
 
   useEffect(() => {
+    if (tab === 'leaves') fetchLeaves();
     if (tab === 'deductions') fetchDeductions();
     if (tab === 'warnings') fetchWarnings();
     if (tab === 'notifications') fetchNotifications();
-  }, [tab, fetchDeductions, fetchWarnings, fetchNotifications]);
+  }, [tab, fetchLeaves, fetchDeductions, fetchWarnings, fetchNotifications]);
+
+  const handleApproveLeave = async (id: number) => {
+    setSaving(true);
+    try {
+      await hrLeavesService.approve(id);
+      setMsg({ text: isAr ? 'تمت الموافقة على الإجازة ✓' : 'Leave approved ✓', type: 'ok' });
+      fetchLeaves();
+    } catch (e: any) {
+      setMsg({ text: e?.message || 'Error', type: 'err' });
+    } finally { setSaving(false); }
+  };
+
+  const handleRejectLeave = async (id: number) => {
+    setSaving(true);
+    try {
+      await hrLeavesService.reject(id, rejectReason || undefined);
+      setMsg({ text: isAr ? 'تم رفض الإجازة' : 'Leave rejected', type: 'ok' });
+      setRejectId(null);
+      setRejectReason('');
+      fetchLeaves();
+    } catch (e: any) {
+      setMsg({ text: e?.message || 'Error', type: 'err' });
+    } finally { setSaving(false); }
+  };
 
   const handleAddDeduction = async () => {
     if (!dedForm.employee_id || !dedForm.amount) return;
@@ -168,6 +211,7 @@ const HrManagerActionsView: React.FC = () => {
   const empName = (id: number) => employees.find(e => e.id === id)?.fullName || `#${id}`;
 
   const tabs: { key: Tab; icon: string; label: string; labelAr: string }[] = [
+    { key: 'leaves', icon: 'fa-umbrella-beach', label: 'Leaves', labelAr: 'الإجازات' },
     { key: 'deductions', icon: 'fa-money-bill-transfer', label: 'Deductions', labelAr: 'الخصومات' },
     { key: 'warnings', icon: 'fa-triangle-exclamation', label: 'Warnings', labelAr: 'الإنذارات' },
     { key: 'notifications', icon: 'fa-bell', label: 'Notifications', labelAr: 'الإشعارات' },
@@ -193,6 +237,91 @@ const HrManagerActionsView: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {/* ════ LEAVES TAB ════ */}
+      {tab === 'leaves' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-soft border p-4 flex flex-wrap items-end gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{isAr ? 'الحالة' : 'Status'}</label>
+              <select value={leaveStatusFilter} onChange={e => setLeaveStatusFilter(e.target.value)}
+                className="border border-slate-200 rounded-xl px-4 py-2 text-sm min-w-[140px]">
+                <option value="">{isAr ? 'الكل' : 'All'}</option>
+                <option value="pending">{isAr ? 'قيد الانتظار' : 'Pending'}</option>
+                <option value="approved">{isAr ? 'موافق عليه' : 'Approved'}</option>
+                <option value="rejected">{isAr ? 'مرفوض' : 'Rejected'}</option>
+                <option value="cancelled">{isAr ? 'ملغي' : 'Cancelled'}</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{isAr ? 'الموظف' : 'Employee'}</label>
+              <select value={leaveEmpFilter} onChange={e => setLeaveEmpFilter(e.target.value)}
+                className="border border-slate-200 rounded-xl px-4 py-2 text-sm min-w-[160px]">
+                <option value="">{isAr ? 'الكل' : 'All'}</option>
+                {employees.filter(e => e.status === 'active').map(e => <option key={e.id} value={e.id}>{e.fullName}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Leave Requests List */}
+          <div className="space-y-3">
+            {leaves.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-soft border p-8 text-center text-slate-300">
+                {isAr ? 'لا توجد طلبات إجازة' : 'No leave requests'}
+              </div>
+            ) : leaves.map(l => (
+              <div key={l.id} className={`bg-white rounded-2xl shadow-soft border p-4 ${l.status === 'pending' ? 'border-amber-300' : ''}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-800">{l.employeeName || empName(l.employeeId)}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${l.leaveType === 'annual' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                      {l.leaveType === 'annual' ? (isAr ? 'سنوية' : 'Annual') : (isAr ? 'مرضية' : 'Sick')}
+                    </span>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${l.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : l.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : l.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500'}`}>
+                    {l.status === 'pending' ? (isAr ? 'قيد الانتظار' : 'Pending') : l.status === 'approved' ? (isAr ? 'موافق عليه' : 'Approved') : l.status === 'rejected' ? (isAr ? 'مرفوض' : 'Rejected') : (isAr ? 'ملغي' : 'Cancelled')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-slate-600 mb-2">
+                  <span><i className="fa-solid fa-calendar me-1 text-amber-400"></i>{new Date(l.startDate).toLocaleDateString()} → {new Date(l.endDate).toLocaleDateString()}</span>
+                  <span className="font-bold">{l.durationDays} {isAr ? 'يوم' : 'days'}</span>
+                </div>
+                {l.reason && <p className="text-xs text-slate-400 mb-2">{l.reason}</p>}
+                {l.rejectionReason && <p className="text-xs text-red-500 mb-2"><i className="fa-solid fa-circle-info me-1"></i>{l.rejectionReason}</p>}
+
+                {l.status === 'pending' && (
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={() => handleApproveLeave(l.id)} disabled={saving}
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl font-bold text-sm disabled:opacity-50 transition-colors">
+                      <i className="fa-solid fa-check me-1"></i>{isAr ? 'موافقة' : 'Approve'}
+                    </button>
+                    {rejectId === l.id ? (
+                      <div className="flex-1 flex gap-2">
+                        <input value={rejectReason} onChange={e => setRejectReason(e.target.value)}
+                          placeholder={isAr ? 'سبب الرفض...' : 'Rejection reason...'}
+                          className="flex-1 border border-red-200 rounded-xl px-3 py-2 text-sm" />
+                        <button onClick={() => handleRejectLeave(l.id)} disabled={saving}
+                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm disabled:opacity-50">
+                          <i className="fa-solid fa-check"></i>
+                        </button>
+                        <button onClick={() => { setRejectId(null); setRejectReason(''); }}
+                          className="bg-slate-200 hover:bg-slate-300 text-slate-600 px-3 py-2 rounded-xl text-sm">
+                          <i className="fa-solid fa-xmark"></i>
+                        </button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setRejectId(l.id)}
+                        className="flex-1 bg-red-100 hover:bg-red-200 text-red-600 py-2 rounded-xl font-bold text-sm transition-colors">
+                        <i className="fa-solid fa-xmark me-1"></i>{isAr ? 'رفض' : 'Reject'}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ════ DEDUCTIONS TAB ════ */}
       {tab === 'deductions' && (

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Layout from '../components/Layout';
 import { HrMeProfile, HrMonthlyReport } from '../types';
-import { hrMeService, hrWebAuthnService, hrAttendanceService, hrReportsService, hrDebugService } from '../services/hrApiServices';
+import { hrMeService, hrWebAuthnService, hrAttendanceService, hrReportsService, hrDebugService, hrLeavesService } from '../services/hrApiServices';
 import { useLanguage } from '../context/LanguageContext';
 import { fmtMinutes, fmtTime } from '../utils/formatters';
+import { HrLeaveRequest, HrLeaveBalance } from '../types';
 
 const DAY_LABELS_EN = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_LABELS_AR = ['', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت', 'أحد'];
@@ -28,6 +29,13 @@ const HrEmployeeMeView: React.FC = () => {
   const [showDebug, setShowDebug] = useState(false);
   // Per-device registration tracking
   const [deviceRegistered, setDeviceRegistered] = useState<boolean>(false);
+
+  // Leave management state
+  const [myLeaves, setMyLeaves] = useState<HrLeaveRequest[]>([]);
+  const [leaveBalance, setLeaveBalance] = useState<HrLeaveBalance | null>(null);
+  const [showLeaveForm, setShowLeaveForm] = useState(false);
+  const [leaveForm, setLeaveForm] = useState({ leave_type: 'annual', start_date: '', end_date: '', reason: '' });
+  const [leaveSaving, setLeaveSaving] = useState(false);
 
   // Check if THIS device has registered — sync with server state
   useEffect(() => {
@@ -91,6 +99,50 @@ const HrEmployeeMeView: React.FC = () => {
   }, [curMonth]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // ── load leaves + balance ──
+  const refreshLeaves = useCallback(async () => {
+    try {
+      const leaves = await hrLeavesService.getMine();
+      setMyLeaves(leaves);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { refreshLeaves(); }, [refreshLeaves]);
+
+  useEffect(() => {
+    if (profile) {
+      hrLeavesService.getBalance(profile.id).then(setLeaveBalance).catch(() => {});
+    }
+  }, [profile]);
+
+  const handleLeaveSubmit = async () => {
+    if (!leaveForm.start_date || !leaveForm.end_date) return;
+    setLeaveSaving(true);
+    try {
+      await hrLeavesService.create(leaveForm);
+      setMsg({ text: isAr ? 'تم تقديم طلب الإجازة ✓' : 'Leave request submitted ✓', type: 'ok' });
+      setShowLeaveForm(false);
+      setLeaveForm({ leave_type: 'annual', start_date: '', end_date: '', reason: '' });
+      refreshLeaves();
+      if (profile) hrLeavesService.getBalance(profile.id).then(setLeaveBalance).catch(() => {});
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ' : 'Error'), type: 'err' });
+    } finally {
+      setLeaveSaving(false);
+    }
+  };
+
+  const handleCancelLeave = async (id: number) => {
+    try {
+      await hrLeavesService.cancel(id);
+      setMsg({ text: isAr ? 'تم إلغاء الطلب ✓' : 'Request cancelled ✓', type: 'ok' });
+      refreshLeaves();
+      if (profile) hrLeavesService.getBalance(profile.id).then(setLeaveBalance).catch(() => {});
+    } catch (e: any) {
+      setMsg({ text: e?.message || (isAr ? 'خطأ' : 'Error'), type: 'err' });
+    }
+  };
 
   // ── GPS helper ──
   const getGps = (): Promise<{ lat: number; lng: number }> => {
@@ -625,6 +677,144 @@ const HrEmployeeMeView: React.FC = () => {
                 <i className="fa-solid fa-mug-hot text-3xl text-amber-500 mb-2"></i>
                 <p className="text-amber-700 font-extrabold">{isAr ? 'أنت في استراحة حالياً' : 'You are currently on break'}</p>
               </div>
+            )}
+          </div>
+
+          {/* ── LEAVE REQUESTS SECTION ── */}
+          <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-extrabold text-slate-700 uppercase text-sm">
+                <i className="fa-solid fa-umbrella-beach me-1 text-amber-400"></i>
+                {isAr ? 'الإجازات' : 'Leave Requests'}
+              </h3>
+              <button
+                onClick={() => setShowLeaveForm(!showLeaveForm)}
+                className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-xs transition-colors"
+              >
+                <i className={`fa-solid ${showLeaveForm ? 'fa-xmark' : 'fa-plus'} me-1`}></i>
+                {showLeaveForm ? (isAr ? 'إلغاء' : 'Cancel') : (isAr ? 'طلب إجازة' : 'Request Leave')}
+              </button>
+            </div>
+
+            {/* Leave Balance */}
+            {leaveBalance && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-blue-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-blue-500 font-bold mb-1">{isAr ? 'سنوية' : 'Annual'}</p>
+                  <p className="text-2xl font-extrabold text-blue-700">{leaveBalance.annual.remaining}</p>
+                  <p className="text-xs text-blue-400">{isAr ? `من ${leaveBalance.annual.quota} يوم` : `of ${leaveBalance.annual.quota} days`}</p>
+                </div>
+                <div className="bg-green-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-green-500 font-bold mb-1">{isAr ? 'مرضية' : 'Sick'}</p>
+                  <p className="text-2xl font-extrabold text-green-700">{leaveBalance.sick.remaining}</p>
+                  <p className="text-xs text-green-400">{isAr ? `من ${leaveBalance.sick.quota} يوم` : `of ${leaveBalance.sick.quota} days`}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Leave Request Form */}
+            {showLeaveForm && (
+              <div className="bg-slate-50 rounded-xl p-4 mb-4 space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">{isAr ? 'نوع الإجازة' : 'Leave Type'}</label>
+                  <select
+                    value={leaveForm.leave_type}
+                    onChange={e => setLeaveForm({ ...leaveForm, leave_type: e.target.value })}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="annual">{isAr ? 'سنوية' : 'Annual'}</option>
+                    <option value="sick">{isAr ? 'مرضية' : 'Sick'}</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 mb-1 block">{isAr ? 'من' : 'From'}</label>
+                    <input
+                      type="date"
+                      value={leaveForm.start_date}
+                      onChange={e => setLeaveForm({ ...leaveForm, start_date: e.target.value })}
+                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 mb-1 block">{isAr ? 'إلى' : 'To'}</label>
+                    <input
+                      type="date"
+                      value={leaveForm.end_date}
+                      onChange={e => setLeaveForm({ ...leaveForm, end_date: e.target.value })}
+                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 mb-1 block">{isAr ? 'السبب (اختياري)' : 'Reason (optional)'}</label>
+                  <textarea
+                    value={leaveForm.reason}
+                    onChange={e => setLeaveForm({ ...leaveForm, reason: e.target.value })}
+                    rows={2}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm resize-none"
+                    placeholder={isAr ? 'سبب الإجازة...' : 'Reason for leave...'}
+                  />
+                </div>
+                <button
+                  onClick={handleLeaveSubmit}
+                  disabled={leaveSaving || !leaveForm.start_date || !leaveForm.end_date}
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-bold text-sm disabled:opacity-50 transition-colors"
+                >
+                  {leaveSaving ? <i className="fa-solid fa-circle-notch fa-spin me-2"></i> : <i className="fa-solid fa-paper-plane me-2"></i>}
+                  {isAr ? 'تقديم الطلب' : 'Submit Request'}
+                </button>
+              </div>
+            )}
+
+            {/* Leave History */}
+            {myLeaves.length > 0 ? (
+              <div className="space-y-3">
+                {myLeaves.map(l => (
+                  <div key={l.id} className="border border-slate-100 rounded-xl p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          l.leaveType === 'annual' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                        }`}>
+                          {l.leaveType === 'annual' ? (isAr ? 'سنوية' : 'Annual') : (isAr ? 'مرضية' : 'Sick')}
+                        </span>
+                        <span className="text-xs text-slate-400">{l.durationDays} {isAr ? 'يوم' : 'days'}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                        l.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        l.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                        l.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        'bg-slate-100 text-slate-500'
+                      }`}>
+                        {l.status === 'pending' ? (isAr ? 'قيد الانتظار' : 'Pending') :
+                         l.status === 'approved' ? (isAr ? 'موافق عليه' : 'Approved') :
+                         l.status === 'rejected' ? (isAr ? 'مرفوض' : 'Rejected') :
+                         (isAr ? 'ملغي' : 'Cancelled')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-600 font-mono">
+                      {new Date(l.startDate).toLocaleDateString()} → {new Date(l.endDate).toLocaleDateString()}
+                    </p>
+                    {l.reason && <p className="text-xs text-slate-400 mt-1">{l.reason}</p>}
+                    {l.rejectionReason && (
+                      <p className="text-xs text-red-500 mt-1"><i className="fa-solid fa-circle-info me-1"></i>{l.rejectionReason}</p>
+                    )}
+                    {l.status === 'pending' && (
+                      <button
+                        onClick={() => handleCancelLeave(l.id)}
+                        className="mt-2 text-xs text-red-500 hover:text-red-700 font-bold"
+                      >
+                        <i className="fa-solid fa-xmark me-1"></i>{isAr ? 'إلغاء الطلب' : 'Cancel Request'}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-slate-300 text-sm py-4">
+                {isAr ? 'لا توجد طلبات إجازة' : 'No leave requests yet'}
+              </p>
             )}
           </div>
         </div>
