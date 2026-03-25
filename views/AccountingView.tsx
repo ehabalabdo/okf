@@ -92,8 +92,11 @@ const AccountingView: React.FC = () => {
   };
 
   const getDateRangeMs = (): { from: number; to: number } => {
-    const from = new Date(dateFrom).getTime();
-    const to = new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1; // end of day
+    // Parse as local time (not UTC) by using T00:00:00 format
+    const [fy, fm, fd] = dateFrom.split('-').map(Number);
+    const [ty, tm, td] = dateTo.split('-').map(Number);
+    const from = new Date(fy, fm - 1, fd, 0, 0, 0, 0).getTime();
+    const to = new Date(ty, tm - 1, td, 23, 59, 59, 999).getTime();
     return { from, to };
   };
 
