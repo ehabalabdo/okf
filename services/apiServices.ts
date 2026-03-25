@@ -152,9 +152,9 @@ function mapUserRow(row: any): User {
     clinicIds,
     clientId: row.clientId || row.client_id || undefined,
     isActive: row.isActive !== undefined ? row.isActive : (row.is_active !== false),
-    createdAt: row.createdAt || (row.created_at ? new Date(row.created_at).getTime() : Date.now()),
+    createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
-    updatedAt: row.updatedAt || (row.updated_at ? new Date(row.updated_at).getTime() : Date.now()),
+    updatedAt: Number(row.updatedAt || row.updated_at) || Date.now(),
     updatedBy: row.updatedBy || row.updated_by || 'system',
     isArchived: row.isArchived || row.is_archived || false
   };
@@ -220,9 +220,9 @@ function mapClinicRow(row: any): Clinic {
     category: (row.category || 'clinic') as ClinicCategory,
     active: row.active !== false,
     clientId: row.clientId || row.client_id || undefined,
-    createdAt: row.createdAt || (row.created_at ? new Date(row.created_at).getTime() : Date.now()),
+    createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
-    updatedAt: row.updatedAt || (row.updated_at ? new Date(row.updated_at).getTime() : Date.now()),
+    updatedAt: Number(row.updatedAt || row.updated_at) || Date.now(),
     updatedBy: row.updatedBy || row.updated_by || 'system',
     isArchived: row.isArchived || row.is_archived || false
   };
@@ -320,9 +320,9 @@ function mapPatientRow(row: any): Patient {
       reasonForVisit: ''
     },
     history: Array.isArray(history) ? history : [],
-    createdAt: row.createdAt || (row.created_at ? new Date(row.created_at).getTime() : Date.now()),
+    createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
-    updatedAt: row.updatedAt || (row.updated_at ? new Date(row.updated_at).getTime() : Date.now()),
+    updatedAt: Number(row.updatedAt || row.updated_at) || Date.now(),
     updatedBy: row.updatedBy || row.updated_by || 'system',
     isArchived: row.isArchived || row.is_archived || false
   };
@@ -502,9 +502,9 @@ function mapInvoiceRow(row: any): any {
     paidAmount: parseFloat(row.paidAmount || row.paid_amount || 0),
     paymentMethod: row.paymentMethod || row.payment_method,
     status: row.status,
-    createdAt: row.createdAt || (row.created_at ? new Date(row.created_at).getTime() : Date.now()),
+    createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
-    updatedAt: row.updatedAt || (row.updated_at ? new Date(row.updated_at).getTime() : Date.now()),
+    updatedAt: Number(row.updatedAt || row.updated_at) || Date.now(),
     updatedBy: row.updatedBy || row.updated_by || 'system',
     isArchived: row.isArchived || row.is_archived || false
   };
