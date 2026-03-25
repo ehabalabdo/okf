@@ -7,7 +7,6 @@ import { api } from '../src/api';
 import type { Invoice } from '../types';
 
 type TabKey = 'overview' | 'invoices' | 'services';
-type DateRange = '7d' | '30d' | '90d' | '365d' | 'all';
 
 const AccountingView: React.FC = () => {
   const { user } = useAuth();
@@ -15,7 +14,12 @@ const AccountingView: React.FC = () => {
   const isRTL = language === 'ar';
 
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [dateRange, setDateRange] = useState<DateRange>('30d');
+  // Date range: default last 30 days
+  const [dateFrom, setDateFrom] = useState(() => {
+    const d = new Date(); d.setDate(d.getDate() - 30);
+    return d.toISOString().split('T')[0];
+  });
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split('T')[0]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -79,19 +83,18 @@ const AccountingView: React.FC = () => {
     } catch (e: any) { alert(e.message); }
   };
 
-  const getDateRangeMs = (range: DateRange): { from: number; to: number } => {
-    const to = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const map: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90, '365d': 365, 'all': 3650 };
-    return { from: to - map[range] * dayMs, to };
+  const getDateRangeMs = (): { from: number; to: number } => {
+    const from = new Date(dateFrom).getTime();
+    const to = new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1; // end of day
+    return { from, to };
   };
 
   const loadData = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const { from, to } = getDateRangeMs(dateRange);
-      const daysNum = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : dateRange === '90d' ? 90 : dateRange === '365d' ? 365 : 3650;
+      const { from, to } = getDateRangeMs();
+      const daysNum = Math.max(1, Math.round((to - from) / (24 * 60 * 60 * 1000)));
 
       const [inv, sum, daily, methods, services] = await Promise.all([
         BillingService.getAll(user),
@@ -113,11 +116,11 @@ const AccountingView: React.FC = () => {
     }
   };
 
-  useEffect(() => { loadData(); }, [dateRange]);
+  useEffect(() => { loadData(); }, [dateFrom, dateTo]);
 
   // Filter invoices
   const filteredInvoices = useMemo(() => {
-    const { from, to } = getDateRangeMs(dateRange);
+    const { from, to } = getDateRangeMs();
     return invoices.filter(inv => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
       if (inv.createdAt < from || inv.createdAt > to) return false;
@@ -127,11 +130,11 @@ const AccountingView: React.FC = () => {
       }
       return true;
     });
-  }, [invoices, statusFilter, searchQuery, dateRange]);
+  }, [invoices, statusFilter, searchQuery, dateFrom, dateTo]);
 
   // Local calculations as fallback
   const localSummary = useMemo(() => {
-    const { from, to } = getDateRangeMs(dateRange);
+    const { from, to } = getDateRangeMs();
     const rangedInvoices = invoices.filter(i => i.createdAt >= from && i.createdAt <= to);
     return {
       total_invoices: rangedInvoices.length,
@@ -142,7 +145,7 @@ const AccountingView: React.FC = () => {
       unpaid_count: rangedInvoices.filter(i => i.status === 'unpaid').length,
       partial_count: rangedInvoices.filter(i => i.status === 'partial').length,
     };
-  }, [invoices, dateRange]);
+  }, [invoices, dateFrom, dateTo]);
 
   const s = summary || localSummary;
 
@@ -151,9 +154,9 @@ const AccountingView: React.FC = () => {
 
   // PDF Export
   const handleExportPDF = useCallback(() => {
-    const { from, to } = getDateRangeMs(dateRange);
+    const { from, to } = getDateRangeMs();
     const rangedInvoices = invoices.filter(i => i.createdAt >= from && i.createdAt <= to);
-    const rangeLabel = dateRange === '7d' ? t('range_7d') : dateRange === '30d' ? t('range_30d') : dateRange === '90d' ? t('range_90d') : dateRange === '365d' ? t('range_365d') : t('range_all');
+    const rangeLabel = `${dateFrom} → ${dateTo}`;
     const fromDate = formatDate(from);
     const toDate = formatDate(to);
     const now = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -292,7 +295,7 @@ tr:nth-child(even) { background: #f8fafc; }
       printWindow.document.close();
       setTimeout(() => { printWindow.print(); }, 500);
     }
-  }, [invoices, dateRange, localSummary]);
+  }, [invoices, dateFrom, dateTo, localSummary]);
 
   const paymentMethodLabel = (m: string) => {
     const map: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), insurance: t('insurance_method') };
@@ -308,13 +311,7 @@ tr:nth-child(even) { background: #f8fafc; }
     { key: 'services', label: t('top_services_tab'), icon: 'fa-ranking-star' },
   ];
 
-  const dateRanges: { key: DateRange; label: string }[] = [
-    { key: '7d', label: t('range_7d') },
-    { key: '30d', label: t('range_30d') },
-    { key: '90d', label: t('range_90d') },
-    { key: '365d', label: t('range_365d') },
-    { key: 'all', label: t('range_all') },
-  ];
+
 
   if (loading) {
     return (
@@ -345,19 +342,14 @@ tr:nth-child(even) { background: #f8fafc; }
             </button>
           ))}
         </div>
-        <div className="flex gap-2 items-center">
-          <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-200">
-            {dateRanges.map(r => (
-              <button
-                key={r.key}
-                onClick={() => setDateRange(r.key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  dateRange === r.key ? 'bg-primary text-white' : 'text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
+        <div className="flex gap-2 items-center flex-wrap">
+          <div className="flex gap-2 items-center bg-white rounded-xl px-3 py-2 border border-slate-200">
+            <i className="fa-solid fa-calendar text-slate-400 text-sm"></i>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+              className="text-sm font-bold text-slate-700 outline-none bg-transparent w-[130px]" />
+            <span className="text-slate-300">→</span>
+            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+              className="text-sm font-bold text-slate-700 outline-none bg-transparent w-[130px]" />
           </div>
           <button
             onClick={handleExportPDF}
