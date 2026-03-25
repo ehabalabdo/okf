@@ -205,7 +205,6 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
 
   // --- Real Chart Data Logic ---
   const calculateChartData = () => {
-      // Last 7 days
       const days: string[] = [];
       const values: number[] = [];
       const dates: Date[] = [];
@@ -219,18 +218,24 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
           const nextD = new Date(d);
           nextD.setDate(d.getDate() + 1);
           
+          const dayStart = d.getTime();
+          const dayEnd = nextD.getTime();
+          
           // Sum paid invoices for this day
           const sum = invoices
-            .filter(inv => inv.status === 'paid' && inv.createdAt >= d.getTime() && inv.createdAt < nextD.getTime())
+            .filter(inv => {
+              if (inv.status !== 'paid') return false;
+              const ts = Number(inv.createdAt) || Number((inv as any).created_at) || 0;
+              return ts >= dayStart && ts < dayEnd;
+            })
             .reduce((acc, curr) => acc + curr.totalAmount, 0);
             
-          days.push(d.toLocaleDateString('en-GB', { weekday: 'short' }));
+          days.push(d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase());
           values.push(sum);
           dates.push(d);
       }
       
-      // Normalize values for CSS height % (max value = 100%)
-      const maxVal = Math.max(...values, 100); // Avoid div by zero, min scale 100
+      const maxVal = Math.max(...values, 100);
       const heights = values.map(v => Math.round((v / maxVal) * 100));
       
       return { days, values, heights, dates };
@@ -552,26 +557,36 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
             </div>
             
             {/* Real Financial Chart */}
-            <div className="bg-slate-900 rounded-[2rem] p-8 mb-8 text-white relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
-                <div className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 items-end h-64">
-                    {chartData.heights.map((h, i) => (
+            <div className="bg-white rounded-[2rem] p-8 mb-8 relative overflow-hidden shadow-soft border border-gray-100">
+                <h3 className="text-sm font-extrabold text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <i className="fa-solid fa-chart-line text-emerald-500"></i> {t('revenue_analytics')}
+                </h3>
+                <div className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-6 items-end h-56">
+                    {chartData.heights.map((h, i) => {
+                        const isToday = i === chartData.days.length - 1;
+                        const hasValue = chartData.values[i] > 0;
+                        return (
                         <div key={i} onClick={() => {
                             const d = chartData.dates[i];
                             const dateStr = d.toISOString().split('T')[0];
                             navigate(`/accounting?from=${dateStr}&to=${dateStr}`);
                         }} className="flex-1 flex flex-col justify-end items-center gap-2 group h-full cursor-pointer">
-                            <div className="text-xs font-bold text-sky-300 opacity-0 group-hover:opacity-100 transition-opacity mb-1">${chartData.values[i]}</div>
-                            <div className="w-full bg-slate-800 rounded-xl relative overflow-hidden h-full flex items-end group-hover:ring-2 group-hover:ring-sky-400 transition-all">
-                                <div className="w-full bg-gradient-to-t from-primary to-sky-400 rounded-t-xl transition-all duration-1000" style={{height: `${h}%`, minHeight: '4px'}}></div>
+                            <div className={`text-xs font-extrabold transition-opacity mb-1 ${hasValue ? 'text-emerald-600 opacity-100' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>
+                                ${chartData.values[i]}
                             </div>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase group-hover:text-sky-400 transition-colors">{chartData.days[i]}</span>
+                            <div className="w-full bg-slate-50 rounded-2xl relative overflow-hidden h-full flex items-end group-hover:ring-2 group-hover:ring-emerald-300 transition-all border border-slate-100">
+                                <div 
+                                    className={`w-full rounded-t-2xl transition-all duration-1000 ${isToday ? 'bg-gradient-to-t from-emerald-500 to-emerald-300' : 'bg-gradient-to-t from-emerald-200 to-emerald-100'}`} 
+                                    style={{height: `${Math.max(h, 3)}%`}}
+                                ></div>
+                            </div>
+                            <span className={`text-[11px] font-bold tracking-wide transition-colors ${isToday ? 'text-emerald-600' : 'text-slate-400 group-hover:text-emerald-500'}`}>
+                                {chartData.days[i]}
+                            </span>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
-                <h3 className="text-lg font-bold mt-6 flex items-center gap-2">
-                    <i className="fa-solid fa-chart-line text-primary"></i> {t('revenue_analytics')}
-                </h3>
             </div>
 
 
