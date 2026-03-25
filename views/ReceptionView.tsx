@@ -738,10 +738,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                  <select className="input-modern" value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value as Gender})}><option value="male">{t('male')}</option><option value="female">{t('female')}</option></select>
                             </div>
                             <input type="tel" placeholder={t('phone')} className="input-modern" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
-                               <i className="fa-solid fa-info-circle mr-2"></i>
-                               <strong>{t('phone_note').split(':')[0]}:</strong> {t('phone_note').split(':').slice(1).join(':')}
-                            </div>
                          </div>
                          <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
                              <select className="input-modern" value={formData.clinicId} onChange={e => setFormData({...formData, clinicId: e.target.value})}>{clinics.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
