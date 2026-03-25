@@ -568,7 +568,7 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                         return (
                         <div key={i} onClick={() => {
                             const d = chartData.dates[i];
-                            const dateStr = d.toISOString().split('T')[0];
+                            const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                             navigate(`/accounting?from=${dateStr}&to=${dateStr}`);
                         }} className="flex-1 flex flex-col justify-end items-center gap-2 group h-full cursor-pointer">
                             <div className={`text-xs font-extrabold transition-opacity mb-1 ${hasValue ? 'text-emerald-600 opacity-100' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>
