@@ -206,8 +206,9 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
   // --- Real Chart Data Logic ---
   const calculateChartData = () => {
       // Last 7 days
-      const days = [];
-      const values = [];
+      const days: string[] = [];
+      const values: number[] = [];
+      const dates: Date[] = [];
       const now = new Date();
       
       for (let i = 6; i >= 0; i--) {
@@ -225,16 +226,25 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
             
           days.push(d.toLocaleDateString('en-GB', { weekday: 'short' }));
           values.push(sum);
+          dates.push(d);
       }
       
       // Normalize values for CSS height % (max value = 100%)
       const maxVal = Math.max(...values, 100); // Avoid div by zero, min scale 100
       const heights = values.map(v => Math.round((v / maxVal) * 100));
       
-      return { days, values, heights };
+      return { days, values, heights, dates };
   };
 
   const chartData = calculateChartData();
+
+  // Day detail modal
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
+  const selectedDayInvoices = selectedDayDate ? invoices.filter(inv => {
+    const start = selectedDayDate.getTime();
+    const end = start + 24 * 60 * 60 * 1000;
+    return inv.createdAt >= start && inv.createdAt < end;
+  }) : [];
 
   // --- Settings Handler ---
   const handleSaveSettings = async (e: React.FormEvent) => {
@@ -554,12 +564,12 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <div className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 items-end h-64">
                     {chartData.heights.map((h, i) => (
-                        <div key={i} className="flex-1 flex flex-col justify-end items-center gap-2 group h-full">
+                        <div key={i} onClick={() => setSelectedDayDate(chartData.dates[i])} className="flex-1 flex flex-col justify-end items-center gap-2 group h-full cursor-pointer">
                             <div className="text-xs font-bold text-sky-300 opacity-0 group-hover:opacity-100 transition-opacity mb-1">${chartData.values[i]}</div>
-                            <div className="w-full bg-slate-800 rounded-xl relative overflow-hidden h-full flex items-end">
+                            <div className="w-full bg-slate-800 rounded-xl relative overflow-hidden h-full flex items-end group-hover:ring-2 group-hover:ring-sky-400 transition-all">
                                 <div className="w-full bg-gradient-to-t from-primary to-sky-400 rounded-t-xl transition-all duration-1000" style={{height: `${h}%`, minHeight: '4px'}}></div>
                             </div>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">{chartData.days[i]}</span>
+                            <span className="text-[10px] font-bold text-slate-500 uppercase group-hover:text-sky-400 transition-colors">{chartData.days[i]}</span>
                         </div>
                     ))}
                 </div>
@@ -567,6 +577,55 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
                     <i className="fa-solid fa-chart-line text-primary"></i> {t('revenue_analytics')}
                 </h3>
             </div>
+
+            {/* Day Detail Modal */}
+            {selectedDayDate && (
+            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm animate-fade-in" onClick={() => setSelectedDayDate(null)}>
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+                    <div className="p-5 bg-slate-900 text-white flex justify-between items-center">
+                        <div>
+                            <h3 className="font-bold text-lg">
+                                <i className="fa-solid fa-calendar-day mr-2 text-sky-400"></i>
+                                {selectedDayDate.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
+                            </h3>
+                            <p className="text-sm text-slate-400">{selectedDayInvoices.length} {t('invoices_tab')} &bull; ${selectedDayInvoices.reduce((s, i) => s + i.totalAmount, 0).toLocaleString()} JOD</p>
+                        </div>
+                        <button onClick={() => setSelectedDayDate(null)} className="text-slate-400 hover:text-white transition"><i className="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div className="overflow-y-auto max-h-[60vh] divide-y divide-slate-100">
+                        {selectedDayInvoices.length === 0 ? (
+                            <div className="p-8 text-center text-slate-400">
+                                <i className="fa-solid fa-inbox text-4xl mb-3"></i>
+                                <p className="font-bold">{t('no_invoices')}</p>
+                            </div>
+                        ) : (
+                            selectedDayInvoices.map(inv => (
+                                <div key={inv.id} className="p-4 hover:bg-slate-50 transition">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-bold text-slate-800">{inv.patientName || '-'}</p>
+                                            <p className="text-xs text-slate-400 mt-0.5">
+                                                {inv.items.map(it => it.description).join(', ')}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-slate-800">${inv.totalAmount.toLocaleString()} JOD</p>
+                                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase mt-1 ${
+                                                inv.status === 'paid' ? 'bg-emerald-100 text-emerald-600' :
+                                                inv.status === 'unpaid' ? 'bg-red-100 text-red-600' :
+                                                'bg-amber-100 text-amber-600'
+                                            }`}>
+                                                {inv.status === 'paid' ? t('paid') : inv.status === 'unpaid' ? t('unpaid') : t('partial_label')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+            )}
 
 
 
