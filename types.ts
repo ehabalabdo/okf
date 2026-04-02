@@ -281,6 +281,9 @@ export interface Invoice extends AuditMetadata {
   totalAmount: number;
   paidAmount: number;
   paymentMethod: 'cash' | 'card' | 'insurance';
+  insuranceCompany?: string;
+  patientShare?: number;
+  patientPayMethod?: 'cash' | 'card';
   status: 'unpaid' | 'paid' | 'partial';
   clientId?: number;
 }

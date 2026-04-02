@@ -869,6 +869,9 @@ export const pgInvoices = {
       totalAmount: parseFloat(row.total_amount),
       paidAmount: parseFloat(row.paid_amount),
       paymentMethod: row.payment_method,
+      insuranceCompany: row.insurance_company || undefined,
+      patientShare: row.patient_share != null ? parseFloat(row.patient_share) : undefined,
+      patientPayMethod: row.patient_pay_method || undefined,
       status: row.status,
       createdAt: new Date(row.created_at || Date.now()).getTime(),
       createdBy: row.created_by || 'system',
@@ -916,6 +919,15 @@ export const pgInvoices = {
     }
     if (data.status !== undefined) {
       await sql`UPDATE invoices SET status = ${data.status} WHERE id = ${id} ${clientFilter}`;
+    }
+    if (data.insuranceCompany !== undefined) {
+      await sql`UPDATE invoices SET insurance_company = ${data.insuranceCompany} WHERE id = ${id} ${clientFilter}`;
+    }
+    if (data.patientShare !== undefined) {
+      await sql`UPDATE invoices SET patient_share = ${data.patientShare} WHERE id = ${id} ${clientFilter}`;
+    }
+    if (data.patientPayMethod !== undefined) {
+      await sql`UPDATE invoices SET patient_pay_method = ${data.patientPayMethod} WHERE id = ${id} ${clientFilter}`;
     }
   },
 

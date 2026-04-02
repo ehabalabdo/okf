@@ -634,7 +634,7 @@ export const BillingService = {
         await mockDb.writeDocument('invoices', updated);
     },
     
-    processPayment: async (user: User, id: string, amount: number, method: Invoice['paymentMethod']) => {
+    processPayment: async (user: User, id: string, amount: number, method: Invoice['paymentMethod'], insuranceData?: { insuranceCompany?: string; patientShare?: number; patientPayMethod?: 'cash' | 'card' }) => {
         if (USE_POSTGRES) {
             const invoices = await pgInvoices.getAll();
             const inv = invoices.find(i => i.id === id);
@@ -646,7 +646,8 @@ export const BillingService = {
             await pgInvoices.update(id, {
                 paidAmount: newPaid,
                 status,
-                paymentMethod: method
+                paymentMethod: method,
+                ...(insuranceData || {})
             });
             return;
         }
@@ -663,6 +664,7 @@ export const BillingService = {
             paidAmount: newPaid, 
             status, 
             paymentMethod: method, 
+            ...(insuranceData || {}),
             ...createMeta(user, inv) 
         };
         await mockDb.writeDocument('invoices', updated);

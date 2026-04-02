@@ -296,7 +296,11 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                   alert(t('payment_split_error'));
                   return;
               }
-              await BillingService.processPayment(user, selectedInvoice.id, patientPay + insurancePay, paymentMethod);
+              await BillingService.processPayment(user, selectedInvoice.id, patientPay + insurancePay, paymentMethod, {
+                  insuranceCompany: insuranceCompanyName.trim(),
+                  patientShare: patientPay,
+                  patientPayMethod: patientPayMethod
+              });
           } else {
               await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
           }

@@ -547,13 +547,14 @@ tr:nth-child(even) { background: #f8fafc; }
                   <th className="px-5 py-3 border-b border-slate-100">{t('paid_col')}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{t('balance_col')}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{t('method_col')}</th>
+                  <th className="px-5 py-3 border-b border-slate-100">{t('insurance_details_col')}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{t('status_col')}</th>
                   <th className="px-5 py-3 border-b border-slate-100">{t('date_col')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredInvoices.length === 0 ? (
-                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{t('no_invoices')}</td></tr>
+                  <tr><td colSpan={9} className="px-5 py-12 text-center text-slate-400">{t('no_invoices')}</td></tr>
                 ) : (
                   filteredInvoices.map(inv => {
                     const balance = inv.totalAmount - inv.paidAmount;
@@ -573,6 +574,17 @@ tr:nth-child(even) { background: #f8fafc; }
                         </td>
                         <td className="px-5 py-3">
                           <span className="text-xs font-bold">{paymentMethodLabel(inv.paymentMethod)}</span>
+                        </td>
+                        <td className="px-5 py-3 text-xs">
+                          {inv.paymentMethod === 'insurance' ? (
+                            <div className="space-y-0.5">
+                              {inv.insuranceCompany && <div className="font-bold text-purple-700">{inv.insuranceCompany}</div>}
+                              {inv.patientShare != null && <div className="text-slate-500">{t('patient_share')}: <span className="font-bold text-slate-700">{formatCurrency(inv.patientShare)}</span></div>}
+                              {inv.patientPayMethod && <div className="text-slate-400">{paymentMethodLabel(inv.patientPayMethod)}</div>}
+                            </div>
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
                         </td>
                         <td className="px-5 py-3">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-tight border ${statusColors[inv.status] || ''}`}>
