@@ -278,7 +278,21 @@ const LandingView: React.FC = () => {
 
         <FloatingParticles color="rgba(232,150,31,0.25)" count={15} />
 
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 px-6 max-w-6xl mx-auto">
+          {/* Doctor Photo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex-shrink-0 order-first md:order-last"
+          >
+            <div className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full overflow-hidden border-2 border-primary/20 shadow-[0_0_60px_rgba(232,150,31,0.15)]">
+              <img src="/doctor.jpg" alt="Dr. Tarek Khrais" className="w-full h-full object-cover" />
+            </div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-t from-[#050a15]/40 via-transparent to-transparent pointer-events-none" />
+          </motion.div>
+
+          <div className="text-center md:text-start">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -358,6 +372,7 @@ const LandingView: React.FC = () => {
               </span>
             </a>
           </motion.div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
