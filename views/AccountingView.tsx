@@ -43,6 +43,7 @@ const AccountingView: React.FC = () => {
 
   // Invoice filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [methodFilter, setMethodFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Invoice edit
@@ -138,6 +139,7 @@ const AccountingView: React.FC = () => {
     const { from, to } = getDateRangeMs();
     return invoices.filter(inv => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
+      if (methodFilter !== 'all' && inv.paymentMethod !== methodFilter) return false;
       if (inv.createdAt < from || inv.createdAt > to) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -145,7 +147,7 @@ const AccountingView: React.FC = () => {
       }
       return true;
     });
-  }, [invoices, statusFilter, searchQuery, dateFrom, dateTo]);
+  }, [invoices, statusFilter, methodFilter, searchQuery, dateFrom, dateTo]);
 
   // Local calculations as fallback
   const localSummary = useMemo(() => {
@@ -521,6 +523,23 @@ tr:nth-child(even) { background: #f8fafc; }
                   }`}
                 >
                   {f.label}
+                </button>
+              ))}
+              <span className="mx-1 border-l border-slate-200 h-6"></span>
+              {[
+                { key: 'all', label: t('all_filter'), icon: 'fa-layer-group' },
+                { key: 'cash', label: t('cash_method'), icon: 'fa-money-bill-wave' },
+                { key: 'card', label: t('card_method'), icon: 'fa-credit-card' },
+                { key: 'insurance', label: t('insurance_method'), icon: 'fa-shield-heart' },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setMethodFilter(f.key)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    methodFilter === f.key ? 'bg-indigo-600 text-white' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <i className={`fa-solid ${f.icon} text-[10px]`}></i>{f.label}
                 </button>
               ))}
             </div>
