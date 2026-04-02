@@ -305,6 +305,10 @@ const translations = {
     amount_distribution: "Amount Distribution",
     patient_share: "Patient Share",
     insurance_share: "Insurance Share",
+    insurance_company_name: "Insurance Company",
+    insurance_company_placeholder: "e.g. Al-Nisr Al-Arabi",
+    insurance_company_required: "Please enter the insurance company name",
+    patient_pay_method: "Patient Share Payment Method",
     total_label: "Total",
 
     // Doctor View
@@ -1940,6 +1944,10 @@ const translations = {
     amount_distribution: "توزيع المبلغ",
     patient_share: "حصة المريض (د.أ)",
     insurance_share: "حصة التأمين (د.أ)",
+    insurance_company_name: "شركة التأمين",
+    insurance_company_placeholder: "مثال: النسر العربي",
+    insurance_company_required: "يرجى إدخال اسم شركة التأمين",
+    patient_pay_method: "طريقة دفع حصة المريض",
     total_label: "المجموع",
 
     // Doctor View

@@ -280,11 +280,16 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance'>('cash');
   const [insurancePatientAmount, setInsurancePatientAmount] = useState('');
   const [insuranceCompanyAmount, setInsuranceCompanyAmount] = useState('');
-
+  const [insuranceCompanyName, setInsuranceCompanyName] = useState('');
+  const [patientPayMethod, setPatientPayMethod] = useState<'cash' | 'card'>('cash');
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
       try {
           if (paymentMethod === 'insurance') {
+              if (!insuranceCompanyName.trim()) {
+                  alert(t('insurance_company_required'));
+                  return;
+              }
               const patientPay = parseFloat(insurancePatientAmount) || 0;
               const insurancePay = parseFloat(insuranceCompanyAmount) || 0;
               if (patientPay + insurancePay !== selectedInvoice.totalAmount) {
@@ -300,6 +305,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
           setPaymentMethod('cash');
           setInsurancePatientAmount('');
           setInsuranceCompanyAmount('');
+          setInsuranceCompanyName('');
+          setPatientPayMethod('cash');
           await loadData();
       } catch (e: any) {
           alert(e.message || t('payment_error'));
@@ -515,6 +522,17 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                         <div className="text-sm font-bold text-blue-700 text-center mb-2">
                                             <i className="fa-solid fa-shield-heart ml-1"></i> {t('amount_distribution')}
                                         </div>
+                                        {/* Insurance Company Name */}
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-600 mb-1">{t('insurance_company_name')}</label>
+                                            <input
+                                                type="text"
+                                                value={insuranceCompanyName}
+                                                onChange={(e) => setInsuranceCompanyName(e.target.value)}
+                                                className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-sm focus:border-blue-500 focus:outline-none"
+                                                placeholder={t('insurance_company_placeholder')}
+                                            />
+                                        </div>
                                         <div className="flex gap-3">
                                             <div className="flex-1">
                                                 <label className="block text-xs font-bold text-slate-600 mb-1">{t('patient_share')}</label>
@@ -549,6 +567,24 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                                 />
                                             </div>
                                         </div>
+                                        {/* Patient Pay Method */}
+                                        {parseFloat(insurancePatientAmount) > 0 && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-600 mb-2">{t('patient_pay_method')}</label>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => setPatientPayMethod('cash')} className={`flex-1 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all border-2 ${
+                                                        patientPayMethod === 'cash' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-500 border-slate-200 hover:border-emerald-400'
+                                                    }`}>
+                                                        <i className="fa-solid fa-money-bill-wave"></i> {t('cash')}
+                                                    </button>
+                                                    <button onClick={() => setPatientPayMethod('card')} className={`flex-1 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all border-2 ${
+                                                        patientPayMethod === 'card' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-400'
+                                                    }`}>
+                                                        <i className="fa-solid fa-credit-card"></i> {t('card')}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                         <div className="text-center text-xs text-slate-500">
                                             {t('total_label')}: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === selectedInvoice.totalAmount ? 'text-emerald-600' : 'text-red-500'}`}>
                                                 {((parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0)).toFixed(2)}
