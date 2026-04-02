@@ -259,6 +259,14 @@ const LandingView: React.FC = () => {
         style={{ opacity: heroOpacity, scale: heroScale }}
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
       >
+        {/* Background Video */}
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
+        >
+          <source src="/bg-video.mp4" type="video/mp4" />
+        </video>
+
         {/* Deep gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,150,31,0.06)_0%,rgba(5,10,21,1)_70%)]" />
         
