@@ -277,7 +277,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
     } catch (e: any) { alert(e.message); }
   };
 
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'insurance' | 'cliq'>('cash');
   const [insurancePatientAmount, setInsurancePatientAmount] = useState('');
   const [insuranceCompanyAmount, setInsuranceCompanyAmount] = useState('');
   const [insuranceCompanyName, setInsuranceCompanyName] = useState('');
@@ -511,7 +511,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                     <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount} {t('rcpt_currency')}</div>
                                 </div>
                                 <div className="flex gap-2 mb-3">
-                                    {([['cash', 'fa-money-bill-wave', t('cash')], ['card', 'fa-credit-card', t('card')], ['insurance', 'fa-shield-heart', t('insurance')]] as const).map(([method, icon, label]) => (
+                                    {([['cash', 'fa-money-bill-wave', t('cash')], ['card', 'fa-credit-card', t('card')], ['cliq', 'fa-bolt', 'CliQ'], ['insurance', 'fa-shield-heart', t('insurance')]] as const).map(([method, icon, label]) => (
                                         <button key={method} onClick={() => setPaymentMethod(method)} className={`flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all border-2 ${
                                             paymentMethod === method
                                                 ? 'bg-primary text-white border-primary shadow-lg scale-105'

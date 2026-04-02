@@ -181,6 +181,7 @@ const AccountingView: React.FC = () => {
 
     const cashTotal = rangedInvoices.filter(i => i.paymentMethod === 'cash').reduce((s, i) => s + i.totalAmount, 0);
     const cardTotal = rangedInvoices.filter(i => i.paymentMethod === 'card').reduce((s, i) => s + i.totalAmount, 0);
+    const cliqTotal = rangedInvoices.filter(i => i.paymentMethod === 'cliq').reduce((s, i) => s + i.totalAmount, 0);
     const insuranceTotal = rangedInvoices.filter(i => i.paymentMethod === 'insurance').reduce((s, i) => s + i.totalAmount, 0);
 
     const html = `<!DOCTYPE html>
@@ -213,7 +214,7 @@ tr:nth-child(even) { background: #f8fafc; }
 .status-paid { color: #10b981; font-weight: 700; }
 .status-unpaid { color: #ef4444; font-weight: 700; }
 .status-partial { color: #f59e0b; font-weight: 700; }
-.method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.method-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
 .method-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center; }
 .method-card .val { font-size: 14px; font-weight: 800; }
 .method-card .lbl { font-size: 9px; color: #94a3b8; }
@@ -257,6 +258,7 @@ tr:nth-child(even) { background: #f8fafc; }
 <div class="method-grid">
   <div class="method-card"><div class="val" style="color:#10b981">${formatCurrency(cashTotal)}</div><div class="lbl">${t('cash_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'cash').length})</div></div>
   <div class="method-card"><div class="val" style="color:#3b82f6">${formatCurrency(cardTotal)}</div><div class="lbl">${t('card_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'card').length})</div></div>
+  <div class="method-card"><div class="val" style="color:#f59e0b">${formatCurrency(cliqTotal)}</div><div class="lbl">CliQ (${rangedInvoices.filter(i => i.paymentMethod === 'cliq').length})</div></div>
   <div class="method-card"><div class="val" style="color:#8b5cf6">${formatCurrency(insuranceTotal)}</div><div class="lbl">${t('insurance_method')} (${rangedInvoices.filter(i => i.paymentMethod === 'insurance').length})</div></div>
 </div>
 
@@ -277,7 +279,7 @@ tr:nth-child(even) { background: #f8fafc; }
   <tbody>
     ${rangedInvoices.sort((a, b) => b.createdAt - a.createdAt).map((inv, idx) => {
       const balance = inv.totalAmount - inv.paidAmount;
-      const methodMap: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), insurance: t('insurance_method') };
+      const methodMap: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), cliq: 'CliQ', insurance: t('insurance_method') };
       const statusMap: Record<string, string> = { paid: t('paid'), unpaid: t('unpaid'), partial: t('partial_label') };
       return `<tr>
         <td>${idx + 1}</td>
@@ -315,7 +317,7 @@ tr:nth-child(even) { background: #f8fafc; }
   }, [invoices, dateFrom, dateTo, localSummary]);
 
   const paymentMethodLabel = (m: string) => {
-    const map: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), insurance: t('insurance_method') };
+    const map: Record<string, string> = { cash: t('cash_method'), card: t('card_method'), cliq: 'CliQ', insurance: t('insurance_method') };
     return map[m] || m;
   };
 
@@ -447,7 +449,7 @@ tr:nth-child(even) { background: #f8fafc; }
                   {paymentMethods.map((m, i) => {
                     const totalAll = paymentMethods.reduce((s, x) => s + parseFloat(x.total || 0), 0);
                     const pct = totalAll > 0 ? (parseFloat(m.total) / totalAll * 100).toFixed(1) : '0';
-                    const colors: Record<string, string> = { cash: 'bg-emerald-500', card: 'bg-blue-500', insurance: 'bg-purple-500' };
+                    const colors: Record<string, string> = { cash: 'bg-emerald-500', card: 'bg-blue-500', cliq: 'bg-amber-500', insurance: 'bg-purple-500' };
                     return (
                       <div key={i}>
                         <div className="flex justify-between items-center mb-1">
@@ -530,6 +532,7 @@ tr:nth-child(even) { background: #f8fafc; }
                 { key: 'all', label: t('all_filter'), icon: 'fa-layer-group' },
                 { key: 'cash', label: t('cash_method'), icon: 'fa-money-bill-wave' },
                 { key: 'card', label: t('card_method'), icon: 'fa-credit-card' },
+                { key: 'cliq', label: 'CliQ', icon: 'fa-bolt' },
                 { key: 'insurance', label: t('insurance_method'), icon: 'fa-shield-heart' },
               ].map(f => (
                 <button

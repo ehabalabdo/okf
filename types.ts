@@ -280,7 +280,7 @@ export interface Invoice extends AuditMetadata {
   items: InvoiceItem[];
   totalAmount: number;
   paidAmount: number;
-  paymentMethod: 'cash' | 'card' | 'insurance';
+  paymentMethod: 'cash' | 'card' | 'insurance' | 'cliq';
   insuranceCompany?: string;
   patientShare?: number;
   patientPayMethod?: 'cash' | 'card';
