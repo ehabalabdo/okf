@@ -315,7 +315,7 @@ function mapPatientRow(row: any): Patient {
       visitId: '',
       clinicId: '',
       date: Date.now(),
-      status: 'waiting' as const,
+      status: '' as any,
       priority: 'normal' as const,
       reasonForVisit: ''
     },

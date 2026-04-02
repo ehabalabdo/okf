@@ -474,12 +474,12 @@ export const pgPatients = {
           notes: row.notes || ''
         },
         currentVisit: currentVisit && Object.keys(currentVisit).length > 0 ? currentVisit : {
-          visitId: `v_${row.id}_${Date.now()}`,
+          visitId: '',
           clinicId: '',
           date: Date.now(),
-          status: 'waiting' as const,
+          status: '' as any,
           priority: 'normal' as const,
-          reasonForVisit: row.notes || ''
+          reasonForVisit: ''
         },
         history: Array.isArray(history) ? history : [],
         createdAt: new Date(row.created_at || Date.now()).getTime(),
@@ -531,7 +531,7 @@ export const pgPatients = {
         currentMedications: { exists: false, details: '' }, isPregnant: false, notes: row.notes || ''
       },
       currentVisit: currentVisit && Object.keys(currentVisit).length > 0 ? currentVisit : {
-        visitId: '', clinicId: '', date: Date.now(), status: 'waiting' as const, priority: 'normal' as const, reasonForVisit: ''
+        visitId: '', clinicId: '', date: Date.now(), status: '' as any, priority: 'normal' as const, reasonForVisit: ''
       },
       history: Array.isArray(history) ? history : [],
       createdAt: new Date(row.created_at || Date.now()).getTime(), createdBy: row.created_by || 'system',
@@ -581,7 +581,7 @@ export const pgPatients = {
         notes: row.notes || ''
       },
       currentVisit: currentVisit && Object.keys(currentVisit).length > 0 ? currentVisit : {
-        visitId: '', clinicId: '', date: Date.now(), status: 'waiting' as const, priority: 'normal' as const, reasonForVisit: ''
+        visitId: '', clinicId: '', date: Date.now(), status: '' as any, priority: 'normal' as const, reasonForVisit: ''
       },
       history: Array.isArray(history) ? history : [],
       createdAt: new Date(row.created_at || Date.now()).getTime(),
