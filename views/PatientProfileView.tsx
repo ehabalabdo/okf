@@ -7,7 +7,6 @@ import { api } from '../src/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Patient, Clinic, UserRole } from '../types';
-import DeviceResultsTimeline from '../components/DeviceResultsTimeline';
 import { fmtDate, fmtDateTime } from '../utils/formatters';
 
 const PatientProfileView: React.FC = () => {
@@ -18,7 +17,7 @@ const PatientProfileView: React.FC = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
-  const [activeTab, setActiveTab] = useState<'basic' | 'timeline' | 'clinical' | 'devices' | 'ent-forms'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'timeline' | 'clinical' | 'ent-forms'>('basic');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -298,7 +297,6 @@ const PatientProfileView: React.FC = () => {
            <TabButton id="basic" label={t('tab_basic')} icon="fa-solid fa-address-card" />
            <TabButton id="timeline" label={t('tab_timeline')} icon="fa-solid fa-clock-rotate-left" />
            <TabButton id="clinical" label={t('tab_clinical')} icon="fa-solid fa-file-medical" />
-           <TabButton id="devices" label={t('pp_tab_devices')} icon="fa-solid fa-microscope" />
            <TabButton id="ent-forms" label={t('pp_tab_ent_forms')} icon="fa-solid fa-stethoscope" />
        </div>
 
@@ -795,13 +793,6 @@ const PatientProfileView: React.FC = () => {
                            </div>
                        </div>
                    )}
-               </div>
-           )}
-
-           {/* TAB 4: DEVICE RESULTS */}
-           {activeTab === 'devices' && (
-               <div className="animate-fade-in">
-                   <DeviceResultsTimeline patientId={patient.id} />
                </div>
            )}
 

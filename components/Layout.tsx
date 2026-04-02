@@ -17,7 +17,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra }) => {
   const { user, logout } = useAuth();
   const clientCtx = useClientSafe();
-  const features = clientCtx?.client?.enabledFeatures || { device_results: false };
+  const features = clientCtx?.client?.enabledFeatures || {};
   const { language, toggleLanguage, t } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
@@ -67,8 +67,6 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
   // Clinical Views: Admin, Doctor, Secretary
   const showClinicalViews = true; 
 
-  // Device results visibility — Admin always sees + management, others only if enabled
-  const showDeviceResults = role === UserRole.ADMIN || (features.device_results && (role === UserRole.SECRETARY || role === UserRole.DOCTOR));
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden">
@@ -100,8 +98,6 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
                {role === UserRole.DOCTOR && <NavItem to="/doctor" icon="fa-solid fa-user-doctor" label={t('doctor_console')} />}
                {role !== UserRole.TECHNICIAN && <NavItem to="/appointments" icon="fa-regular fa-calendar-check" label={t('appointments_nav')} />}
                {role !== UserRole.TECHNICIAN && <NavItem to="/patients" icon="fa-solid fa-users-viewfinder" label={t('patients_registry')} />}
-               {showDeviceResults && <NavItem to="/device-results" icon="fa-solid fa-microscope" label={t('device_results_nav')} />}
-               {role === UserRole.ADMIN && <NavItem to="/device-management" icon="fa-solid fa-microchip" label={t('device_mgmt_nav')} />}
                {(role === UserRole.ADMIN || role === UserRole.DOCTOR) && <NavItem to="/clinic-history" icon="fa-solid fa-chart-line" label={t('clinic_history_nav')} />}
              </>
            )}

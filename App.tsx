@@ -18,8 +18,6 @@ import AppointmentsView from './views/AppointmentsView';
 import PatientLoginView from './views/PatientLoginView';
 import PatientDashboardView from './views/PatientDashboardView';
 import ClinicHistoryView from './views/ClinicHistoryView';
-import DeviceResultsView from './views/DeviceResultsView';
-import DeviceManagementView from './views/DeviceManagementView';
 import SuperAdminView from './views/SuperAdminView';
 import LandingView from './views/LandingView';
 import HrEmployeesView from './views/HrEmployeesView';
@@ -198,8 +196,6 @@ const AppRoutes: React.FC = () => {
           <Route path="/patients/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientProfileView /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AppointmentsView /></ProtectedRoute>} />
           <Route path="/clinic-history" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DOCTOR]}><ClinicHistoryView /></ProtectedRoute>} />
-          <Route path="/device-results" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><DeviceResultsView /></ProtectedRoute>} />
-          <Route path="/device-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><DeviceManagementView /></ProtectedRoute>} />
           <Route path="/catalog" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><CatalogView /></ProtectedRoute>} />
           <Route path="/accounting" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AccountingView /></ProtectedRoute>} />
           <Route path="/queue-display" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY]}><QueueDisplayView /></ProtectedRoute>} />

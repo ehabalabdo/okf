@@ -1,5 +1,5 @@
 import { api } from '../src/api';
-import { User, Patient, Clinic, Appointment, ClinicCategory, Client, SuperAdmin, Device, DeviceResult, DeviceResultStatus } from '../types';
+import { User, Patient, Clinic, Appointment, ClinicCategory, Client, SuperAdmin } from '../types';
 import { getCurrentClientId } from '../context/ClientContext';
 
 /**
@@ -44,7 +44,7 @@ function mapClientRow(row: any): Client {
     createdAt: row.createdAt || row.created_at,
     updatedAt: row.updatedAt || row.updated_at,
     isActive: row.isActive !== undefined ? row.isActive : row.is_active,
-    enabledFeatures: row.enabledFeatures || row.enabled_features || { dental_lab: false, implant_company: false, academy: false, device_results: false }
+    enabledFeatures: row.enabledFeatures || row.enabled_features || { dental_lab: false, implant_company: false, academy: false }
   };
 }
 
@@ -542,166 +542,6 @@ export const pgInvoices = {
 
   delete: async (id: string): Promise<void> => {
     await api.del(`/invoices/${id}`);
-  }
-};
-
-// ==================== DEVICES ====================
-
-function mapDeviceRow(row: any): Device {
-  return {
-    id: row.id,
-    clientId: row.clientId || row.client_id,
-    clinicId: String(row.clinicId || row.clinic_id),
-    name: row.name,
-    type: row.type,
-    connectionType: row.connectionType || row.connection_type,
-    ipAddress: row.ipAddress || row.ip_address || undefined,
-    port: row.port || undefined,
-    comPort: row.comPort || row.com_port || undefined,
-    baudRate: row.baudRate || row.baud_rate || undefined,
-    config: row.config || {},
-    isActive: row.isActive !== undefined ? row.isActive : row.is_active,
-    lastSeenAt: (row.lastSeenAt || row.last_seen_at) ? new Date(row.lastSeenAt || row.last_seen_at).toISOString() : undefined,
-    createdAt: (row.createdAt || row.created_at) ? new Date(row.createdAt || row.created_at).toISOString() : new Date().toISOString(),
-    updatedAt: (row.updatedAt || row.updated_at) ? new Date(row.updatedAt || row.updated_at).toISOString() : new Date().toISOString()
-  };
-}
-
-export const pgDevices = {
-  getAll: async (clientId?: number): Promise<Device[]> => {
-    const result = await api.get('/devices');
-    return (result || []).map(mapDeviceRow);
-  },
-
-  getByClinic: async (clinicId: string, clientId?: number): Promise<Device[]> => {
-    const result = await api.get(`/devices?clinicId=${clinicId}`);
-    return (result || []).map(mapDeviceRow);
-  },
-
-  create: async (data: Omit<Device, 'id' | 'createdAt' | 'updatedAt' | 'lastSeenAt'>): Promise<string> => {
-    const result = await api.post('/devices', {
-      clinic_id: parseInt(data.clinicId) || 0,
-      name: data.name,
-      type: data.type,
-      connection_type: data.connectionType,
-      ip_address: data.ipAddress || null,
-      port: data.port || null,
-      com_port: data.comPort || null,
-      baud_rate: data.baudRate || null,
-      config: data.config || {},
-      is_active: data.isActive
-    });
-    return result.id || result;
-  },
-
-  update: async (id: string, data: Partial<Device>): Promise<void> => {
-    const body: any = {};
-    if (data.name !== undefined) body.name = data.name;
-    if (data.type !== undefined) body.type = data.type;
-    if (data.connectionType !== undefined) body.connection_type = data.connectionType;
-    if (data.ipAddress !== undefined) body.ip_address = data.ipAddress;
-    if (data.port !== undefined) body.port = data.port;
-    if (data.comPort !== undefined) body.com_port = data.comPort;
-    if (data.isActive !== undefined) body.is_active = data.isActive;
-    await api.put(`/devices/${id}`, body);
-  },
-
-  updateLastSeen: async (id: string): Promise<void> => {
-    await api.put(`/devices/${id}/last-seen`, {});
-  },
-
-  delete: async (id: string): Promise<void> => {
-    await api.del(`/devices/${id}`);
-  }
-};
-
-// ==================== DEVICE RESULTS ====================
-
-function mapDeviceResultRow(row: any): DeviceResult {
-  return {
-    id: row.id,
-    clientId: row.clientId || row.client_id,
-    deviceId: row.deviceId || row.device_id,
-    deviceName: row.deviceName || row.device_name || undefined,
-    deviceType: row.deviceType || row.device_type || undefined,
-    patientIdentifier: row.patientIdentifier || row.patient_identifier,
-    testCode: row.testCode || row.test_code,
-    testName: row.testName || row.test_name || undefined,
-    value: row.value,
-    unit: row.unit || undefined,
-    referenceRange: row.referenceRange || row.reference_range || undefined,
-    isAbnormal: row.isAbnormal || row.is_abnormal || false,
-    rawMessage: row.rawMessage || row.raw_message || undefined,
-    status: row.status,
-    matchedPatientId: (row.matchedPatientId || row.matched_patient_id) ? String(row.matchedPatientId || row.matched_patient_id) : undefined,
-    matchedPatientName: row.matchedPatientName || row.matched_patient_name || row.patient_name || undefined,
-    matchedAt: (row.matchedAt || row.matched_at) ? new Date(row.matchedAt || row.matched_at).toISOString() : undefined,
-    matchedBy: row.matchedBy || row.matched_by || undefined,
-    errorMessage: row.errorMessage || row.error_message || undefined,
-    createdAt: (row.createdAt || row.created_at) ? new Date(row.createdAt || row.created_at).toISOString() : new Date().toISOString()
-  };
-}
-
-export const pgDeviceResults = {
-  insert: async (clientId: number, data: {
-    deviceId: string;
-    patientIdentifier: string;
-    testCode: string;
-    testName?: string;
-    value: string;
-    unit?: string;
-    referenceRange?: string;
-    isAbnormal?: boolean;
-    rawMessage?: string;
-  }): Promise<{ id: string; status: DeviceResultStatus; matchedPatientId: number | null }> => {
-    const result = await api.post('/device-results', {
-      device_id: data.deviceId,
-      patient_identifier: data.patientIdentifier,
-      test_code: data.testCode,
-      test_name: data.testName || null,
-      value: data.value,
-      unit: data.unit || null,
-      reference_range: data.referenceRange || null,
-      is_abnormal: data.isAbnormal || false,
-      raw_message: data.rawMessage || null
-    });
-    return {
-      id: result.id,
-      status: result.status || 'pending',
-      matchedPatientId: result.matchedPatientId || result.matched_patient_id || null
-    };
-  },
-
-  getPending: async (clientId: number): Promise<DeviceResult[]> => {
-    const result = await api.get('/device-results?status=pending');
-    return (result || []).map(mapDeviceResultRow);
-  },
-
-  getAll: async (clientId: number, statusFilter?: DeviceResultStatus): Promise<DeviceResult[]> => {
-    const query = statusFilter ? `/device-results?status=${statusFilter}` : '/device-results';
-    const result = await api.get(query);
-    return (result || []).map(mapDeviceResultRow);
-  },
-
-  getByPatientId: async (patientId: string, clientId?: number): Promise<DeviceResult[]> => {
-    const result = await api.get(`/device-results?patientId=${patientId}`);
-    return (result || []).map(mapDeviceResultRow);
-  },
-
-  manualMatch: async (resultId: string, patientId: string, matchedBy: string): Promise<void> => {
-    await api.put(`/device-results/${resultId}/match`, {
-      patient_id: patientId,
-      matched_by: matchedBy
-    });
-  },
-
-  reject: async (resultId: string): Promise<void> => {
-    await api.put(`/device-results/${resultId}/reject`, {});
-  },
-
-  getPendingCount: async (clientId: number): Promise<number> => {
-    const result = await api.get('/device-results/pending-count');
-    return result?.count || 0;
   }
 };
 
