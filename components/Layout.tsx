@@ -30,6 +30,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
       case UserRole.DOCTOR: return 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
       case UserRole.SECRETARY: return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
       case UserRole.TECHNICIAN: return 'bg-sky-500/20 text-sky-300 border border-sky-500/30';
+      case UserRole.ACCOUNTANT: return 'bg-teal-500/20 text-teal-300 border border-teal-500/30';
+      case UserRole.SENIOR_ACCOUNTANT: return 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
 
       default: return 'bg-gray-100';
     }
@@ -91,6 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra 
            {role === UserRole.ADMIN && <NavItem to="/admin" icon="fa-solid fa-shield-halved" label={t('admin_dashboard')} />}
            {role === UserRole.SECRETARY && <NavItem to="/reception" icon="fa-solid fa-clipboard-user" label={t('reception_desk')} />}
            {role === UserRole.TECHNICIAN && <NavItem to="/technician" icon="fa-solid fa-ear-listen" label={t('technician_title')} />}
+           {(role === UserRole.ACCOUNTANT || role === UserRole.SENIOR_ACCOUNTANT) && <NavItem to="/accountant" icon="fa-solid fa-calculator" label="المحاسبة" />}
            
            {/* Clinical Views (Hidden for Dept Staff & Technician) */}
            {showClinicalViews && (

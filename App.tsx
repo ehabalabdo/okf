@@ -34,6 +34,7 @@ import AudiogramFormView from './views/AudiogramFormView';
 import BalanceAssessmentFormView from './views/BalanceAssessmentFormView';
 import ReferralFormView from './views/ReferralFormView';
 import TechnicianView from './views/TechnicianView';
+import AccountantView from './views/AccountantView';
 // HrLoginView removed — HR login integrated into main LoginView
 import DevModeSwitcher from './components/DevModeSwitcher';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -135,6 +136,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     if (user.role === UserRole.SECRETARY) return <RedirectHandler to="/reception" />;
     if (user.role === UserRole.DOCTOR) return <RedirectHandler to="/doctor" />;
     if (user.role === UserRole.TECHNICIAN) return <RedirectHandler to="/technician" />;
+    if (user.role === UserRole.ACCOUNTANT || user.role === UserRole.SENIOR_ACCOUNTANT) return <RedirectHandler to="/accountant" />;
     return <RedirectHandler to="/login" />;
   }
 
@@ -159,6 +161,7 @@ const getHomeRoute = (user: User): string => {
   if (user.role === UserRole.ADMIN) return '/admin';
   if (user.role === UserRole.SECRETARY) return '/reception';
   if (user.role === UserRole.DOCTOR) return '/doctor';
+  if (user.role === UserRole.ACCOUNTANT || user.role === UserRole.SENIOR_ACCOUNTANT) return '/accountant';
   return '/login';
 };
 
@@ -192,6 +195,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/reception" element={<ProtectedRoute allowedRoles={[UserRole.SECRETARY]}><ReceptionView /></ProtectedRoute>} />
           <Route path="/doctor" element={<ProtectedRoute allowedRoles={[UserRole.DOCTOR]}><DoctorView /></ProtectedRoute>} />
           <Route path="/technician" element={<ProtectedRoute allowedRoles={[UserRole.TECHNICIAN]}><TechnicianView /></ProtectedRoute>} />
+          <Route path="/accountant" element={<ProtectedRoute allowedRoles={[UserRole.ACCOUNTANT, UserRole.SENIOR_ACCOUNTANT]}><AccountantView /></ProtectedRoute>} />
           <Route path="/patients" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientsRegistryView /></ProtectedRoute>} />
           <Route path="/patients/:id" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><PatientProfileView /></ProtectedRoute>} />
           <Route path="/appointments" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SECRETARY, UserRole.DOCTOR]}><AppointmentsView /></ProtectedRoute>} />

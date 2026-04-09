@@ -282,9 +282,21 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   const [insuranceCompanyAmount, setInsuranceCompanyAmount] = useState('');
   const [insuranceCompanyName, setInsuranceCompanyName] = useState('');
   const [patientPayMethod, setPatientPayMethod] = useState<'cash' | 'card'>('cash');
+  const [manualAmount, setManualAmount] = useState('');
+
   const handlePayInvoice = async (amount: number) => {
       if(!user || !selectedInvoice) return;
       try {
+          // First update the invoice with the manual amount entered by secretary
+          const enteredAmount = parseFloat(manualAmount) || selectedInvoice.totalAmount;
+          if (enteredAmount > 0 && selectedInvoice.totalAmount === 0) {
+              await BillingService.update(user, selectedInvoice.id, {
+                  items: [{ id: 'manual', description: 'Medical Consultation', price: enteredAmount }],
+                  totalAmount: enteredAmount
+              });
+          }
+          const finalAmount = enteredAmount > 0 ? enteredAmount : selectedInvoice.totalAmount;
+
           if (paymentMethod === 'insurance') {
               if (!insuranceCompanyName.trim()) {
                   alert(t('insurance_company_required'));
@@ -292,7 +304,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
               }
               const patientPay = parseFloat(insurancePatientAmount) || 0;
               const insurancePay = parseFloat(insuranceCompanyAmount) || 0;
-              if (patientPay + insurancePay !== selectedInvoice.totalAmount) {
+              if (patientPay + insurancePay !== finalAmount) {
                   alert(t('payment_split_error'));
                   return;
               }
@@ -302,7 +314,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                   patientPayMethod: patientPayMethod
               });
           } else {
-              await BillingService.processPayment(user, selectedInvoice.id, amount, paymentMethod);
+              await BillingService.processPayment(user, selectedInvoice.id, finalAmount, paymentMethod);
           }
           setShowBillingModal(false);
           setSelectedInvoice(null);
@@ -311,6 +323,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
           setInsuranceCompanyAmount('');
           setInsuranceCompanyName('');
           setPatientPayMethod('cash');
+          setManualAmount('');
           await loadData();
       } catch (e: any) {
           alert(e.message || t('payment_error'));
@@ -327,12 +340,15 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
       const clinicAddress = client?.address || '';
       const invoiceDate = fmtDate(selectedInvoice.createdAt);
       
-      const itemsHtml = selectedInvoice.items.map(item => `
+      const itemsHtml = selectedInvoice.items.length > 0 ? selectedInvoice.items.map(item => `
         <tr>
           <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155">${item.description}</td>
           <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#334155;text-align:left;white-space:nowrap">${item.price.toFixed(2)} ${t('rcpt_currency')}</td>
         </tr>
-      `).join('');
+      `).join('') : `<tr>
+          <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;color:#334155">Medical Consultation</td>
+          <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#334155;text-align:left;white-space:nowrap">${selectedInvoice.totalAmount.toFixed(2)} ${t('rcpt_currency')}</td>
+        </tr>`;
 
       const printHtml = `<!DOCTYPE html>
 <html lang="${language}" dir="${language === 'ar' ? 'rtl' : 'ltr'}">
@@ -499,16 +515,32 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                     </button>
                                     
                                     <div className="text-sm font-bold text-primary mt-1 mb-2 text-xl">{selectedInvoice.patientName}</div>
-                                    <div className="bg-slate-50 p-4 rounded-xl text-left space-y-2 mb-4">
-                                        {selectedInvoice.items.map((item, idx) => (
-                                            <div key={idx} className="flex justify-between text-sm text-slate-600 border-b border-slate-200 pb-1 last:border-0 last:pb-0">
-                                                <span>{item.description}</span>
-                                                <span className="font-mono font-bold">{item.price} {t('rcpt_currency')}</span>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    {selectedInvoice.totalAmount === 0 ? (
+                                        <div className="bg-slate-50 p-4 rounded-xl mb-4">
+                                            <label className="block text-xs font-bold text-slate-600 mb-2">أدخل المبلغ</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                value={manualAmount}
+                                                onChange={(e) => setManualAmount(e.target.value)}
+                                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-center font-bold text-2xl focus:border-primary focus:outline-none"
+                                                placeholder="0.00"
+                                                autoFocus
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="bg-slate-50 p-4 rounded-xl text-left space-y-2 mb-4">
+                                            {selectedInvoice.items.map((item, idx) => (
+                                                <div key={idx} className="flex justify-between text-sm text-slate-600 border-b border-slate-200 pb-1 last:border-0 last:pb-0">
+                                                    <span>{item.description}</span>
+                                                    <span className="font-mono font-bold">{item.price} {t('rcpt_currency')}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                     <div className="text-sm text-slate-400 uppercase">{t('total_due')}</div>
-                                    <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount} {t('rcpt_currency')}</div>
+                                    <div className="text-4xl font-bold text-slate-800">{selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount} {t('rcpt_currency')}</div>
                                 </div>
                                 <div className="flex gap-2 mb-3">
                                     {([['cash', 'fa-money-bill-wave', t('cash')], ['card', 'fa-credit-card', t('card')], ['cliq', 'fa-bolt', 'CliQ'], ['insurance', 'fa-shield-heart', t('insurance')]] as const).map(([method, icon, label]) => (
@@ -548,7 +580,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                                     onChange={(e) => {
                                                         setInsurancePatientAmount(e.target.value);
                                                         const patVal = parseFloat(e.target.value) || 0;
-                                                        setInsuranceCompanyAmount((selectedInvoice.totalAmount - patVal).toFixed(2));
+                                                        const effectiveTotal = selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount;
+                                                        setInsuranceCompanyAmount((effectiveTotal - patVal).toFixed(2));
                                                     }}
                                                     className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-center font-bold text-lg focus:border-blue-500 focus:outline-none"
                                                     placeholder="0.00"
@@ -564,7 +597,8 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                                     onChange={(e) => {
                                                         setInsuranceCompanyAmount(e.target.value);
                                                         const insVal = parseFloat(e.target.value) || 0;
-                                                        setInsurancePatientAmount((selectedInvoice.totalAmount - insVal).toFixed(2));
+                                                        const effectiveTotal = selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount;
+                                                        setInsurancePatientAmount((effectiveTotal - insVal).toFixed(2));
                                                     }}
                                                     className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-center font-bold text-lg focus:border-blue-500 focus:outline-none"
                                                     placeholder="0.00"
@@ -590,13 +624,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                             </div>
                                         )}
                                         <div className="text-center text-xs text-slate-500">
-                                            {t('total_label')}: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === selectedInvoice.totalAmount ? 'text-emerald-600' : 'text-red-500'}`}>
+                                            {t('total_label')}: <span className={`font-bold ${(parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0) === (selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount) ? 'text-emerald-600' : 'text-red-500'}`}>
                                                 {((parseFloat(insurancePatientAmount) || 0) + (parseFloat(insuranceCompanyAmount) || 0)).toFixed(2)}
-                                            </span> / {selectedInvoice.totalAmount.toFixed(2)} {t('rcpt_currency')}
+                                            </span> / {(selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount).toFixed(2)} {t('rcpt_currency')}
                                         </div>
                                     </div>
                                 )}
-                                <button onClick={() => handlePayInvoice(selectedInvoice.totalAmount)} className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-lg">
+                                <button onClick={() => handlePayInvoice(selectedInvoice.totalAmount === 0 ? (parseFloat(manualAmount) || 0) : selectedInvoice.totalAmount)} disabled={selectedInvoice.totalAmount === 0 && (!manualAmount || parseFloat(manualAmount) <= 0)} className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
                                     <i className="fa-solid fa-check-circle mr-2"></i> {t('confirm_payment')}
                                 </button>
                                 <button onClick={() => setSelectedInvoice(null)} className="w-full text-slate-400 text-sm hover:text-slate-600">{t('back_to_list')}</button>
@@ -606,13 +640,13 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                                 {invoices.length === 0 ? <div className="text-center py-10 text-slate-400">{t('no_pending_invoices')}</div> : invoices.map(inv => (
                                     <div key={inv.id}
                                         className="flex justify-between items-center p-4 border border-slate-100 rounded-xl hover:border-primary cursor-pointer transition-colors select-none"
-                                        onClick={() => setSelectedInvoice(inv)}
+                                        onClick={() => { setSelectedInvoice(inv); setManualAmount(''); }}
                                     >
                                         <div>
                                             <div className="font-bold text-slate-800">{inv.patientName}</div>
-                                            <div className="text-xs text-slate-500">{fmtDate(inv.createdAt)} • {inv.items.length} items</div>
+                                            <div className="text-xs text-slate-500">{fmtDate(inv.createdAt)}</div>
                                         </div>
-                                        <div className="font-bold text-lg text-emerald-600">{inv.totalAmount} {t('rcpt_currency')}</div>
+                                        <div className={`font-bold text-lg ${inv.totalAmount === 0 ? 'text-amber-500' : 'text-emerald-600'}`}>{inv.totalAmount === 0 ? 'أدخل السعر' : `${inv.totalAmount} ${t('rcpt_currency')}`}</div>
                                     </div>
                                 ))}
                             </div>

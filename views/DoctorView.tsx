@@ -5,12 +5,12 @@ import { ClinicService, PatientService, AppointmentService, SettingsService } fr
 import { api } from '../src/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Patient, VisitData, Appointment, Gender, Priority, PrescriptionItem, Attachment, InvoiceItem, VitalSigns, LabOrder, ImagingOrder, CatalogService, CatalogMedication } from '../types';
-import { pgCatalogServices, pgCatalogMedications } from '../services/apiServices';
+import { Patient, VisitData, Appointment, Gender, Priority, PrescriptionItem, Attachment, VitalSigns, LabOrder, ImagingOrder, CatalogMedication } from '../types';
+import { pgCatalogMedications } from '../services/apiServices';
 import { fmtDate } from '../utils/formatters';
 
 // ===================== SOAP TAB TYPES =====================
-type SoapTab = 'chief' | 'history' | 'exam' | 'assessment' | 'plan' | 'billing' | 'ent-forms';
+type SoapTab = 'chief' | 'history' | 'exam' | 'assessment' | 'plan' | 'ent-forms';
 
 const DoctorView: React.FC = () => {
   const { user } = useAuth();
@@ -53,10 +53,6 @@ const DoctorView: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [prescriptions, setPrescriptions] = useState<PrescriptionItem[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  
-  // Billing State
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
-  const [selectedService, setSelectedService] = useState('Consultation');
 
   // Prescription Input State
   const [newRx, setNewRx] = useState({ name: '', dose: '', freq: '', dur: '' });
@@ -64,13 +60,7 @@ const DoctorView: React.FC = () => {
   const [rxDropdownOpen, setRxDropdownOpen] = useState(false);
 
   // Catalog data (loaded once)
-  const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
   const [catalogMedications, setCatalogMedications] = useState<CatalogMedication[]>([]);
-
-  // Billing custom service
-  const [customServiceName, setCustomServiceName] = useState('');
-  const [customServicePrice, setCustomServicePrice] = useState('');
-  const [serviceMode, setServiceMode] = useState<'catalog' | 'custom'>('catalog');
 
   // Lab & Imaging Input State
   const [newLab, setNewLab] = useState({ testName: '', notes: '' });
@@ -199,11 +189,7 @@ const DoctorView: React.FC = () => {
     // Load catalog data for dropdowns
     const loadCatalog = async () => {
       try {
-        const [svcs, meds] = await Promise.all([
-          pgCatalogServices.getAll(),
-          pgCatalogMedications.getAll()
-        ]);
-        setCatalogServices(svcs.filter((s: CatalogService) => s.active));
+        const meds = await pgCatalogMedications.getAll();
         setCatalogMedications(meds.filter((m: CatalogMedication) => m.active));
       } catch (e) { console.warn('Catalog load failed, using manual entry only:', e); }
     };
@@ -237,13 +223,6 @@ const DoctorView: React.FC = () => {
         setNotes(v.doctorNotes || '');
         setPrescriptions(v.prescriptions || []);
         setAttachments(v.attachments || []);
-        
-        // Initialize billing with a default consultation if empty
-        if (!v.invoiceItems || v.invoiceItems.length === 0) {
-            setInvoiceItems([{ id: Date.now().toString(), description: 'Consultation', price: 50 }]);
-        } else {
-            setInvoiceItems(v.invoiceItems);
-        }
         
         setActiveTab('chief');
         if (window.innerWidth < 1024) setMobileTab('emr');
@@ -303,7 +282,6 @@ const DoctorView: React.FC = () => {
             doctorNotes: notes,
             prescriptions,
             attachments,
-            invoiceItems
         });
         
         // CRITICAL: Force immediate refresh from database
@@ -421,35 +399,6 @@ const DoctorView: React.FC = () => {
       setPrescriptions(prescriptions.filter(p => p.id !== id));
   };
 
-  const addService = () => {
-      // Look up price from catalog first
-      const catalogMatch = catalogServices.find(s => s.serviceName === selectedService);
-      let price = catalogMatch ? Number(catalogMatch.price) : 0;
-      
-      // Fallback to hardcoded defaults if no catalog
-      if (!price) {
-        switch(selectedService) {
-            case 'Consultation': price = 50; break;
-            case 'Follow-up': price = 25; break;
-            case 'Ultrasound': price = 80; break;
-            case 'Lab Test (Basic)': price = 40; break;
-            case 'X-Ray': price = 60; break;
-            case 'Minor Surgery': price = 150; break;
-            default: price = 0;
-        }
-      }
-      const newItem: InvoiceItem = {
-          id: Date.now().toString(),
-          description: selectedService,
-          price: price
-      };
-      setInvoiceItems([...invoiceItems, newItem]);
-  };
-
-  const removeService = (id: string) => {
-      setInvoiceItems(invoiceItems.filter(i => i.id !== id));
-  };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
           const file = e.target.files[0];
@@ -477,7 +426,7 @@ const DoctorView: React.FC = () => {
     setFamilyHistory(''); setSocialHistory(''); setGeneralExamination('');
     setSystemicExamination(''); setVitalSigns({}); setPreliminaryDiagnosis('');
     setDifferentialDiagnosis(''); setLabOrders([]); setImagingOrders([]);
-    setDiagnosis(''); setNotes(''); setPrescriptions([]); setAttachments([]); setInvoiceItems([]);
+    setDiagnosis(''); setNotes(''); setPrescriptions([]); setAttachments([]);
   };
 
   // ===================== LAB ORDERS =====================
@@ -555,7 +504,6 @@ const DoctorView: React.FC = () => {
     { key: 'exam', label: t('examination'), icon: 'fa-stethoscope', color: 'bg-amber-600' },
     { key: 'assessment', label: t('assessment'), icon: 'fa-diagnoses', color: 'bg-purple-600' },
     { key: 'plan', label: t('plan_orders'), icon: 'fa-clipboard-list', color: 'bg-amber-600' },
-    { key: 'billing', label: t('billing_tab'), icon: 'fa-file-invoice-dollar', color: 'bg-emerald-600' },
   ];
 
   return (
@@ -1068,82 +1016,6 @@ const DoctorView: React.FC = () => {
                               </div>
                             ))}
                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ============ TAB 6: BILLING ============ */}
-                    {activeTab === 'billing' && (
-                      <div className="space-y-5 animate-fadeIn">
-                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <i className="fa-solid fa-file-invoice-dollar text-emerald-500"></i> {t('services_billing')}
-                        </h3>
-                        <div className="bg-emerald-50/50 rounded-xl border border-emerald-100 p-4">
-                          {/* Mode toggle */}
-                          <div className="flex gap-2 mb-3">
-                            <button 
-                              onClick={() => setServiceMode('catalog')} 
-                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${serviceMode === 'catalog' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 border'}`}
-                            >
-                              <i className="fa-solid fa-list mr-1"></i> {t('from_catalog')}
-                            </button>
-                            <button 
-                              onClick={() => setServiceMode('custom')} 
-                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${serviceMode === 'custom' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 border'}`}
-                            >
-                              <i className="fa-solid fa-pen mr-1"></i> {t('custom_entry')}
-                            </button>
-                          </div>
-
-                          {serviceMode === 'catalog' ? (
-                            <div className="flex gap-2 mb-3">
-                              <select className="flex-1 p-2 rounded-lg border text-sm bg-white" value={selectedService} onChange={e => setSelectedService(e.target.value)}>
-                                {catalogServices.length > 0 ? (
-                                  catalogServices.map(s => (
-                                    <option key={s.id} value={s.serviceName}>{s.serviceName} ({s.price} {s.currency})</option>
-                                  ))
-                                ) : (
-                                  <>
-                                    <option value="Consultation">General Consultation (50 JOD)</option>
-                                    <option value="Follow-up">Follow-up Visit (25 JOD)</option>
-                                    <option value="Ultrasound">Ultrasound (80 JOD)</option>
-                                    <option value="Lab Test (Basic)">Lab Test - Basic (40 JOD)</option>
-                                    <option value="X-Ray">X-Ray (60 JOD)</option>
-                                    <option value="Minor Surgery">Minor Surgery (150 JOD)</option>
-                                  </>
-                                )}
-                              </select>
-                              <button onClick={addService} className="bg-emerald-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-emerald-700">Add</button>
-                            </div>
-                          ) : (
-                            <div className="flex gap-2 mb-3">
-                              <input className="flex-1 p-2 rounded-lg border text-sm" placeholder={t('service_name_placeholder')} value={customServiceName} onChange={e => setCustomServiceName(e.target.value)} />
-                              <input className="w-24 p-2 rounded-lg border text-sm" type="number" placeholder={t('price_placeholder')} value={customServicePrice} onChange={e => setCustomServicePrice(e.target.value)} />
-                              <button onClick={() => {
-                                if (!customServiceName || !customServicePrice) return;
-                                setInvoiceItems([...invoiceItems, { id: Date.now().toString(), description: customServiceName, price: Number(customServicePrice) }]);
-                                setCustomServiceName(''); setCustomServicePrice('');
-                              }} className="bg-emerald-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-emerald-700">Add</button>
-                            </div>
-                          )}
-                          
-                          {invoiceItems.length > 0 ? (
-                            <div className="space-y-2 bg-white p-3 rounded-lg border border-gray-100">
-                              {invoiceItems.map(item => (
-                                <div key={item.id} className="flex justify-between items-center text-sm border-b border-gray-50 last:border-0 pb-1 last:pb-0">
-                                  <span className="font-medium text-slate-700">{item.description}</span>
-                                  <div className="flex items-center gap-4">
-                                    <span className="font-bold text-emerald-600">{item.price} {t('currency_jod')}</span>
-                                    <button onClick={() => removeService(item.id)} className="text-slate-300 hover:text-red-500"><i className="fa-solid fa-xmark"></i></button>
-                                  </div>
-                                </div>
-                              ))}
-                              <div className="flex justify-between items-center pt-2 mt-2 border-t border-gray-100 font-bold text-slate-800">
-                                <span>{t('total_estimated')}</span>
-                                <span>{invoiceItems.reduce((acc, i) => acc + i.price, 0)} {t('currency_jod')}</span>
-                              </div>
-                            </div>
-                          ) : <div className="text-xs text-slate-400 italic text-center py-2">{t('no_services_added')}</div>}
                         </div>
                       </div>
                     )}

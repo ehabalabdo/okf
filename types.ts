@@ -38,7 +38,9 @@ export enum UserRole {
   ADMIN = 'admin',
   SECRETARY = 'secretary',
   DOCTOR = 'doctor',
-  TECHNICIAN = 'technician'
+  TECHNICIAN = 'technician',
+  ACCOUNTANT = 'accountant',
+  SENIOR_ACCOUNTANT = 'senior_accountant'
 }
 
 // Base Entity for Audit Trails

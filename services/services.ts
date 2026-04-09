@@ -380,16 +380,12 @@ export const PatientService = {
          willResetTo: ''
        });
        
-       // Create invoice first
-       const billableItems = doctorData?.invoiceItems || [];
-       if (billableItems.length === 0) {
-           billableItems.push({ id: generateId('item'), description: 'Medical Consultation', price: 50 });
-       }
+       // Create invoice with empty items — secretary will enter price manually
        await BillingService.create(user, {
            visitId: patient.currentVisit.visitId,
            patientId: patient.id,
            patientName: patient.name,
-           items: billableItems
+           items: []
        });
        
        // Move current visit to history and reset currentVisit in ONE update
