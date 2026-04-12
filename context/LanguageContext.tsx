@@ -23,7 +23,7 @@ const translations = {
     
     // Layout
     system_name: "TKC",
-    system_sub: "Multi-Clinic System",
+    system_sub: "ENT Clinic System",
     current_view: "Current View",
     patients_registry: "Patients Registry",
     appointments_nav: "Appointments",
@@ -1502,8 +1502,8 @@ const translations = {
     dev_tip_msg: "استخدم زر الصاعقة للتبديل السريع بين الأدوار.",
 
     // Layout
-    system_name: "ميد لوب",
-    system_sub: "نظام إدارة العيادات",
+    system_name: "TKC",
+    system_sub: "عيادة أنف وأذن وحنجرة",
     current_view: "الواجهة الحالية",
     patients_registry: "سجل المرضى",
     appointments_nav: "المواعيد",
