@@ -4,7 +4,7 @@
 
 
 
-const BASE_URL = import.meta.env?.VITE_API_URL || "https://okb-zg96.onrender.com";
+const BASE_URL = import.meta.env?.VITE_API_URL || "https://tkc-api.tkc-clinic.workers.dev";
 
 async function request(method, path, body) {
   const token = localStorage.getItem("token");
