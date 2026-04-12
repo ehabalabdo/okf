@@ -3,12 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { ClinicService, AuthService, BillingService, SettingsService } from '../services/services';
-import { pgUsers, pgClientsService } from '../services/apiServices';
+import { pgUsers } from '../services/apiServices';
 import { api } from '../src/api';
-import { Clinic, User, UserRole, Invoice, SystemSettings, ClinicCategory, ClientFeatures } from '../types';
+import { Clinic, User, UserRole, Invoice, SystemSettings, ClinicCategory } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { useClientSafe } from '../context/ClientContext';
 
 interface AdminViewProps {
     user?: User;
@@ -17,9 +16,6 @@ interface AdminViewProps {
 const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
     const { t, language } = useLanguage();
     const { user: authUser, simulateLogin } = useAuth();
-    const clientCtx = useClientSafe();
-    const client = clientCtx?.client || null;
-    const refreshClient = clientCtx?.refreshClient || (async () => {});
     const navigate = useNavigate();
     // Prefer propUser if provided, otherwise fallback to context
     const currentUser = propUser || authUser;
@@ -472,47 +468,6 @@ const AdminView: React.FC<AdminViewProps> = ({ user: propUser }) => {
               </form>
           </div>
 
-          {/* Feature Toggles Section */}
-          <div className="bg-white rounded-[2rem] shadow-soft p-8 max-w-2xl mt-6 animate-fade-in-down">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                  <i className="fa-solid fa-toggle-on text-primary"></i> {t('sections_features')}
-              </h2>
-              <p className="text-slate-400 text-sm mb-6">{t('sections_features_desc')}</p>
-              {[
-                { key: 'device_results' as keyof ClientFeatures, label: t('device_results_label'), icon: 'fa-solid fa-microscope', desc: t('device_results_desc') }
-              ].map(feature => {
-                const features = client?.enabledFeatures || { device_results: false };
-                const isOn = features[feature.key];
-                return (
-                  <div key={feature.key} className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isOn ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-400'}`}>
-                        <i className={feature.icon}></i>
-                      </div>
-                      <div>
-                        <p className={`font-bold text-sm ${isOn ? 'text-slate-800' : 'text-slate-400'}`}>{feature.label}</p>
-                        <p className="text-xs text-slate-400">{feature.desc}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        if (!client) return;
-                        const updated = { ...features, [feature.key]: !isOn };
-                        try {
-                          await pgClientsService.updateFeatures(client.id, updated);
-                          await refreshClient();
-                        } catch (err: any) {
-                          alert(t('error_prefix') + err.message);
-                        }
-                      }}
-                      className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${isOn ? 'bg-primary' : 'bg-slate-200'}`}
-                    >
-                      <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${isOn ? 'right-0.5' : 'left-0.5'}`}></div>
-                    </button>
-                  </div>
-                );
-              })}
-          </div>
           </>
       ) : (
         <>

@@ -1,31 +1,9 @@
-
+﻿
 import { Clinic, Patient, User, UserRole, AuditMetadata, VisitData, Appointment, Invoice, Notification, PrescriptionItem, Attachment, SystemSettings, ClinicCategory } from '../types';
-import { mockDb } from './mockFirebase';
 import { pgUsers, pgClinics, pgPatients, pgAppointments, pgInvoices } from './apiServices';
-
-// Check if we should use PostgreSQL (production) or mockDb (development)
-// ✅ ENABLED: Database schema fixed + Neon-compatible queries
-const USE_POSTGRES = true;
-
-/**
- * PRODUCTION READINESS:
- * Services act as gatekeepers. IDs are now generated using high-entropy randoms.
- */
 
 // --- Helpers ---
 const generateId = (prefix: string) => `${prefix}_${Math.random().toString(36).substr(2, 9)}_${Date.now().toString(36)}`;
-
-const createMeta = (user: User | null, existing?: AuditMetadata): AuditMetadata => {
-  const now = Date.now();
-  const uid = user?.uid || 'system';
-  return {
-    createdAt: existing?.createdAt || now,
-    createdBy: existing?.createdBy || uid,
-    updatedAt: now,
-    updatedBy: uid,
-    isArchived: existing?.isArchived || false
-  };
-};
 
 const DEFAULT_SETTINGS: SystemSettings = {
   clinicName: 'TKC',
@@ -40,347 +18,154 @@ export const AuthService = {
   
   createUser: async (admin: User, data: Pick<User, 'name'|'email'|'password'|'role'|'clinicIds'>): Promise<void> => {
     if (admin.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-    
-    if (USE_POSTGRES) {
-      await pgUsers.create({
-        ...data,
-        password: data.password || 'password123',
-        isActive: true,
-        isArchived: false
-      });
-    } else {
-      const newUser: User = {
-        uid: generateId('user'),
-        ...data,
-        password: data.password || 'password123',
-        isActive: true,
-        ...createMeta(admin)
-      };
-      mockDb.saveUser(newUser);
-    }
+    await pgUsers.create({
+      ...data,
+      password: data.password || 'password123',
+      isActive: true,
+      isArchived: false
+    });
   },
 
   updateUser: async (admin: User, userId: string, data: Partial<User>): Promise<void> => {
     if (admin.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-    
-    if (USE_POSTGRES) {
-      // Remove password from update if it's empty (keep existing password)
-      const updateData = { ...data };
-      if (!updateData.password) {
-        delete updateData.password;
-      }
-      await pgUsers.update(userId, updateData);
-    } else {
-      const allUsers = mockDb.getAllUsers();
-      const user = allUsers.find(u => u.uid === userId);
-      if (!user) throw new Error("User not found");
-      const updated = { ...user, ...data, ...createMeta(admin, user) };
-      mockDb.update('users', userId, updated);
+    const updateData = { ...data };
+    if (!updateData.password) {
+      delete updateData.password;
     }
+    await pgUsers.update(userId, updateData);
   },
 
   deleteUser: async (admin: User, userId: string): Promise<void> => {
     if (admin.role !== UserRole.ADMIN) throw new Error("Unauthorized");
     if (admin.uid === userId) throw new Error("Cannot delete your own account");
-    
-    if (USE_POSTGRES) {
-      await pgUsers.delete(userId);
-    } else {
-      await mockDb.deleteDocument('users', userId);
-    }
+    await pgUsers.delete(userId);
   }
 };
 
 export const ClinicService = {
 
   getActive: async (): Promise<Clinic[]> => {
-    if (USE_POSTGRES) {
-      return await pgClinics.getAll();
-    } else {
-      const all = mockDb.getCollection<Clinic>('clinics');
-      return all.filter(c => c.active && !c.isArchived);
-    }
+    return await pgClinics.getAll();
   },
 
   add: async (user: User, name: string, type: string, category: ClinicCategory): Promise<void> => {
     if (user.role !== UserRole.ADMIN) throw new Error("Unauthorized: Admins only");
-    
-    if (USE_POSTGRES) {
-      await pgClinics.create({
-        name,
-        type,
-        category,
-        active: true,
-        isArchived: false
-      });
-    } else {
-      const newClinic: Clinic = {
-        id: generateId(category === 'clinic' ? 'c' : 'dept'),
-        name, 
-        type, 
-        category,
-        active: true, 
-        ...createMeta(user)
-      };
-      mockDb.add('clinics', newClinic);
-    }
+    await pgClinics.create({
+      name,
+      type,
+      category,
+      active: true,
+      isArchived: false
+    });
   },
 
   toggleStatus: async (user: User, clinicId: string, status: boolean): Promise<void> => {
     if (user.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-    
-    if (USE_POSTGRES) {
-      await pgClinics.toggleStatus(clinicId, status);
-    } else {
-      const clinics = mockDb.getCollection<Clinic>('clinics');
-      const clinic = clinics.find(c => c.id === clinicId);
-      if (!clinic) throw new Error("Clinic not found");
-      const updated = { ...clinic, active: status, ...createMeta(user, clinic) };
-      mockDb.update('clinics', clinicId, updated);
-    }
+    await pgClinics.toggleStatus(clinicId, status);
   },
   
   delete: async (user: User, clinicId: string): Promise<void> => {
     if (user.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-    
-    if (USE_POSTGRES) {
-      await pgClinics.delete(clinicId);
-    } else {
-      await mockDb.deleteDocument('clinics', clinicId);
-    }
+    await pgClinics.delete(clinicId);
   }
 };
 
 export const PatientService = {
   subscribe: (user: User, callback: (patients: Patient[]) => void): (() => void) => {
-    if (USE_POSTGRES) {
-      // Use PostgreSQL with polling for real-time updates
-      return pgPatients.subscribe((allPatients) => {
-        console.log('[PatientService.subscribe] BEFORE FILTER - All patients from DB:', allPatients.map(p => ({
-          id: p.id,
-          name: p.name,
-          visitId: p.currentVisit?.visitId,
-          visitIdIsEmpty: p.currentVisit?.visitId === '',
-          visitIdLength: p.currentVisit?.visitId?.length,
-          clinicId: p.currentVisit?.clinicId
-        })));
-        
-        // Filter: only active patients with current visit (visitId must be non-empty string)
-        let filtered = allPatients.filter(p => {
-          const shouldShow = !p.isArchived && 
-                 p.currentVisit && 
-                 p.currentVisit.visitId && 
-                 p.currentVisit.visitId.trim() !== '';
-          
-          if (!shouldShow) {
-            console.log('[PatientService.subscribe] FILTERING OUT patient:', {
-              id: p.id,
-              name: p.name,
-              isArchived: p.isArchived,
-              hasCurrentVisit: !!p.currentVisit,
-              visitId: p.currentVisit?.visitId,
-              visitIdTrimmed: p.currentVisit?.visitId?.trim(),
-              reason: !p.currentVisit ? 'no currentVisit' : 
-                      !p.currentVisit.visitId ? 'no visitId' :
-                      p.currentVisit.visitId.trim() === '' ? 'empty visitId' : 'unknown'
-            });
-          }
-          
-          return shouldShow;
-        });
-        
-        console.log('[PatientService.subscribe] AFTER FILTER - Filtered count:', filtered.length);
-        
-        // Filter for Doctors: Only see patients in their clinics
-        if (user.role === UserRole.DOCTOR) {
-          if (!user.clinicIds || user.clinicIds.length === 0) {
-            console.warn('[PatientService.subscribe] Doctor has no clinicIds:', user.name);
-            callback([]); return;
-          }
-          filtered = filtered.filter(p => {
-            const hasClinic = p.currentVisit && p.currentVisit.clinicId;
-            return hasClinic && user.clinicIds.includes(p.currentVisit.clinicId);
-          });
-        }
-        callback(filtered.sort((a, b) => {
-          if (a.currentVisit.priority === 'urgent' && b.currentVisit.priority !== 'urgent') return -1;
-          if (a.currentVisit.priority !== 'urgent' && b.currentVisit.priority === 'urgent') return 1;
-          return a.currentVisit.date - b.currentVisit.date;
-        }));
-      });
-    } else {
-      // Use mockDb.subscribeToPatients for real-time updates
-      return mockDb.subscribeToPatients((allPatients) => {
-        // Filter: only active patients with VALID visitId (not empty string)
-        let filtered = allPatients.filter(p => {
-          return !p.isArchived && 
-                 p.currentVisit && 
-                 p.currentVisit.visitId && 
-                 p.currentVisit.visitId.trim() !== '';
-        });
-      
-        // Filter for Doctors: Only see patients in their clinics
-        if (user.role === UserRole.DOCTOR) {
-          if (!user.clinicIds || user.clinicIds.length === 0) {
-            callback([]); return;
-          }
-          filtered = filtered.filter(p => user.clinicIds.includes(p.currentVisit.clinicId));
-        }
-        callback(filtered.sort((a, b) => {
-          if (a.currentVisit.priority === 'urgent' && b.currentVisit.priority !== 'urgent') return -1;
-          if (a.currentVisit.priority !== 'urgent' && b.currentVisit.priority === 'urgent') return 1;
-          return a.currentVisit.date - b.currentVisit.date;
-        }));
-      });
-    }
-  },
-
-  getAll: async (user: User): Promise<Patient[]> => {
-    if (USE_POSTGRES) {
-      const allPatients = await pgPatients.getAll();
-      // Filter: only active patients with VALID visitId (not empty string)
-      const activePatients = allPatients.filter(p => {
+    return pgPatients.subscribe((allPatients) => {
+      // Filter: only active patients with current visit (visitId must be non-empty string)
+      let filtered = allPatients.filter(p => {
         return !p.isArchived && 
                p.currentVisit && 
                p.currentVisit.visitId && 
                p.currentVisit.visitId.trim() !== '';
       });
+      
+      // Filter for Doctors: Only see patients in their clinics
       if (user.role === UserRole.DOCTOR) {
         if (!user.clinicIds || user.clinicIds.length === 0) {
-          console.warn('[PatientService.getAll] Doctor has no clinicIds:', user.name);
-          return [];
+          callback([]); return;
         }
-        return activePatients.filter(p => {
+        filtered = filtered.filter(p => {
           const hasClinic = p.currentVisit && p.currentVisit.clinicId;
           return hasClinic && user.clinicIds.includes(p.currentVisit.clinicId);
         });
       }
-      return activePatients;
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      // Filter: only active patients with VALID visitId (not empty string)
-      const activePatients = allPatients.filter(p => {
-        return !p.isArchived && 
-               p.currentVisit && 
-               p.currentVisit.visitId && 
-               p.currentVisit.visitId.trim() !== '';
-      });
-      if (user.role === UserRole.DOCTOR) {
-        if (!user.clinicIds || user.clinicIds.length === 0) return [];
-        return activePatients.filter(p => user.clinicIds.includes(p.currentVisit.clinicId));
-      }
-      return activePatients;
-    }
+      callback(filtered.sort((a, b) => {
+        if (a.currentVisit.priority === 'urgent' && b.currentVisit.priority !== 'urgent') return -1;
+        if (a.currentVisit.priority !== 'urgent' && b.currentVisit.priority === 'urgent') return 1;
+        return a.currentVisit.date - b.currentVisit.date;
+      }));
+    });
   },
 
-  // Get ALL patients for Registry view (including those without active visits)
-  getAllForRegistry: async (user: User): Promise<Patient[]> => {
-    if (USE_POSTGRES) {
-      const allPatients = await pgPatients.getAll();
-      // Only filter out archived patients, keep all others including completed ones
-      return allPatients.filter(p => !p.isArchived);
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      return allPatients.filter(p => !p.isArchived);
+  getAll: async (user: User): Promise<Patient[]> => {
+    const allPatients = await pgPatients.getAll();
+    const activePatients = allPatients.filter(p => {
+      return !p.isArchived && 
+             p.currentVisit && 
+             p.currentVisit.visitId && 
+             p.currentVisit.visitId.trim() !== '';
+    });
+    if (user.role === UserRole.DOCTOR) {
+      if (!user.clinicIds || user.clinicIds.length === 0) {
+        return [];
+      }
+      return activePatients.filter(p => {
+        const hasClinic = p.currentVisit && p.currentVisit.clinicId;
+        return hasClinic && user.clinicIds.includes(p.currentVisit.clinicId);
+      });
     }
+    return activePatients;
+  },
+
+  getAllForRegistry: async (user: User): Promise<Patient[]> => {
+    const allPatients = await pgPatients.getAll();
+    return allPatients.filter(p => !p.isArchived);
   },
 
   getById: async (user: User, id: string): Promise<Patient | null> => {
-    if (USE_POSTGRES) {
-      const allPatients = await pgPatients.getAll();
-      const patient = allPatients.find(p => p.id === id);
-      if (!patient || patient.isArchived) return null;
-      return patient;
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      const patient = allPatients.find(p => p.id === id);
-      if (!patient || patient.isArchived) return null;
-      return patient;
-    }
+    const allPatients = await pgPatients.getAll();
+    const patient = allPatients.find(p => p.id === id);
+    if (!patient || patient.isArchived) return null;
+    return patient;
   },
 
   add: async (user: User, data: Pick<Patient, 'name'|'dateOfBirth'|'phone'|'gender'|'medicalProfile'|'currentVisit'|'username'|'password'> & Partial<Pick<Patient, 'age'|'email'>>): Promise<string> => {
     const age = data.age ?? (data.dateOfBirth ? Math.floor((Date.now() - new Date(data.dateOfBirth).getTime()) / 31557600000) : 0);
     const fullData = { ...data, age };
-    if (USE_POSTGRES) {
-      const patientId = await pgPatients.create({
-        ...fullData,
-        hasAccess: true, // ✅ Always enable access for all patients
-        currentVisit: { ...data.currentVisit, visitId: generateId('v') },
-        history: [],
-        isArchived: false
-      });
-      return patientId;
-    } else {
-      const patientId = generateId('p');
-      const newPatient: Patient = {
-        id: patientId,
-        ...fullData,
-        hasAccess: true, // ✅ Always enable access for all patients
-        currentVisit: { ...data.currentVisit, visitId: generateId('v') },
-        history: [],
-        ...createMeta(user)
-      };
-      await mockDb.writeDocument('patients', newPatient);
-      return patientId;
-    }
+    const patientId = await pgPatients.create({
+      ...fullData,
+      hasAccess: true,
+      currentVisit: { ...data.currentVisit, visitId: generateId('v') },
+      history: [],
+      isArchived: false
+    });
+    return patientId;
   },
 
   update: async (user: User, patientId: string, data: Partial<Pick<Patient, 'name'|'age'|'dateOfBirth'|'phone'|'gender'|'username'|'email'|'password'|'hasAccess'>>): Promise<void> => {
-    if (USE_POSTGRES) {
-      // Remove password from update if it's empty (keep existing password)
-      const updateData = { ...data };
-      if (!updateData.password) {
-        delete updateData.password;
-      }
-      await pgPatients.update(patientId, updateData);
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      const patient = allPatients.find(p => p.id === patientId);
-      if (!patient) throw new Error("Patient not found");
-      const updated = { ...patient, ...data, ...createMeta(user, patient) };
-      await mockDb.writeDocument('patients', updated);
+    const updateData = { ...data };
+    if (!updateData.password) {
+      delete updateData.password;
     }
+    await pgPatients.update(patientId, updateData);
   },
 
   updateMedicalProfile: async (user: User, patientId: string, medicalProfile: Patient['medicalProfile']): Promise<void> => {
-    if (USE_POSTGRES) {
-      await pgPatients.update(patientId, { medicalProfile });
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      const patient = allPatients.find(p => p.id === patientId);
-      if (!patient) throw new Error("Patient not found");
-      const updated = { ...patient, medicalProfile, ...createMeta(user, patient) };
-      await mockDb.writeDocument('patients', updated);
-    }
+    await pgPatients.update(patientId, { medicalProfile });
   },
 
   updateVisitData: async (user: User, patient: Patient, data: Partial<VisitData>) => {
-    const updated: Patient = { 
-        ...patient,
-        currentVisit: { ...patient.currentVisit, ...data },
-        ...createMeta(user, patient) 
-    };
-    
-    if (USE_POSTGRES) {
-      await pgPatients.update(patient.id, { currentVisit: updated.currentVisit });
-    } else {
-      await mockDb.writeDocument('patients', updated);
-    }
+    const updatedVisit = { ...patient.currentVisit, ...data };
+    await pgPatients.update(patient.id, { currentVisit: updatedVisit });
   },
 
   updateStatus: async (user: User, patient: Patient, status: VisitData['status'], doctorData?: Partial<VisitData>) => {
     const updatedVisit = { ...patient.currentVisit, status, ...(doctorData || {}) };
     
     if (status === 'completed') {
-       console.log('[PatientService.updateStatus] COMPLETING patient:', {
-         patientId: patient.id,
-         patientName: patient.name,
-         currentVisitId: patient.currentVisit.visitId,
-         willResetTo: ''
-       });
-       
-       // Create invoice with empty items — secretary will enter price manually
+       // Create invoice with empty items â€” secretary will enter price manually
        await BillingService.create(user, {
            visitId: patient.currentVisit.visitId,
            patientId: patient.id,
@@ -400,76 +185,28 @@ export const PatientService = {
          source: 'walk-in' as const
        };
        
-       console.log('[PatientService.updateStatus] About to save to DB:', {
-         patientId: patient.id,
-         resetVisit: resetVisit,
-         resetVisitStringified: JSON.stringify(resetVisit)
+       await pgPatients.update(patient.id, { 
+         history: newHistory,
+         currentVisit: resetVisit
        });
-       
-       if (USE_POSTGRES) {
-         await pgPatients.update(patient.id, { 
-           history: newHistory,
-           currentVisit: resetVisit
-         });
-         
-         console.log('[PatientService.updateStatus] ✅ COMPLETED - UPDATE successful in PostgreSQL');
-       } else {
-         const updated: Patient = { 
-           ...patient,
-           history: newHistory,
-           currentVisit: resetVisit,
-           ...createMeta(user, patient) 
-         };
-         await mockDb.writeDocument('patients', updated);
-       }
     } else {
-      // For non-completed status, just update currentVisit
-      console.log('[PatientService.updateStatus] Updating status to:', status, 'for patient:', patient.id);
-      
-      if (USE_POSTGRES) {
-        await pgPatients.update(patient.id, { currentVisit: updatedVisit });
-        console.log('[PatientService.updateStatus] ✅ Status UPDATE successful in PostgreSQL');
-      } else {
-        const updated: Patient = { 
-          ...patient,
-          currentVisit: updatedVisit,
-          ...createMeta(user, patient) 
-        };
-        await mockDb.writeDocument('patients', updated);
-      }
+      await pgPatients.update(patient.id, { currentVisit: updatedVisit });
     }
   },
 
   archive: async (user: User, patientId: string) => {
     if (user.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-    
-    if (USE_POSTGRES) {
-      await pgPatients.update(patientId, { isArchived: true });
-    } else {
-      const allPatients = mockDb.getCollection<Patient>('patients');
-      const patient = allPatients.find(p => p.id === patientId);
-      if (!patient) throw new Error("Patient not found");
-      const updated = { ...patient, isArchived: true, ...createMeta(user, patient) };
-      await mockDb.writeDocument('patients', updated);
-    }
+    await pgPatients.update(patientId, { isArchived: true });
   }
 };
 
 export const AppointmentService = {
     getAll: async (user: User): Promise<Appointment[]> => {
-        if (USE_POSTGRES) {
-            const allApps = await pgAppointments.getAll();
-            if (user.role === UserRole.DOCTOR) {
-                return allApps.filter(a => (a.doctorId === user.uid) || (!a.doctorId && user.clinicIds.includes(a.clinicId)));
-            }
-            return allApps;
-        } else {
-            const apps = mockDb.getCollection<Appointment>('appointments');
-            if (user.role === UserRole.DOCTOR) {
-                return apps.filter(a => (a.doctorId === user.uid) || (!a.doctorId && user.clinicIds.includes(a.clinicId)));
-            }
-            return apps;
-        }
+      const allApps = await pgAppointments.getAll();
+      if (user.role === UserRole.DOCTOR) {
+        return allApps.filter(a => (a.doctorId === user.uid) || (!a.doctorId && user.clinicIds.includes(a.clinicId)));
+      }
+      return allApps;
     },
 
     create: async (user: User, data: Pick<Appointment, 'patientId'|'patientName'|'clinicId'|'doctorId'|'date'|'reason'>) => {
@@ -477,77 +214,35 @@ export const AppointmentService = {
             id: generateId('app'),
             ...data,
             status: 'scheduled',
-            ...createMeta(user)
+            createdAt: Date.now(),
+            createdBy: user?.uid || 'system',
+            updatedAt: Date.now(),
+            updatedBy: user?.uid || 'system',
+            isArchived: false
         };
         
-        if (USE_POSTGRES) {
-          await pgAppointments.create(newApp);
-        } else {
-          await mockDb.writeDocument('appointments', newApp);
-        }
-        
-        await NotificationService.create(user, {
-            type: 'reminder',
-            title: 'Appointment Reminder',
-            message: `Call ${data.patientName} for tomorrow's appointment.`,
-            targetRole: UserRole.SECRETARY,
-            relatedPatientId: data.patientId,
-            dueDate: data.date - 86400000
-        });
+        await pgAppointments.create(newApp);
     },
 
     update: async (user: User, id: string, data: Partial<Pick<Appointment, 'clinicId'|'doctorId'|'date'|'reason'>>) => {
-        if (USE_POSTGRES) {
-          await pgAppointments.update(id, data);
-        } else {
-          const apps = mockDb.getCollection<Appointment>('appointments');
-          const app = apps.find(a => a.id === id);
-          if (!app) throw new Error("Appointment not found");
-          const updated = { ...app, ...data, ...createMeta(user, app) };
-          await mockDb.writeDocument('appointments', updated);
-        }
+      await pgAppointments.update(id, data);
     },
 
     updateStatus: async (user: User, id: string, status: Appointment['status']) => {
-        if (USE_POSTGRES) {
-          await pgAppointments.update(id, { status });
-        } else {
-          const apps = mockDb.getCollection<Appointment>('appointments');
-          const app = apps.find(a => a.id === id);
-          if (!app) throw new Error("Appointment not found");
-          const updated = { ...app, status, ...createMeta(user, app) };
-          await mockDb.writeDocument('appointments', updated);
-        }
+      await pgAppointments.update(id, { status });
     },
     
     delete: async (user: User, id: string) => {
-        if (USE_POSTGRES) {
-          await pgAppointments.delete(id);
-        } else {
-          await mockDb.deleteDocument('appointments', id);
-        }
+      await pgAppointments.delete(id);
     },
 
     checkIn: async (user: User, appointmentId: string) => {
-        let app: Appointment | undefined;
-        let patient: Patient | null;
-
-        if (USE_POSTGRES) {
-          const allApps = await pgAppointments.getAll();
-          app = allApps.find(a => a.id === appointmentId);
-          if (!app) throw new Error("Appointment not found");
-          
-          patient = await PatientService.getById(user, app.patientId);
-          if (!patient) throw new Error("Patient not found in database");
-        } else {
-          const apps = mockDb.getCollection<Appointment>('appointments');
-          app = apps.find(a => a.id === appointmentId);
-          if (!app) throw new Error("Appointment not found");
-
-          const patients = mockDb.getCollection<Patient>('patients');
-          patient = patients.find(p => p.id === app.patientId) || null;
-          if (!patient) throw new Error("Patient not found in database");
-        }
+        const allApps = await pgAppointments.getAll();
+        const app = allApps.find(a => a.id === appointmentId);
+        if (!app) throw new Error("Appointment not found");
+        
+        const patient = await PatientService.getById(user, app.patientId);
+        if (!patient) throw new Error("Patient not found in database");
 
         const oldHistory = Array.isArray(patient.history) ? patient.history : [];
         const historyToAdd = patient.currentVisit ? [{ ...patient.currentVisit, status: 'completed' as const }] : [];
@@ -563,33 +258,17 @@ export const AppointmentService = {
             reasonForVisit: app.reason || 'Appointment'
         };
 
-        if (USE_POSTGRES) {
-          await pgAppointments.update(appointmentId, { status: 'checked-in' });
-          await pgPatients.update(patient.id, {
-            history: [...oldHistory, ...historyToAdd],
-            currentVisit: newCurrentVisit
-          });
-        } else {
-          const updatedApp = { ...app, status: 'checked-in' as const, ...createMeta(user, app) };
-          const updatedPatient: Patient = {
-              ...patient,
-              history: [...oldHistory, ...historyToAdd],
-              currentVisit: newCurrentVisit,
-              ...createMeta(user, patient)
-          };
-          await mockDb.writeDocument('appointments', updatedApp);
-          await mockDb.writeDocument('patients', updatedPatient);
-        }
+        await pgAppointments.update(appointmentId, { status: 'checked-in' });
+        await pgPatients.update(patient.id, {
+          history: [...oldHistory, ...historyToAdd],
+          currentVisit: newCurrentVisit
+        });
     }
 };
 
 export const BillingService = {
     getAll: async (user: User): Promise<Invoice[]> => {
-        if (USE_POSTGRES) {
-            return await pgInvoices.getAll();
-        }
-        const invoices = mockDb.getCollection<Invoice>('invoices');
-        return invoices.sort((a,b) => b.createdAt - a.createdAt);
+      return await pgInvoices.getAll();
     },
 
     create: async (user: User, data: Pick<Invoice, 'visitId'|'patientId'|'patientName'|'items'>) => {
@@ -601,121 +280,64 @@ export const BillingService = {
             paidAmount: 0,
             status: 'unpaid',
             paymentMethod: 'cash',
-            ...createMeta(user)
+            createdAt: Date.now(),
+            createdBy: user?.uid || 'system',
+            updatedAt: Date.now(),
+            updatedBy: user?.uid || 'system',
+            isArchived: false
         };
-        
-        if (USE_POSTGRES) {
-            await pgInvoices.create(newInvoice);
-        } else {
-            await mockDb.writeDocument('invoices', newInvoice);
-        }
+        await pgInvoices.create(newInvoice);
     },
 
     update: async (user: User, id: string, data: Partial<Invoice>) => {
-        if (USE_POSTGRES) {
-            await pgInvoices.update(id, data);
-            return;
-        }
-        
-        const invoices = mockDb.getCollection<Invoice>('invoices');
-        const inv = invoices.find(i => i.id === id);
-        if (!inv) throw new Error("Invoice not found");
-        
-        let total = inv.totalAmount;
-        if (data.items) {
-            total = data.items.reduce((sum, item) => sum + item.price, 0);
-        }
-
-        const updated = { ...inv, ...data, totalAmount: total, ...createMeta(user, inv) };
-        await mockDb.writeDocument('invoices', updated);
+      await pgInvoices.update(id, data);
     },
     
     processPayment: async (user: User, id: string, amount: number, method: Invoice['paymentMethod'], insuranceData?: { insuranceCompany?: string; patientShare?: number; patientPayMethod?: 'cash' | 'card' }) => {
-        if (USE_POSTGRES) {
-            const invoices = await pgInvoices.getAll();
-            const inv = invoices.find(i => i.id === id);
-            if (!inv) throw new Error("Invoice not found");
-            
-            const newPaid = inv.paidAmount + amount;
-            const status = newPaid >= inv.totalAmount ? 'paid' : 'partial';
-            
-            await pgInvoices.update(id, {
-                paidAmount: newPaid,
-                status,
-                paymentMethod: method,
-                ...(insuranceData || {})
-            });
-            return;
-        }
-        
-        const invoices = mockDb.getCollection<Invoice>('invoices');
+        const invoices = await pgInvoices.getAll();
         const inv = invoices.find(i => i.id === id);
         if (!inv) throw new Error("Invoice not found");
         
         const newPaid = inv.paidAmount + amount;
         const status = newPaid >= inv.totalAmount ? 'paid' : 'partial';
         
-        const updated = { 
-            ...inv, 
-            paidAmount: newPaid, 
-            status, 
-            paymentMethod: method, 
-            ...(insuranceData || {}),
-            ...createMeta(user, inv) 
-        };
-        await mockDb.writeDocument('invoices', updated);
+        await pgInvoices.update(id, {
+            paidAmount: newPaid,
+            status,
+            paymentMethod: method,
+            ...(insuranceData || {})
+        });
     }
 };
 
 export const NotificationService = {
     getAll: async (user: User): Promise<Notification[]> => {
-        const all = mockDb.getCollection<Notification>('notifications');
-        return all.filter(n => !n.targetRole || n.targetRole === user.role).sort((a,b) => b.createdAt - a.createdAt);
+        // TODO: implement via API when backend notification endpoints are ready
+        return [];
     },
     
     getPendingReminders: async (user: User): Promise<Notification[]> => {
-        const all = mockDb.getCollection<Notification>('notifications');
-        const now = Date.now();
-        return all.filter(n => 
-            n.type === 'reminder' && 
-            !n.isRead && 
-            n.dueDate && n.dueDate <= now &&
-            (!n.targetRole || n.targetRole === user.role)
-        );
+        // TODO: implement via API when backend notification endpoints are ready
+        return [];
     },
 
     create: async (user: User, data: Pick<Notification, 'type'|'title'|'message'|'targetRole'|'relatedPatientId'|'dueDate'>) => {
-        const notif: Notification = {
-            id: generateId('notif'),
-            ...data,
-            isRead: false,
-            ...createMeta(user)
-        };
-        await mockDb.writeDocument('notifications', notif);
+        // TODO: implement via API when backend notification endpoints are ready
     },
 
     markAsRead: async (user: User, id: string) => {
-        const all = mockDb.getCollection<Notification>('notifications');
-        const notif = all.find(n => n.id === id);
-        if (notif) {
-            const updated = { ...notif, isRead: true, ...createMeta(user, notif) };
-            await mockDb.writeDocument('notifications', updated);
-        }
+        // TODO: implement via API when backend notification endpoints are ready
     }
 };
 
 export const SettingsService = {
     getSettings: async (): Promise<SystemSettings> => {
-        const arr = mockDb.getCollection<SystemSettings>('settings');
-        return arr.length > 0 ? arr[0] : DEFAULT_SETTINGS;
+        // TODO: implement via API when backend settings endpoints are ready
+        return DEFAULT_SETTINGS;
     },
     
     updateSettings: async (user: User, settings: SystemSettings): Promise<void> => {
         if (user.role !== UserRole.ADMIN) throw new Error("Unauthorized");
-        // Add an id to make it compatible with writeDocument
-        const settingsWithId = { ...settings, id: 'settings_default' };
-        await mockDb.writeDocument('settings', settingsWithId);
+        // TODO: implement via API when backend settings endpoints are ready
     }
 };
-
-

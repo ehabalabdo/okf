@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { hrAuthService } from '../services/hrApiServices';
-import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 
 const HrLoginView: React.FC = () => {
-  const { client } = useClient();
   const { language } = useLanguage();
   const isAr = language === 'ar';
   const navigate = useNavigate();
@@ -22,7 +20,7 @@ const HrLoginView: React.FC = () => {
     setError('');
 
     try {
-      const result = await hrAuthService.login(username, password, client?.id || 0);
+      const result = await hrAuthService.login(username, password);
       // Store token & HR employee data
       localStorage.setItem('token', result.token);
       localStorage.setItem('hrEmployee', JSON.stringify(result.employee));
@@ -48,7 +46,7 @@ const HrLoginView: React.FC = () => {
           <h1 className="text-2xl font-extrabold text-slate-800">
             {isAr ? 'بوابة الموظفين' : 'Employee Portal'}
           </h1>
-          {client && <p className="text-sm text-slate-400 mt-1">{client.name}</p>}
+          <p className="text-sm text-slate-400 mt-1">{isAr ? 'مركز د. طارق خريس' : 'Dr. Tarek Khrais Center'}</p>
         </div>
 
         {/* Login Card */}

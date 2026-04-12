@@ -1,130 +1,10 @@
 import { api } from '../src/api';
-import { User, Patient, Clinic, Appointment, ClinicCategory, Client, SuperAdmin } from '../types';
-import { getCurrentClientId } from '../context/ClientContext';
+import { User, Patient, Clinic, Appointment, ClinicCategory } from '../types';
 
 /**
- * API Services - Calls the backend API (medloop-api on Render)
- * Drop-in replacement for pgServices.ts
+ * API Services - Calls the backend API on Cloudflare Workers
  * All queries go through the authenticated backend; no direct DB access from browser.
  */
-
-// ==================== SUPER ADMIN ====================
-
-export const pgSuperAdmin = {
-  login: async (username: string, password: string): Promise<SuperAdmin | null> => {
-    try {
-      const result = await api.post('/auth/super-admin/login', { username, password });
-      if (!result || !result.admin) return null;
-      // Store the super-admin token
-      if (result.token) {
-        localStorage.setItem('token', result.token);
-      }
-      return { id: result.admin.id, username: result.admin.username, name: result.admin.name };
-    } catch {
-      return null;
-    }
-  }
-};
-
-// ==================== CLIENTS (SaaS) ====================
-
-function mapClientRow(row: any): Client {
-  return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    logoUrl: row.logoUrl || row.logo_url || '',
-    phone: row.phone || '',
-    email: row.email || '',
-    address: row.address || '',
-    status: row.status,
-    trialEndsAt: row.trialEndsAt || row.trial_ends_at,
-    subscriptionEndsAt: row.subscriptionEndsAt || row.subscription_ends_at,
-    ownerUserId: row.ownerUserId || row.owner_user_id,
-    createdAt: row.createdAt || row.created_at,
-    updatedAt: row.updatedAt || row.updated_at,
-    isActive: row.isActive !== undefined ? row.isActive : row.is_active,
-    enabledFeatures: row.enabledFeatures || row.enabled_features || { dental_lab: false, implant_company: false, academy: false }
-  };
-}
-
-export const pgClientsService = {
-  getAll: async (): Promise<Client[]> => {
-    const result = await api.get('/clients');
-    return (result || []).map(mapClientRow);
-  },
-
-  getBySlug: async (slug: string): Promise<Client | null> => {
-    try {
-      const result = await api.get(`/clients/by-slug/${encodeURIComponent(slug)}`);
-      if (!result) return null;
-      return mapClientRow(result);
-    } catch {
-      return null;
-    }
-  },
-
-  getById: async (id: number): Promise<Client | null> => {
-    try {
-      const result = await api.get(`/clients/${id}`);
-      if (!result) return null;
-      return mapClientRow(result);
-    } catch {
-      return null;
-    }
-  },
-
-  create: async (data: { name: string; slug: string; phone?: string; email?: string; address?: string; trialDays?: number }): Promise<number> => {
-    const result = await api.post('/clients', data);
-    return result.id || result;
-  },
-
-  createOwner: async (clientId: number, data: { name: string; email: string; password: string }): Promise<number> => {
-    const result = await api.post(`/clients/${clientId}/owner`, data);
-    return result.userId || result.id || result;
-  },
-
-  extendTrial: async (clientId: number, days: number): Promise<void> => {
-    await api.put(`/clients/${clientId}/extend-trial`, { days });
-  },
-
-  setTrialEndDate: async (clientId: number, endDate: string): Promise<void> => {
-    await api.put(`/clients/${clientId}/trial-end-date`, { endDate });
-  },
-
-  extendSubscription: async (clientId: number, days: number): Promise<void> => {
-    await api.put(`/clients/${clientId}/extend-subscription`, { days });
-  },
-
-  suspend: async (clientId: number): Promise<void> => {
-    await api.put(`/clients/${clientId}/suspend`, {});
-  },
-
-  activate: async (clientId: number): Promise<void> => {
-    await api.put(`/clients/${clientId}/activate`, {});
-  },
-
-  updateFeatures: async (clientId: number, features: Record<string, boolean>): Promise<void> => {
-    await api.put(`/clients/${clientId}/features`, { features });
-  },
-
-  delete: async (clientId: number): Promise<void> => {
-    await api.del(`/clients/${clientId}`);
-  },
-
-  update: async (clientId: number, data: Partial<Pick<Client, 'name' | 'phone' | 'email' | 'address' | 'logoUrl'>>): Promise<void> => {
-    await api.patch(`/clients/${clientId}`, data);
-  },
-
-  getStats: async (clientId: number) => {
-    const result = await api.get(`/clients/${clientId}/stats`);
-    return {
-      patientsCount: result?.patientsCount || result?.patients_count || 0,
-      usersCount: result?.usersCount || result?.users_count || 0,
-      appointmentsCount: result?.appointmentsCount || result?.appointments_count || 0
-    };
-  }
-};
 
 // ==================== USERS ====================
 
@@ -150,7 +30,6 @@ function mapUserRow(row: any): User {
     name: row.name || row.full_name,
     role: row.role,
     clinicIds,
-    clientId: row.clientId || row.client_id || undefined,
     isActive: row.isActive !== undefined ? row.isActive : (row.is_active !== false),
     createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
@@ -161,25 +40,9 @@ function mapUserRow(row: any): User {
 }
 
 export const pgUsers = {
-  getAll: async (clientId?: number): Promise<User[]> => {
+  getAll: async (): Promise<User[]> => {
     const result = await api.get('/users');
     return (result || []).map(mapUserRow);
-  },
-
-  findByLogin: async (identifier: string, password: string, clientId?: number): Promise<User | null> => {
-    try {
-      const cid = clientId || getCurrentClientId();
-      const result = await api.post('/auth/login', {
-        username: identifier,
-        password,
-        client_id: cid
-      });
-      if (!result || !result.user) return null;
-      if (result.token) localStorage.setItem('token', result.token);
-      return mapUserRow(result.user);
-    } catch {
-      return null;
-    }
   },
 
   create: async (user: Omit<User, 'uid' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>): Promise<string> => {
@@ -219,7 +82,6 @@ function mapClinicRow(row: any): Clinic {
     type: row.type || 'General',
     category: (row.category || 'clinic') as ClinicCategory,
     active: row.active !== false,
-    clientId: row.clientId || row.client_id || undefined,
     createdAt: Number(row.createdAt || row.created_at) || Date.now(),
     createdBy: row.createdBy || row.created_by || 'system',
     updatedAt: Number(row.updatedAt || row.updated_at) || Date.now(),
@@ -229,7 +91,7 @@ function mapClinicRow(row: any): Clinic {
 }
 
 export const pgClinics = {
-  getAll: async (clientId?: number): Promise<Clinic[]> => {
+  getAll: async (): Promise<Clinic[]> => {
     const result = await api.get('/clinics');
     return (result || []).map(mapClinicRow);
   },
@@ -329,26 +191,9 @@ function mapPatientRow(row: any): Patient {
 }
 
 export const pgPatients = {
-  getAll: async (clientId?: number): Promise<Patient[]> => {
+  getAll: async (): Promise<Patient[]> => {
     const result = await api.get('/patients');
     return (result || []).map(mapPatientRow);
-  },
-
-  findByLogin: async (identifier: string, password: string, clientId?: number): Promise<Patient | null> => {
-    try {
-      const cid = clientId || getCurrentClientId();
-      const result = await api.post('/auth/login', {
-        username: identifier,
-        password,
-        client_id: cid,
-        type: 'patient'
-      });
-      if (!result || !result.patient) return null;
-      if (result.token) localStorage.setItem('token', result.token);
-      return mapPatientRow(result.patient);
-    } catch {
-      return null;
-    }
   },
 
   getById: async (id: string): Promise<Patient | null> => {
@@ -452,7 +297,7 @@ function mapAppointmentRow(row: any): Appointment {
 }
 
 export const pgAppointments = {
-  getAll: async (clientId?: number): Promise<Appointment[]> => {
+  getAll: async (): Promise<Appointment[]> => {
     const result = await api.get('/appointments');
     return (result || []).map(mapAppointmentRow);
   },
@@ -511,7 +356,7 @@ function mapInvoiceRow(row: any): any {
 }
 
 export const pgInvoices = {
-  getAll: async (clientId?: number): Promise<any[]> => {
+  getAll: async (): Promise<any[]> => {
     const result = await api.get('/invoices');
     return (result || []).map(mapInvoiceRow);
   },

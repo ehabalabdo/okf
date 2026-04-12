@@ -1,36 +1,4 @@
-
-// =============================================
-// SaaS Client (المركز كزبون)
-// =============================================
-export type ClientStatus = 'trial' | 'active' | 'expired' | 'suspended';
-
-export interface ClientFeatures {
-}
-
-export interface Client {
-  id: number;
-  name: string;
-  slug: string;
-  logoUrl: string;
-  phone: string;
-  email: string;
-  address: string;
-  status: ClientStatus;
-  trialEndsAt: string | null;
-  subscriptionEndsAt: string | null;
-  ownerUserId: number | null;
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  enabledFeatures: ClientFeatures;
-}
-
-export interface SuperAdmin {
-  id: number;
-  username: string;
-  name: string;
-}
-
+﻿
 // =============================================
 // User Roles & Types
 // =============================================
@@ -61,7 +29,6 @@ export interface Clinic extends AuditMetadata {
   type: string;
   category: ClinicCategory;
   active: boolean;
-  clientId?: number;
 }
 
 export interface User extends AuditMetadata {
@@ -71,7 +38,6 @@ export interface User extends AuditMetadata {
   name: string;
   role: UserRole;
   clinicIds: string[];
-  clientId?: number; // SaaS: which client this user belongs to
   isActive: boolean;
 }
 
@@ -173,10 +139,10 @@ export interface VisitData {
   
   // === SOAP STRUCTURED SECTIONS ===
 
-  // 1️⃣ Chief Complaint
+  // 1ï¸âƒ£ Chief Complaint
   chiefComplaint?: string;
 
-  // 2️⃣ History
+  // 2ï¸âƒ£ History
   presentIllness?: string;
   pastMedicalHistory?: string;
   surgicalHistory?: string;
@@ -185,16 +151,16 @@ export interface VisitData {
   familyHistory?: string;
   socialHistory?: string;
 
-  // 3️⃣ Examination
+  // 3ï¸âƒ£ Examination
   generalExamination?: string;
   vitalSigns?: VitalSigns;
   systemicExamination?: string;
 
-  // 4️⃣ Assessment
+  // 4ï¸âƒ£ Assessment
   preliminaryDiagnosis?: string;
   differentialDiagnosis?: string;
 
-  // 5️⃣ Plan — Orders
+  // 5ï¸âƒ£ Plan â€” Orders
   labOrders?: LabOrder[];
   imagingOrders?: ImagingOrder[];
 
@@ -240,9 +206,6 @@ export interface Patient extends AuditMetadata {
   password?: string;
   hasAccess?: boolean;
   
-  // SaaS
-  clientId?: number;
-  
   // Medical Profile (Sticky data)
   medicalProfile: MedicalIntake;
   
@@ -269,7 +232,6 @@ export interface Appointment extends AuditMetadata {
   notes?: string;
   suggestedDate?: number;
   suggestedNotes?: string;
-  clientId?: number;
 }
 
 // --- NEW: Billing & Notifications ---
@@ -287,7 +249,6 @@ export interface Invoice extends AuditMetadata {
   patientShare?: number;
   patientPayMethod?: 'cash' | 'card';
   status: 'unpaid' | 'paid' | 'partial';
-  clientId?: number;
 }
 
 export interface Notification extends AuditMetadata {
@@ -327,7 +288,7 @@ export type PayrollRunStatus = 'draft' | 'closed';
 export type WarningLevel = 'verbal' | 'written' | 'final';
 
 export interface HrSchedule {
-  workDays: number[];       // 1=Mon … 7=Sun
+  workDays: number[];       // 1=Mon â€¦ 7=Sun
   startTime: string;        // "HH:MM"
   endTime: string;          // "HH:MM"
   graceMinutes: number;
@@ -336,7 +297,6 @@ export interface HrSchedule {
 
 export interface HrEmployee {
   id: number;
-  clientId: number;
   fullName: string;
   username: string;
   phone?: string;
@@ -435,7 +395,6 @@ export interface ClinicLocation {
 
 export interface HrSocialSecuritySettings {
   id: number;
-  clientId: number;
   employeeRatePercent: number;
   employerRatePercent: number;
   enabled: boolean;
@@ -443,7 +402,6 @@ export interface HrSocialSecuritySettings {
 
 export interface HrPayrollRun {
   id: number;
-  clientId: number;
   month: string;            // YYYY-MM-01
   status: PayrollRunStatus;
   createdBy?: number;
@@ -453,7 +411,6 @@ export interface HrPayrollRun {
 
 export interface HrPayslip {
   id: number;
-  clientId: number;
   payrollRunId: number;
   employeeId: number;
   employeeName?: string;
@@ -496,7 +453,6 @@ export interface HrPayslip {
 
 export interface HrDeduction {
   id: number;
-  clientId: number;
   employeeId: number;
   employeeName?: string;
   month: string;
@@ -509,7 +465,6 @@ export interface HrDeduction {
 
 export interface HrWarning {
   id: number;
-  clientId: number;
   employeeId: number;
   employeeName?: string;
   level: WarningLevel;
@@ -521,7 +476,6 @@ export interface HrWarning {
 
 export interface HrNotification {
   id: number;
-  clientId: number;
   employeeId: number;
   message: string;
   isRead: boolean;
@@ -566,7 +520,6 @@ export interface CatalogService {
   price: number;
   currency: string;
   active: boolean;
-  clientId: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -583,7 +536,6 @@ export interface CatalogMedication {
   defaultDuration: string;
   notes: string;
   active: boolean;
-  clientId: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -599,11 +551,10 @@ export interface ImportResult {
 // ENT Medical Forms (Dr. Tarek Khrais Clinic)
 // =============================================
 
-// --- Form 1: New Patient Questionnaire (استبيان مريض جديد) ---
+// --- Form 1: New Patient Questionnaire (Ø§Ø³ØªØ¨ÙŠØ§Ù† Ù…Ø±ÙŠØ¶ Ø¬Ø¯ÙŠØ¯) ---
 export interface ENTNewPatientForm {
   id?: string;
   patientId: string;
-  clientId?: number;
   createdAt?: number;
   
   // Chief Complaint
@@ -615,22 +566,22 @@ export interface ENTNewPatientForm {
   symptoms: {
     earPain: boolean;
     hearingLoss: boolean;
-    tinnitus: boolean; // طنين
+    tinnitus: boolean; // Ø·Ù†ÙŠÙ†
     earDischarge: boolean;
-    vertigo: boolean; // دوخة
-    nasalObstruction: boolean; // انسداد أنف
+    vertigo: boolean; // Ø¯ÙˆØ®Ø©
+    nasalObstruction: boolean; // Ø§Ù†Ø³Ø¯Ø§Ø¯ Ø£Ù†Ù
     nasalDischarge: boolean;
     sneezing: boolean;
     soreThroat: boolean;
-    voiceChange: boolean; // تغير صوت
-    dysphagia: boolean; // صعوبة بلع
+    voiceChange: boolean; // ØªØºÙŠØ± ØµÙˆØª
+    dysphagia: boolean; // ØµØ¹ÙˆØ¨Ø© Ø¨Ù„Ø¹
     snoring: boolean;
     sleepApnea: boolean;
     facialPain: boolean;
     headache: boolean;
-    nosebleeds: boolean; // رعاف
-    lossOfSmell: boolean; // فقدان شم
-    neckMass: boolean; // كتلة بالرقبة
+    nosebleeds: boolean; // Ø±Ø¹Ø§Ù
+    lossOfSmell: boolean; // ÙÙ‚Ø¯Ø§Ù† Ø´Ù…
+    neckMass: boolean; // ÙƒØªÙ„Ø© Ø¨Ø§Ù„Ø±Ù‚Ø¨Ø©
     other?: string;
   };
   
@@ -644,12 +595,11 @@ export interface ENTNewPatientForm {
   notes?: string;
 }
 
-// --- Form 2: Follow-up Questionnaire (استبيان مراجعة) ---
+// --- Form 2: Follow-up Questionnaire (Ø§Ø³ØªØ¨ÙŠØ§Ù† Ù…Ø±Ø§Ø¬Ø¹Ø©) ---
 export interface ENTFollowUpForm {
   id?: string;
   patientId: string;
   visitId?: string;
-  clientId?: number;
   createdAt?: number;
   
   // Follow-up Assessment
@@ -678,7 +628,7 @@ export interface ENTFollowUpForm {
   notes?: string;
 }
 
-// --- Form 3: Audiogram (فحص سمع) ---
+// --- Form 3: Audiogram (ÙØ­Øµ Ø³Ù…Ø¹) ---
 export interface AudiogramFrequencyData {
   hz250?: number;
   hz500?: number;
@@ -692,7 +642,6 @@ export interface AudiogramResult {
   id?: string;
   patientId: string;
   visitId?: string;
-  clientId?: number;
   createdAt?: number;
   testDate: number;
   
@@ -737,12 +686,11 @@ export interface AudiogramResult {
   notes?: string;
 }
 
-// --- Form 4: Balance Assessment / VNG (فحص توازن) ---
+// --- Form 4: Balance Assessment / VNG (ÙØ­Øµ ØªÙˆØ§Ø²Ù†) ---
 export interface BalanceAssessmentForm {
   id?: string;
   patientId: string;
   visitId?: string;
-  clientId?: number;
   createdAt?: number;
   testDate: number;
   
@@ -792,12 +740,11 @@ export interface BalanceAssessmentForm {
   notes?: string;
 }
 
-// --- Form 5: Referral Form (نموذج تحويل) ---
+// --- Form 5: Referral Form (Ù†Ù…ÙˆØ°Ø¬ ØªØ­ÙˆÙŠÙ„) ---
 export interface ReferralForm {
   id?: string;
   patientId: string;
   visitId?: string;
-  clientId?: number;
   createdAt?: number;
   
   // Referring Doctor

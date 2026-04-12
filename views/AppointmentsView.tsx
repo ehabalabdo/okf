@@ -5,14 +5,12 @@ import { ClinicService, PatientService, AppointmentService } from '../services/s
 import { pgUsers, pgAppointments } from '../services/apiServices';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useClient } from '../context/ClientContext';
 import { Appointment, Clinic, Patient, UserRole, User, Gender, Priority } from '../types';
 import { fmtDate } from '../utils/formatters';
 
 const AppointmentsView: React.FC = () => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
-  const { client } = useClient();
   
   // State
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -148,7 +146,7 @@ const AppointmentsView: React.FC = () => {
       if (cleanPhone.startsWith('06')) cleanPhone = '962' + cleanPhone.substring(1);
       
       const loginUrl = window.location.origin;
-      const clinicName = client?.name || t('the_clinic');
+      const clinicName = 'مركز د. طارق خريس';
       
       const message = [
         `${t('wa_hello')} ${name}`,

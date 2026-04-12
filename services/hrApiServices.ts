@@ -111,16 +111,14 @@ export const hrAuthService = {
   login: async (
     username: string,
     password: string,
-    clientId: number
   ): Promise<{
     token: string;
     type: string;
-    employee: { id: number; fullName: string; username: string; clientId: number };
+    employee: { id: number; fullName: string; username: string };
   }> => {
     return await api.post('/auth/hr-login', {
       username,
       password,
-      client_id: clientId,
     });
   },
 };

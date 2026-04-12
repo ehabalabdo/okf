@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useClientSafe } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { UserRole } from '../types';
@@ -16,8 +15,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, title, hideTitle, titleExtra }) => {
   const { user, logout } = useAuth();
-  const clientCtx = useClientSafe();
-  const features = clientCtx?.client?.enabledFeatures || {};
   const { language, toggleLanguage, t } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();

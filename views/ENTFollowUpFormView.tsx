@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ENTFollowUpForm, Patient } from '../types';
 import { api } from '../src/api';
@@ -9,7 +8,6 @@ import Layout from '../components/Layout';
 
 const ENTFollowUpFormView: React.FC = () => {
   const { user } = useAuth();
-  const { client } = useClient();
   const { t, language } = useLanguage();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -54,7 +52,6 @@ const ENTFollowUpFormView: React.FC = () => {
       await api.post('/ent-forms/follow-up', {
         ...form,
         patientId: selectedPatientId,
-        clientId: client?.id,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

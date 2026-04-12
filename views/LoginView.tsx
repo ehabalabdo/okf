@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
-import { useClientSafe } from '../context/ClientContext';
 import { hrAuthService } from '../services/hrApiServices';
 
 const LoginView: React.FC = () => {
@@ -13,8 +12,6 @@ const LoginView: React.FC = () => {
   const { t, toggleLanguage, language } = useLanguage();
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const clientCtx = useClientSafe();
-  const client = clientCtx?.client;
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,7 +25,7 @@ const LoginView: React.FC = () => {
     try {
       if (loginMode === 'hr') {
         // HR Employee Login
-        const result = await hrAuthService.login(identifier, password, client?.id || 0);
+        const result = await hrAuthService.login(identifier, password);
         localStorage.setItem('token', result.token);
         localStorage.setItem('hrEmployee', JSON.stringify(result.employee));
         localStorage.removeItem('user');
@@ -38,26 +35,18 @@ const LoginView: React.FC = () => {
       }
 
       await login(identifier, password);
-      // Login successful - redirect based on user type
-      // localStorage is already set synchronously by login() before it returns
-      const savedPatient = localStorage.getItem('patientUser');
-      
-      if (savedPatient) {
-        navigate('/patient/dashboard', { replace: true });
-      } else {
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-          try {
-            const parsed = JSON.parse(savedUser);
-            const role = parsed.role;
-            if (role === 'admin') navigate('/admin', { replace: true });
-            else if (role === 'secretary') navigate('/reception', { replace: true });
-            else if (role === 'doctor') navigate('/doctor', { replace: true });
-            else if (role === 'technician') navigate('/technician', { replace: true });
-            else navigate('/', { replace: true });
-          } catch {
-            navigate('/', { replace: true });
-          }
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          const role = parsed.role;
+          if (role === 'admin') navigate('/admin', { replace: true });
+          else if (role === 'secretary') navigate('/reception', { replace: true });
+          else if (role === 'doctor') navigate('/doctor', { replace: true });
+          else if (role === 'technician') navigate('/technician', { replace: true });
+          else navigate('/', { replace: true });
+        } catch {
+          navigate('/', { replace: true });
         }
       }
     } catch (err: any) {
@@ -101,10 +90,10 @@ const LoginView: React.FC = () => {
       <div className="relative z-10 w-full max-w-md mx-auto bg-slate-900/85 rounded-3xl shadow-2xl border border-slate-700 backdrop-blur-xl p-8 flex flex-col items-center">
         <div className="flex flex-col items-center mb-8 w-full text-center">
           <div className="logo-float">
-            <img src={client?.logoUrl || "/logo.png"} alt="TKC" className="h-24 w-24 object-contain drop-shadow-2xl" />
+            <img src="/logo.png" alt="TKC" className="h-24 w-24 object-contain drop-shadow-2xl" />
           </div>
           <h1 className="text-3xl font-extrabold text-white mb-2 tracking-wide drop-shadow-md leading-tight text-center">
-            {client?.name ? client.name.replace(' - أنف وأذن وحنجرة', '') : 'TKC'}
+            {'TKC'}
           </h1>
           <p className="text-slate-300 text-sm font-medium">{t('sign_in_subtitle')}</p>
         </div>

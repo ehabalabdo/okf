@@ -4,7 +4,6 @@ import Layout from '../components/Layout';
 import { ClinicService, PatientService, AppointmentService, NotificationService, BillingService } from '../services/services';
 import { api } from '../src/api';
 import { useAuth } from '../context/AuthContext';
-import { useClientSafe } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Clinic, Patient, Gender, Priority, Appointment, Notification, Invoice } from '../types';
 import { fmtDate, fmtDateTime } from '../utils/formatters';
@@ -14,7 +13,6 @@ interface ReceptionViewProps {
 }
 
 const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
-    const client = useClientSafe()?.client || null;
     const { user: authUser } = useAuth();
     const user = propUser || authUser;
     const { t, language } = useLanguage();
@@ -99,7 +97,6 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
       await api.post('/ent-forms/new-patient', {
         ...entForm,
         patientId: entPatientId,
-        clientId: client?.id,
       });
       resetEntForm();
       setShowENTForm(false);
@@ -334,10 +331,9 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
   const handlePrintInvoice = async () => {
       if (!selectedInvoice) return;
       
-      // Use client (clinic) data — each clinic gets their own name/logo/address
-      const clinicName = client?.name || t('rcpt_clinic_fallback');
-      const clinicLogo = client?.logoUrl || '';
-      const clinicAddress = client?.address || '';
+      const clinicName = t('rcpt_clinic_fallback');
+      const clinicLogo = '/logo.png';
+      const clinicAddress = '';
       const invoiceDate = fmtDate(selectedInvoice.createdAt);
       
       const itemsHtml = selectedInvoice.items.length > 0 ? selectedInvoice.items.map(item => `
@@ -734,7 +730,7 @@ const ReceptionView: React.FC<ReceptionViewProps> = ({ user: propUser }) => {
                      <div className="flex items-center gap-3 mb-6 justify-end">
                          <div className="flex flex-col text-right">
                              <span className="text-white font-bold text-sm md:text-base tracking-widest uppercase drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
-                                 {client?.name || 'TKC'}
+                                 {'TKC'}
                              </span>
                              <span className="text-amber-500/70 text-[10px] font-mono tracking-[0.3em] uppercase">
                                  Reception System // Active

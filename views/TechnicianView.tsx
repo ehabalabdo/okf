@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Patient, AudiogramFrequencyData } from '../types';
 import { api } from '../src/api';
@@ -17,7 +16,6 @@ type TestMode = 'audiogram' | 'balance';
 
 const TechnicianView: React.FC = () => {
   const { user } = useAuth();
-  const { client } = useClient();
   const { t } = useLanguage();
 
   // The hearingLevels array needs t() so must be inside the component
@@ -130,7 +128,7 @@ const TechnicianView: React.FC = () => {
     try {
       await api.post('/ent-forms/audiogram', {
         ...audioForm, testDate: Date.now(),
-        patientId: selectedPatient.id, clientId: client?.id,
+        patientId: selectedPatient.id,
       });
       setSaved(true);
       loadPatientHistory(selectedPatient.id);
@@ -146,7 +144,7 @@ const TechnicianView: React.FC = () => {
     try {
       await api.post('/ent-forms/balance-assessment', {
         ...balanceForm, testDate: Date.now(),
-        patientId: selectedPatient.id, clientId: client?.id,
+        patientId: selectedPatient.id,
       });
       setSaved(true);
       loadPatientHistory(selectedPatient.id);

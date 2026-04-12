@@ -1,13 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { BalanceAssessmentForm, Patient } from '../types';
 import { api } from '../src/api';
 import Layout from '../components/Layout';
 
 const BalanceAssessmentView: React.FC = () => {
-  const { client } = useClient();
   const { t, language } = useLanguage();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -64,7 +62,6 @@ const BalanceAssessmentView: React.FC = () => {
       await api.post('/ent-forms/balance-assessment', {
         ...form,
         patientId: selectedPatientId,
-        clientId: client?.id,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

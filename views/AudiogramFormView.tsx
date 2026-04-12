@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useClient } from '../context/ClientContext';
 import { useLanguage } from '../context/LanguageContext';
 import { AudiogramResult, AudiogramFrequencyData, Patient } from '../types';
 import { api } from '../src/api';
@@ -23,7 +22,6 @@ const hearingLevels = [
 const tympTypes = ['A', 'As', 'Ad', 'B', 'C'] as const;
 
 const AudiogramFormView: React.FC = () => {
-  const { client } = useClient();
   const { t, language } = useLanguage();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -70,7 +68,6 @@ const AudiogramFormView: React.FC = () => {
       await api.post('/ent-forms/audiogram', {
         ...form,
         patientId: selectedPatientId,
-        clientId: client?.id,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
